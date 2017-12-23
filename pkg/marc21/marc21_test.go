@@ -33,9 +33,9 @@ func TestMARC(t *testing.T) {
 	}
 	defer fi.Close()
 
-	rec, err := NextRecord(fi)
+	rec, err := ParseNextRecord(fi)
 	if err != nil {
-		t.Errorf("NextRecord() failed: %q", err)
+		t.Errorf("ParseNextRecord() failed: %q", err)
 	} else {
 		out := fmt.Sprint(rec)
 		if out == "" {
@@ -54,9 +54,9 @@ func TestMARC2XML(t *testing.T) {
 	}
 	defer fi.Close()
 
-	rec, err := NextRecord(fi)
+	rec, err := ParseNextRecord(fi)
 	if err != nil {
-		t.Errorf("NextRecord() failed: %q", err)
+		t.Errorf("ParseNextRecord() failed: %q", err)
 	}
 
 	var doc Collection
