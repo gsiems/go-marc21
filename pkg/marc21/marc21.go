@@ -103,9 +103,22 @@ type Subfield struct {
 	Text string `xml:",chardata"`
 }
 
-func NextRecord(r io.Reader) (rec *Record, err error) {
+func ParseNextRecord(r io.Reader) (rec *Record, err error) {
 
-	rec = new(Record)
+	rawRec, err := NextRecord(r)
+	if err != nil {
+		return nil, err
+	}
+
+	rec, err = ParseRecord(rawRec)
+	if err != nil {
+		return nil, err
+	}
+
+	return rec, nil
+}
+
+func NextRecord(r io.Reader) (rawRec []byte, err error) {
 
 	// Read the first 5 bytes, determine the record length and
 	//    read the remainder of the record
@@ -129,7 +142,7 @@ func NextRecord(r io.Reader) (rec *Record, err error) {
 		return nil, err
 	}
 
-	rawRec := make([]byte, recLen)
+	rawRec = make([]byte, recLen)
 	// ensure that the raw len is available for the leader
 	copy(rawRec, rawLen)
 
@@ -143,6 +156,13 @@ func NextRecord(r io.Reader) (rec *Record, err error) {
 	if rawRec[len(rawRec)-1] != recordTerminator {
 		return nil, errors.New("Record terminator not found at end of record")
 	}
+
+	return rawRec, nil
+}
+
+func ParseRecord(rawRec []byte) (rec *Record, err error) {
+
+	rec = new(Record)
 
 	rec.LeaderRaw.Text = string(rawRec[:24])
 	rec.Leader, err = parseLeader(rawRec)
