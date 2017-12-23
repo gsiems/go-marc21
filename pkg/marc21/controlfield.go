@@ -47,7 +47,7 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*directory) (cfs [
 			start := baseAddress + d.startingPos
 			b := rawRec[start : start+d.fieldLength]
 			if b[len(b)-1] != fieldTerminator {
-				return nil, errors.New("Field terminator not found at end of field")
+				return nil, errors.New("parseControlfields: Field terminator not found at end of field")
 			}
 			var cf Controlfield
 			cf.Tag = d.tag

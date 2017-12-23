@@ -89,7 +89,7 @@ func parseDatafields(rawRec []byte, baseAddress int, dir []*directory) (dfs []Da
 			b := rawRec[start : start+d.fieldLength]
 
 			if b[d.fieldLength-1] != fieldTerminator {
-				return nil, errors.New("Field terminator not found at end of field")
+				return nil, errors.New("parseDatafields: Field terminator not found at end of field")
 			}
 
 			var df Datafield
