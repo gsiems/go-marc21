@@ -43,21 +43,22 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 func parseControlfields(rawRec []byte, baseAddress int, dir []*directory) (cfs []Controlfield, err error) {
 
-    // There are records where the 003 and 007 fields are dorky (this
-    // may happen to other fields also) where the first byte is a
-    // terminator character.
-    //
-    // The directory for one record that has this issue looks like:
-    //      001 0 11
-    //      003 11 12
-    //      005 12 17
-    //      007 29 18
-    //      008 30 41
-    // where we can see that the directory has the 003 and 005 tags
-    // overlapping and the 007 and 008 tags overlapping with no actual
-    // data for either dorked-up 003/007 tag. Since the remainder of the
-    // record appears to be good we don't want to fail, but we do want to
-    // bring attention to the data issue.
+	// There are records where the 003 and 007 fields are dorky (this
+	// may happen to other fields also??) where the first byte is a
+	// terminator character and the directory indicates that the field
+    // is longer.
+	//
+	// The directory for one record that has this issue looks like:
+	//      001 0 11
+	//      003 11 12
+	//      005 12 17
+	//      007 29 18
+	//      008 30 41
+	// where we can see that the directory has the 003 and 005 tags
+	// overlapping and the 007 and 008 tags overlapping with no actual
+	// data for either dorked-up 003/007 tag. Since the remainder of the
+	// record appears to be good we don't want to fail, but we do want
+	// to bring attention to the data issue.
 	parseError := false
 
 	for _, d := range dir {
