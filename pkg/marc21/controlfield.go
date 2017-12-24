@@ -46,7 +46,7 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*directory) (cfs [
 	// There are records where the 003 and 007 fields are dorky (this
 	// may happen to other fields also??) where the first byte is a
 	// terminator character and the directory indicates that the field
-    // is longer.
+	// is longer.
 	//
 	// The directory for one record that has this issue looks like:
 	//      001 0 11
