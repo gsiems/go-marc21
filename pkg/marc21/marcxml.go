@@ -71,6 +71,10 @@ func LoadXML(filename string) (Collection, error) {
 	return doc, nil
 }
 
+// https://www.loc.gov/standards/marcxml/
+// <collection xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+// looks like various samples do not mess with the <marc:TAG> and simply use <TAG>
+
 func CollectionAsXML(c Collection) (ret string) {
 
 	ret = fmt.Sprintln("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
