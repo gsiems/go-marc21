@@ -41,7 +41,7 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 //          005 -> last updated: yyyymmddhhmmss.f
 // TODO: parse/translate 006, 007, 008
 
-func parseControlfields(rawRec []byte, baseAddress int, dir []*directory) (cfs []Controlfield, err error) {
+func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []Controlfield, err error) {
 
 	// There are records where the 003 and 007 fields are dorky (this
 	// may happen to other fields also??) where the first byte is a
@@ -62,15 +62,15 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*directory) (cfs [
 	parseError := false
 
 	for _, d := range dir {
-		if strings.HasPrefix(d.tag, "00") {
+		if strings.HasPrefix(d.Tag, "00") {
 
 			var cf Controlfield
-			cf.Tag = d.tag
+			cf.Tag = d.Tag
 
-			start := baseAddress + d.startingPos
-			b := rawRec[start : start+d.fieldLength]
+			start := baseAddress + d.StartingPos
+			b := rawRec[start : start+d.FieldLength]
 
-			if b[len(b)-1] == fieldTerminator {
+			if b[len(b)-1] == FieldTerminator {
 				cf.Text = string(b[:len(b)-1])
 			} else {
 				parseError = true

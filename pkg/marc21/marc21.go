@@ -8,6 +8,7 @@
 package marc21
 
 import (
+	"encoding/binary"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -28,6 +29,9 @@ PRIMARY GOALS:
     Convert between MARC21 and MarcXML
 
     MARC-8 vs. UTF-8 encoding
+        * leader.CharacterCodingScheme == "a" is UCS/Unicode
+        * https://www.loc.gov/marc/specifications/speccharucs.html
+        * https://www.loc.gov/marc/specifications/codetables.xml
 
 Someday, maybe, secondary goals:
 
@@ -44,11 +48,11 @@ https://www.loc.gov/marc/specifications/specrecstruc.html
 */
 
 const (
-	delimiter        = 0x1f
-	fieldTerminator  = 0x1e
-	recordTerminator = 0x1d
-	leaderLen        = 24
-	maxRecordSize    = 99999
+	Delimiter        = 0x1f
+	FieldTerminator  = 0x1e
+	RecordTerminator = 0x1d
+	LeaderLen        = 24
+	MaxRecordSize    = 99999
 )
 
 type Collection struct {
@@ -81,9 +85,16 @@ type LeaderRaw struct {
 
 type Record struct {
 	Leader        *Leader
-	LeaderRaw     LeaderRaw      `xml:"leader"`
+	LeaderRaw     LeaderRaw `xml:"leader"`
+	Directory     []*Directory
 	Controlfields []Controlfield `xml:"controlfield"`
 	Datafields    []Datafield    `xml:"datafield"`
+}
+
+type Directory struct {
+	Tag         string
+	StartingPos int
+	FieldLength int
 }
 
 type Controlfield struct {
@@ -134,10 +145,10 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 	}
 
 	// Ensure that we have a "sane" record length?
-	if recLen <= leaderLen {
+	if recLen <= LeaderLen {
 		err = errors.New("MARC record is too short")
 		return nil, err
-	} else if recLen > maxRecordSize {
+	} else if recLen > MaxRecordSize {
 		err = errors.New("MARC record is too long")
 		return nil, err
 	}
@@ -153,7 +164,7 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 	}
 
 	// The last byte should be a record terminator
-	if rawRec[len(rawRec)-1] != recordTerminator {
+	if rawRec[len(rawRec)-1] != RecordTerminator {
 		return nil, errors.New("Record terminator not found at end of record")
 	}
 
@@ -174,6 +185,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	if err != nil {
 		return nil, err
 	}
+	rec.Directory = dir
 
 	rec.Controlfields, err = parseControlfields(rawRec, rec.Leader.BaseDataAddress, dir)
 	if err != nil {
@@ -203,4 +215,120 @@ func (rec Record) String() string {
 		}
 	}
 	return ret
+}
+
+// RecordAsMARC converts a Record into a MAR record byte array
+func RecordAsMARC(rec *Record) (marc []byte, err error) {
+
+	dl := termToByte(Delimiter)
+	ft := termToByte(FieldTerminator)
+	rt := termToByte(RecordTerminator)
+
+	var ldr []byte
+	var Dir []Directory
+	var dir []byte
+	var cfs []byte
+	var dfs []byte
+	var startPos int
+
+	// Pack the control fields
+	for _, cf := range rec.Controlfields {
+
+		if cf.Text == "" {
+			continue
+		}
+
+		b := []byte(cf.Text)
+		b = append(b, ft...)
+		cfs = append(cfs, b...)
+
+		var d Directory
+		d.Tag = cf.Tag
+		d.StartingPos = startPos
+		d.FieldLength = len(b)
+		Dir = append(Dir, d)
+
+		startPos += d.FieldLength
+	}
+
+	// Pack the data fields/sub-fields
+	for _, df := range rec.Datafields {
+
+		ind1 := df.Ind1
+		if ind1 == "" {
+			ind1 = " "
+		}
+		ind2 := df.Ind2
+		if ind2 == "" {
+			ind2 = " "
+		}
+
+		b := []byte(ind1)
+		b = append(b, []byte(ind2)...)
+
+		for _, sf := range df.Subfields {
+			b = append(b, dl...)
+			b = append(b, []byte(sf.Code)...)
+			b = append(b, []byte(sf.Text)...)
+		}
+		b = append(b, ft...)
+		dfs = append(dfs, b...)
+
+		var d Directory
+		d.Tag = df.Tag
+		d.StartingPos = startPos
+		d.FieldLength = len(b)
+		Dir = append(Dir, d)
+
+		startPos += d.FieldLength
+	}
+
+	// Generate the directory
+	for _, d := range Dir {
+		dir = append(dir, []byte(d.Tag)...)
+		dir = append(dir, []byte(fmt.Sprintf("%04d", d.FieldLength))...)
+		dir = append(dir, []byte(fmt.Sprintf("%05d", d.StartingPos))...)
+	}
+	dir = append(dir, ft...)
+
+	// Build the leader
+	recLen := []byte(fmt.Sprintf("%05d", 24+len(dir)+len(cfs)+len(dfs)+1))
+	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(dir)))
+
+	ldr = append(ldr, recLen...)
+	ldr = append(ldr, rec.Leader.RecordStatus)
+	ldr = append(ldr, rec.Leader.RecordType)
+	ldr = append(ldr, rec.Leader.BibliographicLevel)
+	ldr = append(ldr, rec.Leader.ControlType)
+	ldr = append(ldr, rec.Leader.CharacterCodingScheme)
+	ldr = append(ldr, rec.Leader.IndicatorCount)
+	ldr = append(ldr, rec.Leader.SubfieldCodeCount)
+	ldr = append(ldr, recBaseDataAddress...)
+	ldr = append(ldr, rec.Leader.EncodingLevel)
+	ldr = append(ldr, rec.Leader.CatalogingForm)
+	ldr = append(ldr, rec.Leader.MultipartLevel)
+	ldr = append(ldr, rec.Leader.LenOfLengthOfField)
+	ldr = append(ldr, rec.Leader.LenOfStartCharPosition)
+	ldr = append(ldr, rec.Leader.LenOfImplementDefined)
+	ldr = append(ldr, rec.Leader.Undefined)
+
+	// Final assembly
+	marc = append(marc, ldr...)
+	marc = append(marc, dir...)
+	marc = append(marc, cfs...)
+	marc = append(marc, dfs...)
+	marc = append(marc, rt...)
+
+	return marc, nil
+}
+
+func termToByte(i int) (b []byte) {
+
+	// We apparently need a 2-byte array for setting the uint16...
+	x := make([]byte, 2)
+	binary.LittleEndian.PutUint16(x, uint16(i))
+	// ... but we don't want the trailing null byte in actual use
+	b = x[:1]
+
+	return b
 }

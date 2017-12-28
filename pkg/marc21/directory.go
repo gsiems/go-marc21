@@ -64,24 +64,18 @@ http://www.loc.gov/marc/bibliographic/bddirectory.html
 // TODO: should/how do we detect corrupted data?
 // TODO: Build new/update directory based on new/updated record?
 
-type directory struct {
-	tag         string
-	startingPos int
-	fieldLength int
-}
+func parseDirectory(r []byte) (dir []*Directory, err error) {
 
-func parseDirectory(r []byte) (dir []*directory, err error) {
+	for i := LeaderLen; r[i] != FieldTerminator; i += 12 {
+		var d Directory
 
-	for i := leaderLen; r[i] != fieldTerminator; i += 12 {
-		var d directory
-
-		d.tag = string(r[i : i+3])
-		d.fieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
+		d.Tag = string(r[i : i+3])
+		d.FieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
 		if err != nil {
 			return nil, err
 		}
 
-		d.startingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
+		d.StartingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
 		if err != nil {
 			return nil, err
 		}

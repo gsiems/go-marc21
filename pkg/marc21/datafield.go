@@ -81,23 +81,23 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 // TODO: validate data fields?
 
-func parseDatafields(rawRec []byte, baseAddress int, dir []*directory) (dfs []Datafield, err error) {
+func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []Datafield, err error) {
 
 	for _, d := range dir {
-		if !strings.HasPrefix(d.tag, "00") {
-			start := baseAddress + d.startingPos
-			b := rawRec[start : start+d.fieldLength]
+		if !strings.HasPrefix(d.Tag, "00") {
+			start := baseAddress + d.StartingPos
+			b := rawRec[start : start+d.FieldLength]
 
-			if b[d.fieldLength-1] != fieldTerminator {
+			if b[d.FieldLength-1] != FieldTerminator {
 				return nil, errors.New("parseDatafields: Field terminator not found at end of field")
 			}
 
 			var df Datafield
-			df.Tag = d.tag
+			df.Tag = d.Tag
 			df.Ind1 = string(b[0])
 			df.Ind2 = string(b[1])
 
-			for _, t := range bytes.Split(b[2:d.fieldLength-1], []byte{delimiter}) {
+			for _, t := range bytes.Split(b[2:d.FieldLength-1], []byte{Delimiter}) {
 				if len(t) > 0 {
 					var sf Subfield
 					sf.Code = string(t[0])
