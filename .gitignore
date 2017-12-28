@@ -1,3 +1,7 @@
 git_ignore
-coverage.out
+*.out
 coverage.html
+marcdump
+marcsplit
+marc2xml
+xml2marc
