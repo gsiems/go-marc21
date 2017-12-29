@@ -6,7 +6,6 @@ package marc21
 
 import (
 	"encoding/xml"
-	"fmt"
 	"os"
 )
 
@@ -49,8 +48,12 @@ type Collection struct {
 */
 
 // TODO: indent or not to indent marshalled XML? make it optional? user specified indent chars?
-// TODO: fatten-up the marshalled marc:collection tag?
-// TODO: escape XML (a-la xml func EscapeText(w io.Writer, s []byte) error)
+
+var CollectionXMLHeader string = `<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim>"
+`
+var CollectionXMLFooter string = `</collection>
+`
 
 // LoadXML reads a MARCXML document
 func LoadXML(filename string) (Collection, error) {
@@ -82,44 +85,28 @@ func LoadXML(filename string) (Collection, error) {
 // <collection xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 // looks like various samples do not mess with the <marc:TAG> and simply use <TAG>
 
-func CollectionAsXML(c Collection) (ret string) {
+func CollectionAsXML(c Collection) (ret string, err error) {
 
-	ret = fmt.Sprintln("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-	//ret += fmt.Sprintf("<marc:collection xmlns:marc=%q xmlns:xsi=%q xsi:schemaLocation=\"%s\">\n", c.Marc, c.Xsi, c.SchemaLocation)
-	ret += "<marc:collection>\n"
+	ret = CollectionXMLHeader
 
 	for _, r := range c.Records {
-		ret += RecordAsXML(r)
+		rx, err := RecordAsXML(r)
+		if err != nil {
+			return ret, err
+		}
+		ret += rx
 	}
-	ret += "</marc:collection>\n"
-	return ret
+
+	ret += CollectionXMLFooter
+	return ret, nil
 }
 
-func RecordAsXML(r *Record) (ret string) {
+func RecordAsXML(r *Record) (ret string, err error) {
 
-	ret = "\t<marc:record>\n"
-	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", r.LeaderRaw.Text)
-	for _, cf := range r.Controlfields {
-		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.Tag, cf.Text)
+	b, err := xml.MarshalIndent(r, "    ", "    ")
+	if err != nil {
+		return ret, err
 	}
-	for _, df := range r.Datafields {
-		ret += DatafieldAsXML(df)
-	}
-	ret += "\t</marc:record>\n"
-	return ret
-}
-
-func DatafieldAsXML(df *Datafield) (ret string) {
-
-	ret = fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
-	for _, sf := range df.Subfields {
-		ret += SubfieldAsXML(sf)
-	}
-	ret += fmt.Sprintf("\t\t</marc:datafield>\n")
-	return ret
-}
-
-func SubfieldAsXML(sf *Subfield) (ret string) {
-	ret = fmt.Sprintf("\t\t\t<marc:subfield code=%q>%s</marc:subfield>\n", sf.Code, sf.Text)
-	return ret
+	ret = string(b)
+	return ret, nil
 }

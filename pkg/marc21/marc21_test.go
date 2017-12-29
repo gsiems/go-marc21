@@ -16,8 +16,10 @@ func TestXML(t *testing.T) {
 		t.Errorf("LoadXML() failed: %q", err)
 	}
 
-	out := CollectionAsXML(doc)
-	if out == "" {
+	out, err := CollectionAsXML(doc)
+	if err != nil {
+		t.Errorf("CollectionAsXML() failed: %q", err)
+	} else if out == "" {
 		t.Errorf("CollectionAsXML() failed")
 	}
 
@@ -62,8 +64,10 @@ func TestMARC2XML(t *testing.T) {
 	var doc Collection
 	doc.Records = append(doc.Records, rec)
 
-	out := CollectionAsXML(doc)
-	if out == "" {
+	out, err := CollectionAsXML(doc)
+	if err != nil {
+		t.Errorf("CollectionAsXML() failed: %q", err)
+	} else if out == "" {
 		t.Errorf("CollectionAsXML() failed")
 	}
 }
@@ -73,7 +77,6 @@ func TestXML2PrettyPrint(t *testing.T) {
 	xml_file := os.Getenv("TEST_MARCXML_FILE")
 
 	doc, err := LoadXML(xml_file)
-
 	if err != nil {
 		t.Errorf("LoadXML() failed: %q", err)
 	}
