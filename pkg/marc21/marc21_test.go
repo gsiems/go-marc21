@@ -88,3 +88,24 @@ func TestXML2PrettyPrint(t *testing.T) {
 		}
 	}
 }
+
+func TestRecordAsMARC(t *testing.T) {
+
+	marc_file := os.Getenv("TEST_MARC_FILE")
+
+	fi, err := os.Open(marc_file)
+	if err != nil {
+		t.Errorf("os.Open() failed: %q", err)
+	}
+	defer fi.Close()
+
+	rec, err := ParseNextRecord(fi)
+	if err != nil {
+		t.Errorf("ParseNextRecord() failed: %q", err)
+	} else {
+		_, err := RecordAsMARC(rec)
+		if err != nil {
+			t.Errorf("RecordAsMARC() failed: %q", err)
+		}
+	}
+}
