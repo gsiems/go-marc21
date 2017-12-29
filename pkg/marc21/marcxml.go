@@ -6,6 +6,7 @@ package marc21
 
 import (
 	"encoding/xml"
+	"fmt"
 	"os"
 )
 
@@ -17,7 +18,6 @@ http://www.loc.gov/standards/marcxml/xml/collection.xml
 
 /*
 $ zek -p < collection.xml > xml.go
-
 type Collection struct {
 	XMLName        xml.Name `xml:"collection"`
 	Text           string   `xml:",chardata"`
@@ -47,13 +47,15 @@ type Collection struct {
 }
 */
 
-// TODO: indent or not to indent marshalled XML? make it optional? user specified indent chars?
+// TODO: indent or not to indent marshalled XML? make it optional? user
+//      specified indent chars?
+// TODO: escape XML (a-la xml func EscapeText(w io.Writer, s []byte) error)
+//      current is more performant than xml.MarshalIndent, yet...
 
 var CollectionXMLHeader string = `<?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim>"
 `
-var CollectionXMLFooter string = `</collection>
-`
+var CollectionXMLFooter string = "</collection>\n"
 
 // LoadXML reads a MARCXML document
 func LoadXML(filename string) (Collection, error) {
@@ -92,21 +94,38 @@ func CollectionAsXML(c Collection) (ret string, err error) {
 	for _, r := range c.Records {
 		rx, err := RecordAsXML(r)
 		if err != nil {
-			return ret, err
+			return "", err
 		}
 		ret += rx
 	}
-
 	ret += CollectionXMLFooter
 	return ret, nil
 }
 
 func RecordAsXML(r *Record) (ret string, err error) {
 
-	b, err := xml.MarshalIndent(r, "    ", "    ")
-	if err != nil {
-		return ret, err
+	ret = "\t<record>\n"
+	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", r.LeaderRaw.Text)
+	for _, cf := range r.Controlfields {
+		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, cf.Text)
 	}
-	ret = string(b)
+	for _, df := range r.Datafields {
+		rx, err := DatafieldAsXML(df)
+		if err != nil {
+			return "", err
+		}
+		ret += rx
+	}
+	ret += "\t</record>\n"
+	return ret, nil
+}
+
+func DatafieldAsXML(df *Datafield) (ret string, err error) {
+
+	ret = fmt.Sprintf("\t\t<datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
+	for _, sf := range df.Subfields {
+		ret += fmt.Sprintf("\t\t\t<subfield code=%q>%s</subfield>\n", sf.Code, sf.Text)
+	}
+	ret += fmt.Sprintf("\t\t</datafield>\n")
 	return ret, nil
 }
