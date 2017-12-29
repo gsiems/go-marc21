@@ -68,6 +68,13 @@ func LoadXML(filename string) (Collection, error) {
 		return doc, err
 	}
 
+	for _, r := range doc.Records {
+		r.Leader, err = parseLeader([]byte(r.LeaderRaw.Text))
+		if err != nil {
+			return doc, err
+		}
+	}
+
 	return doc, nil
 }
 
@@ -88,7 +95,7 @@ func CollectionAsXML(c Collection) (ret string) {
 	return ret
 }
 
-func RecordAsXML(r Record) (ret string) {
+func RecordAsXML(r *Record) (ret string) {
 
 	ret = "\t<marc:record>\n"
 	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", r.LeaderRaw.Text)
@@ -102,7 +109,7 @@ func RecordAsXML(r Record) (ret string) {
 	return ret
 }
 
-func DatafieldAsXML(df Datafield) (ret string) {
+func DatafieldAsXML(df *Datafield) (ret string) {
 
 	ret = fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
 	for _, sf := range df.Subfields {
@@ -112,7 +119,7 @@ func DatafieldAsXML(df Datafield) (ret string) {
 	return ret
 }
 
-func SubfieldAsXML(sf Subfield) (ret string) {
+func SubfieldAsXML(sf *Subfield) (ret string) {
 	ret = fmt.Sprintf("\t\t\t<marc:subfield code=%q>%s</marc:subfield>\n", sf.Code, sf.Text)
 	return ret
 }

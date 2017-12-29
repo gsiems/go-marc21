@@ -4,9 +4,7 @@
 
 package marc21
 
-import (
-	"strconv"
-)
+import "strconv"
 
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
@@ -62,8 +60,8 @@ http://www.loc.gov/marc/bibliographic/bddirectory.html
 */
 
 // TODO: should/how do we detect corrupted data?
-// TODO: Build new/update directory based on new/updated record?
 
+// parseDirectory extracts the directory from the raw MARC record bytes
 func parseDirectory(r []byte) (dir []*Directory, err error) {
 
 	for i := LeaderLen; r[i] != FieldTerminator; i += 12 {

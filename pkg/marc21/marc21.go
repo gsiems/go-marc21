@@ -56,8 +56,8 @@ const (
 )
 
 type Collection struct {
-	Name    xml.Name `xml:"collection"`
-	Records []Record `xml:"record"`
+	Name    xml.Name  `xml:"collection"`
+	Records []*Record `xml:"record"`
 }
 
 type Leader struct {
@@ -87,8 +87,8 @@ type Record struct {
 	Leader        *Leader
 	LeaderRaw     LeaderRaw `xml:"leader"`
 	Directory     []*Directory
-	Controlfields []Controlfield `xml:"controlfield"`
-	Datafields    []Datafield    `xml:"datafield"`
+	Controlfields []*Controlfield `xml:"controlfield"`
+	Datafields    []*Datafield    `xml:"datafield"`
 }
 
 type Directory struct {
@@ -103,10 +103,10 @@ type Controlfield struct {
 }
 
 type Datafield struct {
-	Tag       string     `xml:"tag,attr"`
-	Ind1      string     `xml:"ind1,attr"`
-	Ind2      string     `xml:"ind2,attr"`
-	Subfields []Subfield `xml:"subfield"`
+	Tag       string      `xml:"tag,attr"`
+	Ind1      string      `xml:"ind1,attr"`
+	Ind2      string      `xml:"ind2,attr"`
+	Subfields []*Subfield `xml:"subfield"`
 }
 
 type Subfield struct {
@@ -217,8 +217,13 @@ func (rec Record) String() string {
 	return ret
 }
 
-// RecordAsMARC converts a Record into a MAR record byte array
+// RecordAsMARC converts a Record into a MARC record byte array
 func RecordAsMARC(rec *Record) (marc []byte, err error) {
+
+	if rec.Leader == nil {
+		err = errors.New("Record Leader is undefined.")
+		return marc, err
+	}
 
 	dl := termToByte(Delimiter)
 	ft := termToByte(FieldTerminator)

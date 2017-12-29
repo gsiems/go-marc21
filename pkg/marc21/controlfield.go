@@ -5,8 +5,7 @@
 package marc21
 
 import (
-	//"errors"
-	//"fmt"
+	"fmt"
 	"log"
 	"strings"
 )
@@ -41,7 +40,8 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 //          005 -> last updated: yyyymmddhhmmss.f
 // TODO: parse/translate 006, 007, 008
 
-func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []Controlfield, err error) {
+// parseControlfields extracts the control fields from the raw MARC record bytes
+func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []*Controlfield, err error) {
 
 	// There are records where the 003 and 007 fields are dorky (this
 	// may happen to other fields also??) where the first byte is a
@@ -75,7 +75,7 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs [
 			} else {
 				parseError = true
 			}
-			cfs = append(cfs, cf)
+			cfs = append(cfs, &cf)
 		}
 	}
 
@@ -84,4 +84,9 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs [
 	}
 
 	return cfs, nil
+}
+
+// Implement the Stringer interface for "Pretty-printing"
+func (cf Controlfield) String() string {
+	return fmt.Sprintf("{%s: '%s'}", cf.Tag, cf.Text)
 }

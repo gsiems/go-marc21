@@ -60,13 +60,12 @@ func TestMARC2XML(t *testing.T) {
 	}
 
 	var doc Collection
-	doc.Records = append(doc.Records, *rec)
+	doc.Records = append(doc.Records, rec)
 
 	out := CollectionAsXML(doc)
 	if out == "" {
 		t.Errorf("CollectionAsXML() failed")
 	}
-	//fmt.Println(out)
 }
 
 func TestXML2PrettyPrint(t *testing.T) {

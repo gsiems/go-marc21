@@ -81,7 +81,8 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 // TODO: validate data fields?
 
-func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []Datafield, err error) {
+// parseDatafields extracts the data fields/sub-fields from the raw MARC record bytes
+func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*Datafield, err error) {
 
 	for _, d := range dir {
 		if !strings.HasPrefix(d.Tag, "00") {
@@ -102,10 +103,10 @@ func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []Da
 					var sf Subfield
 					sf.Code = string(t[0])
 					sf.Text = string(t[1:])
-					df.Subfields = append(df.Subfields, sf)
+					df.Subfields = append(df.Subfields, &sf)
 				}
 			}
-			dfs = append(dfs, df)
+			dfs = append(dfs, &df)
 		}
 	}
 

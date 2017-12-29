@@ -4,9 +4,7 @@
 
 package marc21
 
-import (
-	"strconv"
-)
+import "strconv"
 
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
@@ -146,8 +144,8 @@ Example:
 */
 
 // TODO: Do we want to/have use for leader validation?
-// TODO: Build new/update leader based on new/updated record?
 
+// parseLeader extracts the leader information from the raw MARC record bytes
 func parseLeader(b []byte) (l *Leader, err error) {
 	l = new(Leader)
 
