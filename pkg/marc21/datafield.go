@@ -81,8 +81,8 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 // TODO: validate data fields?
 
-// parseDatafields extracts the data fields/sub-fields from the raw MARC record bytes
-func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*Datafield, err error) {
+// extractDatafields extracts the data fields/sub-fields from the raw MARC record bytes
+func extractDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*Datafield, err error) {
 
 	for _, d := range dir {
 		if !strings.HasPrefix(d.Tag, "00") {
@@ -90,20 +90,18 @@ func parseDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*D
 			b := rawRec[start : start+d.FieldLength]
 
 			if b[d.FieldLength-1] != FieldTerminator {
-				return nil, errors.New("parseDatafields: Field terminator not found at end of field")
+				return nil, errors.New("extractDatafields: Field terminator not found at end of field")
 			}
 
-			var df Datafield
-			df.Tag = d.Tag
-			df.Ind1 = string(b[0])
-			df.Ind2 = string(b[1])
+			df := Datafield{
+				Tag:  d.Tag,
+				Ind1: string(b[0]),
+				Ind2: string(b[1]),
+			}
 
 			for _, t := range bytes.Split(b[2:d.FieldLength-1], []byte{Delimiter}) {
 				if len(t) > 0 {
-					var sf Subfield
-					sf.Code = string(t[0])
-					sf.Text = string(t[1:])
-					df.Subfields = append(df.Subfields, &sf)
+					df.Subfields = append(df.Subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
 				}
 			}
 			dfs = append(dfs, &df)

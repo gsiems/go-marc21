@@ -187,12 +187,12 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	}
 	rec.Directory = dir
 
-	rec.Controlfields, err = parseControlfields(rawRec, rec.Leader.BaseDataAddress, dir)
+	rec.Controlfields, err = extractControlfields(rawRec, rec.Leader.BaseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
 
-	rec.Datafields, err = parseDatafields(rawRec, rec.Leader.BaseDataAddress, dir)
+	rec.Datafields, err = extractDatafields(rawRec, rec.Leader.BaseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -247,13 +247,9 @@ func RecordAsMARC(rec *Record) (marc []byte, err error) {
 		b = append(b, ft...)
 		cfs = append(cfs, b...)
 
-		var d Directory
-		d.Tag = cf.Tag
-		d.StartingPos = startPos
-		d.FieldLength = len(b)
-		Dir = append(Dir, d)
+		Dir = append(Dir, Directory{Tag: cf.Tag, StartingPos: startPos, FieldLength: len(b)})
 
-		startPos += d.FieldLength
+		startPos += len(b)
 	}
 
 	// Pack the data fields/sub-fields
@@ -279,13 +275,9 @@ func RecordAsMARC(rec *Record) (marc []byte, err error) {
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		var d Directory
-		d.Tag = df.Tag
-		d.StartingPos = startPos
-		d.FieldLength = len(b)
-		Dir = append(Dir, d)
+		Dir = append(Dir, Directory{Tag: df.Tag, StartingPos: startPos, FieldLength: len(b)})
 
-		startPos += d.FieldLength
+		startPos += len(b)
 	}
 
 	// Generate the directory

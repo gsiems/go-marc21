@@ -35,13 +35,13 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 //http://www.loc.gov/marc/bibliographic/bd00x.html
 
 // TODO: validate control fields?
-// TODO: ensure there are no duplicate control fields?
+// TODO: ensure there are no duplicate control (001, 003, 005, 006, 008) fields?
 // TODO: create/update control fields for new/update record?
 //          005 -> last updated: yyyymmddhhmmss.f
 // TODO: parse/translate 006, 007, 008
 
-// parseControlfields extracts the control fields from the raw MARC record bytes
-func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []*Controlfield, err error) {
+// extractControlfields extracts the control fields from the raw MARC record bytes
+func extractControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []*Controlfield, err error) {
 
 	// There are records where the 003 and 007 fields are dorky (this
 	// may happen to other fields also??) where the first byte is a
@@ -64,23 +64,19 @@ func parseControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs [
 	for _, d := range dir {
 		if strings.HasPrefix(d.Tag, "00") {
 
-			var cf Controlfield
-			cf.Tag = d.Tag
-
 			start := baseAddress + d.StartingPos
 			b := rawRec[start : start+d.FieldLength]
 
 			if b[len(b)-1] == FieldTerminator {
-				cf.Text = string(b[:len(b)-1])
+				cfs = append(cfs, &Controlfield{Tag: d.Tag, Text: string(b[:len(b)-1])})
 			} else {
 				parseError = true
 			}
-			cfs = append(cfs, &cf)
 		}
 	}
 
 	if parseError {
-		log.Printf("Control fields parsing error: %s\n", cfs)
+		log.Printf("Control fields extraction error: %s\n", cfs)
 	}
 
 	return cfs, nil
