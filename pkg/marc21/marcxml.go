@@ -74,7 +74,7 @@ func LoadXML(filename string) (Collection, error) {
 	}
 
 	for _, r := range doc.Records {
-		r.Leader, err = parseLeader([]byte(r.LeaderRaw.Text))
+		r.ParsedLeader, err = parseLeader([]byte(r.Leader.Text))
 		if err != nil {
 			return doc, err
 		}
@@ -105,7 +105,7 @@ func CollectionAsXML(c Collection) (ret string, err error) {
 func RecordAsXML(r *Record) (ret string, err error) {
 
 	ret = "\t<record>\n"
-	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", r.LeaderRaw.Text)
+	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", r.Leader.Text)
 	for _, cf := range r.Controlfields {
 		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, cf.Text)
 	}

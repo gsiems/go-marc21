@@ -60,7 +60,7 @@ type Collection struct {
 	Records []*Record `xml:"record"`
 }
 
-type Leader struct {
+type ParsedLeader struct {
 	RecordLength           int
 	RecordStatus           byte
 	RecordType             byte
@@ -79,14 +79,14 @@ type Leader struct {
 	Undefined              byte
 }
 
-type LeaderRaw struct {
+type Leader struct {
 	Text string `xml:",chardata"`
 }
 
 type Record struct {
-	Leader        *Leader
-	LeaderRaw     LeaderRaw `xml:"leader"`
-	Directory     []*Directory
+	ParsedLeader  *ParsedLeader
+	Leader        Leader `xml:"leader"`
+	directory     []*Directory
 	Controlfields []*Controlfield `xml:"controlfield"`
 	Datafields    []*Datafield    `xml:"datafield"`
 }
@@ -175,8 +175,8 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 
 	rec = new(Record)
 
-	rec.LeaderRaw.Text = string(rawRec[:24])
-	rec.Leader, err = parseLeader(rawRec)
+	rec.Leader.Text = string(rawRec[:24])
+	rec.ParsedLeader, err = parseLeader(rawRec)
 	if err != nil {
 		return nil, err
 	}
@@ -185,14 +185,14 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	if err != nil {
 		return nil, err
 	}
-	rec.Directory = dir
+	rec.directory = dir
 
-	rec.Controlfields, err = extractControlfields(rawRec, rec.Leader.BaseDataAddress, dir)
+	rec.Controlfields, err = extractControlfields(rawRec, rec.ParsedLeader.BaseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
 
-	rec.Datafields, err = extractDatafields(rawRec, rec.Leader.BaseDataAddress, dir)
+	rec.Datafields, err = extractDatafields(rawRec, rec.ParsedLeader.BaseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 // Implement the Stringer interface for "Pretty-printing"
 func (rec Record) String() string {
 
-	ret := fmt.Sprintf("LDR %s\n", rec.LeaderRaw.Text)
+	ret := fmt.Sprintf("LDR %s\n", rec.Leader.Text)
 	for _, cf := range rec.Controlfields {
 		ret += fmt.Sprintf("%s     %s\n", cf.Tag, cf.Text)
 	}
@@ -220,8 +220,8 @@ func (rec Record) String() string {
 // RecordAsMARC converts a Record into a MARC record byte array
 func RecordAsMARC(rec *Record) (marc []byte, err error) {
 
-	if rec.Leader == nil {
-		err = errors.New("Record Leader is undefined.")
+	if rec.ParsedLeader == nil {
+		err = errors.New("Record ParsedLeader is undefined.")
 		return marc, err
 	}
 
@@ -293,21 +293,21 @@ func RecordAsMARC(rec *Record) (marc []byte, err error) {
 	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(dir)))
 
 	ldr = append(ldr, recLen...)
-	ldr = append(ldr, rec.Leader.RecordStatus)
-	ldr = append(ldr, rec.Leader.RecordType)
-	ldr = append(ldr, rec.Leader.BibliographicLevel)
-	ldr = append(ldr, rec.Leader.ControlType)
-	ldr = append(ldr, rec.Leader.CharacterCodingScheme)
-	ldr = append(ldr, rec.Leader.IndicatorCount)
-	ldr = append(ldr, rec.Leader.SubfieldCodeCount)
+	ldr = append(ldr, rec.ParsedLeader.RecordStatus)
+	ldr = append(ldr, rec.ParsedLeader.RecordType)
+	ldr = append(ldr, rec.ParsedLeader.BibliographicLevel)
+	ldr = append(ldr, rec.ParsedLeader.ControlType)
+	ldr = append(ldr, rec.ParsedLeader.CharacterCodingScheme)
+	ldr = append(ldr, rec.ParsedLeader.IndicatorCount)
+	ldr = append(ldr, rec.ParsedLeader.SubfieldCodeCount)
 	ldr = append(ldr, recBaseDataAddress...)
-	ldr = append(ldr, rec.Leader.EncodingLevel)
-	ldr = append(ldr, rec.Leader.CatalogingForm)
-	ldr = append(ldr, rec.Leader.MultipartLevel)
-	ldr = append(ldr, rec.Leader.LenOfLengthOfField)
-	ldr = append(ldr, rec.Leader.LenOfStartCharPosition)
-	ldr = append(ldr, rec.Leader.LenOfImplementDefined)
-	ldr = append(ldr, rec.Leader.Undefined)
+	ldr = append(ldr, rec.ParsedLeader.EncodingLevel)
+	ldr = append(ldr, rec.ParsedLeader.CatalogingForm)
+	ldr = append(ldr, rec.ParsedLeader.MultipartLevel)
+	ldr = append(ldr, rec.ParsedLeader.LenOfLengthOfField)
+	ldr = append(ldr, rec.ParsedLeader.LenOfStartCharPosition)
+	ldr = append(ldr, rec.ParsedLeader.LenOfImplementDefined)
+	ldr = append(ldr, rec.ParsedLeader.Undefined)
 
 	// Final assembly
 	marc = append(marc, ldr...)
