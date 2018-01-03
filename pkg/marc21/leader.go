@@ -24,102 +24,180 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     first field of a MARC record.
 */
 
-/*
-http://www.loc.gov/marc/bibliographic/bdleader.html
+// http://www.loc.gov/marc/bibliographic/bdleader.html
+//
+//  Character Positions
+//  00-04 - Record length
 
-    Character Positions
-    00-04 - Record length
+//  05 - Record status
+var recordStatus = map[string]string{
+	"a": "Increase in encoding level",
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
+	"p": "Increase in encoding level from prepublication",
+}
 
-    05 - Record status
-        a - Increase in encoding level
-        c - Corrected or revised
-        d - Deleted
-        n - New
-        p - Increase in encoding level from prepublication
+func (rec Record) RecordStatus() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.RecordStatus)
+		desc, _ = recordStatus[code]
+	}
+	return code, desc
+}
 
-    06 - Type of record
-        a - Language material
-        c - Notated music
-        d - Manuscript notated music
-        e - Cartographic material
-        f - Manuscript cartographic material
-        g - Projected medium
-        i - Nonmusical sound recording
-        j - Musical sound recording
-        k - Two-dimensional nonprojectable graphic
-        m - Computer file
-        o - Kit
-        p - Mixed materials
-        r - Three-dimensional artifact or naturally occurring object
-        t - Manuscript language material
+//  06 - Type of record
+var recordType = map[string]string{
+	"a": "Language material",
+	"c": "Notated music",
+	"d": "Manuscript notated music",
+	"e": "Cartographic material",
+	"f": "Manuscript cartographic material",
+	"g": "Projected medium",
+	"i": "Nonmusical sound recording",
+	"j": "Musical sound recording",
+	"k": "Two-dimensional nonprojectable graphic",
+	"m": "Computer file",
+	"o": "Kit",
+	"p": "Mixed materials",
+	"r": "Three-dimensional artifact or naturally occurring object",
+	"t": "Manuscript language material",
+}
 
-    07 - Bibliographic level
-        a - Monographic component part
-        b - Serial component part
-        c - Collection
-        d - Subunit
-        i - Integrating resource
-        m - Monograph/Item
-        s - Serial
+func (rec Record) RecordType() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.RecordType)
+		desc, _ = recordType[code]
+	}
+	return code, desc
+}
 
-    08 - Type of control
-        # - No specified type
-        a - Archival
+//  07 - Bibliographic level
+var bibliographicLevel = map[string]string{
+	"a": "Monographic component part",
+	"b": "Serial component part",
+	"c": "Collection",
+	"d": "Subunit",
+	"i": "Integrating resource",
+	"m": "Monograph/Item",
+	"s": "Serial",
+}
 
-    09 - Character coding scheme
-        # - MARC-8
-        a - UCS/Unicode
+func (rec Record) BibliographicLevel() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.BibliographicLevel)
+		desc, _ = bibliographicLevel[code]
+	}
+	return code, desc
+}
 
-    10 - Indicator count
-        2 - Number of character positions used for indicators
+//  08 - Type of control
+var controlType = map[string]string{
+	" ": "No specified type",
+	"a": "Archival",
+}
 
-    11 - Subfield code count
-        2 - Number of character positions used for a subfield code
+func (rec Record) ControlType() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.ControlType)
+		desc, _ = controlType[code]
+	}
+	return code, desc
+}
 
-    12-16 - Base address of data
-        [number] - Length of Leader and Directory
+//  09 - Character coding scheme
+var characterCodingScheme = map[string]string{
+	" ": "MARC-8",
+	"a": "UCS/Unicode",
+}
 
-    17 - Encoding level
-        # - Full level
-        1 - Full level, material not examined
-        2 - Less-than-full level, material not examined
-        3 - Abbreviated level
-        4 - Core level
-        5 - Partial (preliminary) level
-        7 - Minimal level
-        8 - Prepublication level
-        u - Unknown
-        z - Not applicable
+func (rec Record) CharacterCodingScheme() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.CharacterCodingScheme)
+		desc, _ = characterCodingScheme[code]
+	}
+	return code, desc
+}
 
-    18 - Descriptive cataloging form
-        # - Non-ISBD
-        a - AACR 2
-        c - ISBD punctuation omitted
-        i - ISBD punctuation included
-        n - Non-ISBD punctuation omitted
-        u - Unknown
+//  10 - Indicator count
+//      2 - Number of character positions used for indicators
+//
+//  11 - Subfield code count
+//      2 - Number of character positions used for a subfield code
+//
+//  12-16 - Base address of data
+//      [number] - Length of Leader and Directory
+//
+//  17 - Encoding level
+var encodingLevel = map[string]string{
+	" ": "Full level",
+	"1": "Full level, material not examined",
+	"2": "Less-than-full level, material not examined",
+	"3": "Abbreviated level",
+	"4": "Core level",
+	"5": "Partial (preliminary) level",
+	"7": "Minimal level",
+	"8": "Prepublication level",
+	"u": "Unknown",
+	"z": "Not applicable",
+}
 
-    19 - Multipart resource record level
-        # - Not specified or not applicable
-        a - Set
-        b - Part with independent title
-        c - Part with dependent title
+func (rec Record) EncodingLevel() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.EncodingLevel)
+		desc, _ = encodingLevel[code]
+	}
+	return code, desc
+}
 
-    20 - Length of the length-of-field portion
-        4 - Number of characters in the length-of-field portion of a
-            Directory entry
+//  18 - Descriptive cataloging form
+var descriptiveCatalogingForm = map[string]string{
+	" ": "Non-ISBD",
+	"a": "AACR 2",
+	"c": "ISBD punctuation omitted",
+	"i": "ISBD punctuation included",
+	"n": "Non-ISBD punctuation omitted",
+	"u": "Unknown",
+}
 
-    21 - Length of the starting-character-position portion
-        5 - Number of characters in the starting-character-position
-            portion of a Directory entry
+func (rec Record) CatalogingForm() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.CatalogingForm)
+		desc, _ = descriptiveCatalogingForm[code]
+	}
+	return code, desc
+}
 
-    22 - Length of the implementation-defined portion
-        0 - Number of characters in the implementation-defined portion
-            of a Directory entry
+//  19 - Multipart resource record level
+var multipartResourceRecordLevel = map[string]string{
+	" ": "Not specified or not applicable",
+	"a": "Set",
+	"b": "Part with independent title",
+	"c": "Part with dependent title",
+}
 
-    23 - Undefined
-        0 - Undefined
-*/
+func (rec Record) MultipartLevel() (code, desc string) {
+	if rec.ParsedLeader != nil {
+		code = string(rec.ParsedLeader.MultipartLevel)
+		desc, _ = multipartResourceRecordLevel[code]
+	}
+	return code, desc
+}
+
+//  20 - Length of the length-of-field portion
+//      4 - Number of characters in the length-of-field portion of a
+//          Directory entry
+//
+//  21 - Length of the starting-character-position portion
+//      5 - Number of characters in the starting-character-position
+//          portion of a Directory entry
+//
+//  22 - Length of the implementation-defined portion
+//      0 - Number of characters in the implementation-defined portion
+//          of a Directory entry
+//
+//  23 - Undefined
+//      0 - Undefined
 
 /*
 Example:
@@ -146,8 +224,8 @@ Example:
 // TODO: Do we want to/have use for leader validation?
 
 // parseLeader extracts the leader information from the raw MARC record bytes
-func parseLeader(b []byte) (l *Leader, err error) {
-	l = new(Leader)
+func parseLeader(b []byte) (l *ParsedLeader, err error) {
+	l = new(ParsedLeader)
 
 	l.RecordLength, err = strconv.Atoi(string(b[0:4]))
 	if err != nil {
