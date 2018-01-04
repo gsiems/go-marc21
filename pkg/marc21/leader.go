@@ -4,7 +4,10 @@
 
 package marc21
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
@@ -38,12 +41,12 @@ var recordStatus = map[string]string{
 	"p": "Increase in encoding level from prepublication",
 }
 
-func (rec Record) RecordStatus() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.RecordStatus)
-		desc, _ = recordStatus[code]
+func (rec Record) RecordStatus() (code, label string) {
+	if len(rec.Leader.Text) > 5 {
+		code = string(rec.Leader.Text[5])
+		label, _ = recordStatus[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  06 - Type of record
@@ -64,12 +67,14 @@ var recordType = map[string]string{
 	"t": "Manuscript language material",
 }
 
-func (rec Record) RecordType() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.RecordType)
-		desc, _ = recordType[code]
+// RecordType returns the one character code and label indicating
+// the type of content and material documented by the record.
+func (rec Record) RecordType() (code, label string) {
+	if len(rec.Leader.Text) > 6 {
+		code = string(rec.Leader.Text[6])
+		label, _ = recordType[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  07 - Bibliographic level
@@ -83,12 +88,14 @@ var bibliographicLevel = map[string]string{
 	"s": "Serial",
 }
 
-func (rec Record) BibliographicLevel() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.BibliographicLevel)
-		desc, _ = bibliographicLevel[code]
+// BibliographicLevel returns the code and label indicating the
+// bibliographic level of the record.
+func (rec Record) BibliographicLevel() (code, label string) {
+	if len(rec.Leader.Text) > 7 {
+		code = string(rec.Leader.Text[7])
+		label, _ = bibliographicLevel[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  08 - Type of control
@@ -97,12 +104,12 @@ var controlType = map[string]string{
 	"a": "Archival",
 }
 
-func (rec Record) ControlType() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.ControlType)
-		desc, _ = controlType[code]
+func (rec Record) ControlType() (code, label string) {
+	if len(rec.Leader.Text) > 8 {
+		code = string(rec.Leader.Text[8])
+		label, _ = controlType[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  09 - Character coding scheme
@@ -111,12 +118,12 @@ var characterCodingScheme = map[string]string{
 	"a": "UCS/Unicode",
 }
 
-func (rec Record) CharacterCodingScheme() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.CharacterCodingScheme)
-		desc, _ = characterCodingScheme[code]
+func (rec Record) CharacterCodingScheme() (code, label string) {
+	if len(rec.Leader.Text) > 9 {
+		code = string(rec.Leader.Text[9])
+		label, _ = characterCodingScheme[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  10 - Indicator count
@@ -142,12 +149,12 @@ var encodingLevel = map[string]string{
 	"z": "Not applicable",
 }
 
-func (rec Record) EncodingLevel() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.EncodingLevel)
-		desc, _ = encodingLevel[code]
+func (rec Record) EncodingLevel() (code, label string) {
+	if len(rec.Leader.Text) > 17 {
+		code = string(rec.Leader.Text[17])
+		label, _ = encodingLevel[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  18 - Descriptive cataloging form
@@ -160,12 +167,12 @@ var descriptiveCatalogingForm = map[string]string{
 	"u": "Unknown",
 }
 
-func (rec Record) CatalogingForm() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.CatalogingForm)
-		desc, _ = descriptiveCatalogingForm[code]
+func (rec Record) CatalogingForm() (code, label string) {
+	if len(rec.Leader.Text) > 18 {
+		code = string(rec.Leader.Text[18])
+		label, _ = descriptiveCatalogingForm[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  19 - Multipart resource record level
@@ -176,12 +183,12 @@ var multipartResourceRecordLevel = map[string]string{
 	"c": "Part with dependent title",
 }
 
-func (rec Record) MultipartLevel() (code, desc string) {
-	if rec.ParsedLeader != nil {
-		code = string(rec.ParsedLeader.MultipartLevel)
-		desc, _ = multipartResourceRecordLevel[code]
+func (rec Record) MultipartResourceRecordLevel() (code, label string) {
+	if len(rec.Leader.Text) > 19 {
+		code = string(rec.Leader.Text[19])
+		label, _ = multipartResourceRecordLevel[code]
 	}
-	return code, desc
+	return code, label
 }
 
 //  20 - Length of the length-of-field portion
@@ -227,7 +234,7 @@ Example:
 func parseLeader(b []byte) (l *ParsedLeader, err error) {
 	l = new(ParsedLeader)
 
-	l.RecordLength, err = strconv.Atoi(string(b[0:4]))
+	l.RecordLength, err = strconv.Atoi(string(b[0:5]))
 	if err != nil {
 		return nil, err
 	}
@@ -251,4 +258,86 @@ func parseLeader(b []byte) (l *ParsedLeader, err error) {
 	l.Undefined = b[23]
 
 	return l, nil
+}
+
+// Implement the Stringer interface for "Pretty-printing"
+func (ldr Leader) String() string {
+
+	b := []byte(ldr.Text)
+	ret := fmt.Sprintf("LDR %s\n", ldr.Text)
+
+	code := string(b[0:5])
+	ret += fmt.Sprintf("    %s: ( RecordLength )\n", code)
+
+	code = string(b[5])
+	label, _ := recordStatus[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( RecordStatus = %q )\n", code, label)
+
+	code = string(b[6])
+	label, _ = recordType[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( RecordType = %q )\n", code, label)
+
+	code = string(b[7])
+	label, _ = bibliographicLevel[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( BibliographicLevel = %q )\n", code, label)
+
+	code = string(b[8])
+	label, _ = controlType[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( ControlType = %q )\n", code, label)
+
+	code = string(b[9])
+	label, _ = characterCodingScheme[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( CharacterCodingScheme = %q )\n", code, label)
+
+	code = string(b[10])
+	ret += fmt.Sprintf("        %s: ( IndicatorCount )\n", code)
+
+	code = string(b[11])
+	ret += fmt.Sprintf("        %s: ( SubfieldCodeCount )\n", code)
+
+	code = string(b[12:17])
+	ret += fmt.Sprintf("    %s: ( BaseAddressOfData )\n", code)
+
+	code = string(b[17])
+	label, _ = encodingLevel[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( EncodingLevel = %q )\n", code, label)
+
+	code = string(b[18])
+	label, _ = descriptiveCatalogingForm[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( DescriptiveCatalogingForm = %q )\n", code, label)
+
+	code = string(b[19])
+	label, _ = multipartResourceRecordLevel[code]
+	if code == " " {
+		code = "#"
+	}
+	ret += fmt.Sprintf("        %s: ( MultipartResourceRecordLevel = %q )\n", code, label)
+
+	ret += fmt.Sprintln("        4: ( LengthOfLengthOfField )")
+	ret += fmt.Sprintln("        5: ( LengthOfStartingCharacterPosition )")
+	ret += fmt.Sprintln("        0: ( LengthOfImplementationDefined )")
+	ret += fmt.Sprintln("        0: ( Undefined )")
+
+	return ret
 }
