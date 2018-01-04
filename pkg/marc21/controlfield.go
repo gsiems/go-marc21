@@ -40,6 +40,40 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 //          005 -> last updated: yyyymmddhhmmss.f
 // TODO: parse/translate 006, 007, 008
 
+// MaterialType returns the code and description of the type of material
+// documented by the record. {"Books", "Computer Files", "Maps", "Music",
+// "Continuing Resources", "Visual Materials" or "Mixed Materials"}
+func (rec Record) MaterialType() (code, label string) {
+	rt, _ := rec.RecordType()
+	bl, _ := rec.BibliographicLevel()
+
+	switch rt {
+	case "c", "d", "i", "j":
+		return "MU", "Music"
+	case "e", "f":
+		return "MP", "Maps"
+	case "g", "k", "o", "r":
+		return "VM", "Visual Materials"
+	case "m":
+		return "CF", "Computer Files"
+	case "p":
+		return "MX", "Mixed Materials"
+	case "t":
+		switch bl {
+		case "a", "c", "d", "m":
+			return "BK", "Books"
+		}
+	case "a":
+		switch bl {
+		case "a", "c", "d", "m":
+			return "BK", "Books"
+		case "b", "i", "s":
+			return "CR", "Continuing Resources"
+		}
+	}
+	return code, label
+}
+
 // extractControlfields extracts the control fields from the raw MARC record bytes
 func extractControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []*Controlfield, err error) {
 
