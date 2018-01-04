@@ -84,7 +84,6 @@ type Leader struct {
 }
 
 type Record struct {
-	ParsedLeader  *ParsedLeader
 	Leader        Leader `xml:"leader"`
 	directory     []*Directory
 	Controlfields []*Controlfield `xml:"controlfield"`
@@ -176,10 +175,6 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	rec = new(Record)
 
 	rec.Leader.Text = string(rawRec[:24])
-	rec.ParsedLeader, err = parseLeader(rawRec)
-	if err != nil {
-		return nil, err
-	}
 
 	dir, err := parseDirectory(rawRec)
 	if err != nil {
@@ -187,12 +182,17 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	}
 	rec.directory = dir
 
-	rec.Controlfields, err = extractControlfields(rawRec, rec.ParsedLeader.BaseDataAddress, dir)
+	baseDataAddress, err := strconv.Atoi(string(rawRec[12:17]))
 	if err != nil {
 		return nil, err
 	}
 
-	rec.Datafields, err = extractDatafields(rawRec, rec.ParsedLeader.BaseDataAddress, dir)
+	rec.Controlfields, err = extractControlfields(rawRec, baseDataAddress, dir)
+	if err != nil {
+		return nil, err
+	}
+
+	rec.Datafields, err = extractDatafields(rawRec, baseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -220,8 +220,8 @@ func (rec Record) String() string {
 // RecordAsMARC converts a Record into a MARC record byte array
 func RecordAsMARC(rec *Record) (marc []byte, err error) {
 
-	if rec.ParsedLeader == nil {
-		err = errors.New("Record ParsedLeader is undefined.")
+	if rec.Leader.Text == "" {
+		err = errors.New("Record Leader is undefined.")
 		return marc, err
 	}
 
@@ -229,7 +229,6 @@ func RecordAsMARC(rec *Record) (marc []byte, err error) {
 	ft := termToByte(FieldTerminator)
 	rt := termToByte(RecordTerminator)
 
-	var ldr []byte
 	var Dir []Directory
 	var dir []byte
 	var cfs []byte
@@ -292,22 +291,11 @@ func RecordAsMARC(rec *Record) (marc []byte, err error) {
 	recLen := []byte(fmt.Sprintf("%05d", 24+len(dir)+len(cfs)+len(dfs)+1))
 	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(dir)))
 
-	ldr = append(ldr, recLen...)
-	ldr = append(ldr, rec.ParsedLeader.RecordStatus)
-	ldr = append(ldr, rec.ParsedLeader.RecordType)
-	ldr = append(ldr, rec.ParsedLeader.BibliographicLevel)
-	ldr = append(ldr, rec.ParsedLeader.ControlType)
-	ldr = append(ldr, rec.ParsedLeader.CharacterCodingScheme)
-	ldr = append(ldr, rec.ParsedLeader.IndicatorCount)
-	ldr = append(ldr, rec.ParsedLeader.SubfieldCodeCount)
-	ldr = append(ldr, recBaseDataAddress...)
-	ldr = append(ldr, rec.ParsedLeader.EncodingLevel)
-	ldr = append(ldr, rec.ParsedLeader.CatalogingForm)
-	ldr = append(ldr, rec.ParsedLeader.MultipartLevel)
-	ldr = append(ldr, rec.ParsedLeader.LenOfLengthOfField)
-	ldr = append(ldr, rec.ParsedLeader.LenOfStartCharPosition)
-	ldr = append(ldr, rec.ParsedLeader.LenOfImplementDefined)
-	ldr = append(ldr, rec.ParsedLeader.Undefined)
+	ldr := []byte(rec.Leader.Text)
+	for i := 0; i <= 4; i++ {
+		ldr[i] = recLen[i]
+		ldr[i+12] = recBaseDataAddress[i]
+	}
 
 	// Final assembly
 	marc = append(marc, ldr...)
