@@ -73,13 +73,6 @@ func LoadXML(filename string) (Collection, error) {
 		return doc, err
 	}
 
-	for _, r := range doc.Records {
-		r.ParsedLeader, err = parseLeader([]byte(r.Leader.Text))
-		if err != nil {
-			return doc, err
-		}
-	}
-
 	return doc, nil
 }
 
