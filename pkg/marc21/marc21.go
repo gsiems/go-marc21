@@ -84,8 +84,7 @@ type Leader struct {
 }
 
 type Record struct {
-	Leader        Leader `xml:"leader"`
-	directory     []*Directory
+	Leader        Leader          `xml:"leader"`
 	Controlfields []*Controlfield `xml:"controlfield"`
 	Datafields    []*Datafield    `xml:"datafield"`
 }
@@ -180,7 +179,6 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 	if err != nil {
 		return nil, err
 	}
-	rec.directory = dir
 
 	baseDataAddress, err := strconv.Atoi(string(rawRec[12:17]))
 	if err != nil {
