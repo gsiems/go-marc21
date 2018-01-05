@@ -16,11 +16,11 @@ func TestXML(t *testing.T) {
 		t.Errorf("LoadXML() failed: %q", err)
 	}
 
-	out, err := CollectionAsXML(doc)
+	out, err := doc.AsXML()
 	if err != nil {
-		t.Errorf("CollectionAsXML() failed: %q", err)
+		t.Errorf("Collection.AsXML() failed: %q", err)
 	} else if out == "" {
-		t.Errorf("CollectionAsXML() failed")
+		t.Errorf("Collection.AsXML() failed")
 	}
 
 }
@@ -102,11 +102,11 @@ func TestMARC2XML(t *testing.T) {
 	var doc Collection
 	doc.Records = append(doc.Records, rec)
 
-	out, err := CollectionAsXML(doc)
+	out, err := doc.AsXML()
 	if err != nil {
-		t.Errorf("CollectionAsXML() failed: %q", err)
+		t.Errorf("Collection.AsXML() failed: %q", err)
 	} else if out == "" {
-		t.Errorf("CollectionAsXML() failed")
+		t.Errorf("Collection.AsXML() failed")
 	}
 }
 
@@ -141,7 +141,7 @@ func TestRecordAsMARC(t *testing.T) {
 	if err != nil {
 		t.Errorf("ParseNextRecord() failed: %q", err)
 	} else {
-		_, err := RecordAsMARC(rec)
+		_, err := rec.RecordAsMARC()
 		if err != nil {
 			t.Errorf("RecordAsMARC() failed: %q", err)
 		}

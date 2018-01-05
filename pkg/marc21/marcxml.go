@@ -80,12 +80,12 @@ func LoadXML(filename string) (Collection, error) {
 // <collection xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 // looks like various samples do not mess with the <marc:TAG> and simply use <TAG>
 
-func CollectionAsXML(c Collection) (ret string, err error) {
+func (c Collection) AsXML() (ret string, err error) {
 
 	ret = CollectionXMLHeader
 
-	for _, r := range c.Records {
-		rx, err := RecordAsXML(r)
+	for _, rec := range c.Records {
+		rx, err := rec.AsXML()
 		if err != nil {
 			return "", err
 		}
@@ -95,15 +95,15 @@ func CollectionAsXML(c Collection) (ret string, err error) {
 	return ret, nil
 }
 
-func RecordAsXML(r *Record) (ret string, err error) {
+func (rec Record) AsXML() (ret string, err error) {
 
 	ret = "\t<record>\n"
-	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", r.Leader.Text)
-	for _, cf := range r.Controlfields {
+	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", rec.Leader.Text)
+	for _, cf := range rec.Controlfields {
 		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, cf.Text)
 	}
-	for _, df := range r.Datafields {
-		rx, err := DatafieldAsXML(df)
+	for _, df := range rec.Datafields {
+		rx, err := df.AsXML()
 		if err != nil {
 			return "", err
 		}
@@ -113,7 +113,7 @@ func RecordAsXML(r *Record) (ret string, err error) {
 	return ret, nil
 }
 
-func DatafieldAsXML(df *Datafield) (ret string, err error) {
+func (df Datafield) AsXML() (ret string, err error) {
 
 	ret = fmt.Sprintf("\t\t<datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
 	for _, sf := range df.Subfields {

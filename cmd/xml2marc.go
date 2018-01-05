@@ -25,7 +25,7 @@ func main() {
 	}
 
 	for _, rec := range c.Records {
-		marc, err := marc21.RecordAsMARC(rec)
+		marc, err := rec.RecordAsMARC()
 		if err != nil {
 			log.Fatal(err)
 		}

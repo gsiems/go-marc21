@@ -37,7 +37,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		recxml, err := marc21.RecordAsXML(rec)
+		recxml, err := rec.AsXML()
 		if err != nil {
 			log.Fatal(err)
 		}
