@@ -27,6 +27,25 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     first field of a MARC record.
 */
 
+type ParsedLeader struct {
+	RecordLength           int
+	RecordStatus           byte
+	RecordType             byte
+	BibliographicLevel     byte
+	ControlType            byte
+	CharacterCodingScheme  byte
+	IndicatorCount         byte
+	SubfieldCodeCount      byte
+	BaseDataAddress        int
+	EncodingLevel          byte
+	CatalogingForm         byte
+	MultipartLevel         byte
+	LenOfLengthOfField     byte
+	LenOfStartCharPosition byte
+	LenOfImplementDefined  byte
+	Undefined              byte
+}
+
 // http://www.loc.gov/marc/bibliographic/bdleader.html
 //
 //  Character Positions

@@ -60,25 +60,6 @@ type Collection struct {
 	Records []*Record `xml:"record"`
 }
 
-type ParsedLeader struct {
-	RecordLength           int
-	RecordStatus           byte
-	RecordType             byte
-	BibliographicLevel     byte
-	ControlType            byte
-	CharacterCodingScheme  byte
-	IndicatorCount         byte
-	SubfieldCodeCount      byte
-	BaseDataAddress        int
-	EncodingLevel          byte
-	CatalogingForm         byte
-	MultipartLevel         byte
-	LenOfLengthOfField     byte
-	LenOfStartCharPosition byte
-	LenOfImplementDefined  byte
-	Undefined              byte
-}
-
 type Leader struct {
 	Text string `xml:",chardata"`
 }
@@ -216,7 +197,7 @@ func (rec Record) String() string {
 }
 
 // RecordAsMARC converts a Record into a MARC record byte array
-func RecordAsMARC(rec *Record) (marc []byte, err error) {
+func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
 	if rec.Leader.Text == "" {
 		err = errors.New("Record Leader is undefined.")
