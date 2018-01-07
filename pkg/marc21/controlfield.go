@@ -599,7 +599,7 @@ var computerFileType = map[string]string{
 	"|": "No attempt to code",
 }
 
-var materialConfiguration = map[string]string{
+var materialType = map[string]string{
 	"BK": "Books",
 	"CF": "Computer Files",
 	"MP": "Maps",
@@ -623,7 +623,15 @@ func lookupCfCode(codeList map[string]string, b []byte, i int) (v CFValue) {
 	return CFValue{Code: code, Label: label}
 }
 
-type ParsedBookCF struct {
+// Order matters so:
+//      type CfData map[string]map[string]string
+// won't work
+//      type CfData map[string][]CFValue
+// might...
+
+type CfData map[string][]CFValue
+
+type CfCommon struct {
 	ControlNumber           string
 	ControlNumberIdentifier string
 	LatestTransDateTime     string
@@ -632,29 +640,98 @@ type ParsedBookCF struct {
 	Date1                   string
 	Date2                   string
 	PlaceOfPublication      string
-	ItemForm                CFValue
-	TargetAudience          CFValue
-	GovernmentPublication   CFValue
-	ConferencePublication   CFValue
-	Festschrift             CFValue
-	Index                   CFValue
-	LiteraryForm            CFValue
-	Biography               CFValue
 	Language                string
 	ModifiedRecord          CFValue
 	CatalogingSource        CFValue
-	Illustrations           []CFValue
-	NatureOfContents        []CFValue
+	MaterialType            CFValue
 }
 
-// parseBookCf parses the control field data for Book (BK) material types.
-func (rec Record) ParseBookCf() (bcf ParsedBookCF) {
+func (rec Record) parseControlfields() (c CfCommon, md CfData) {
 
 	// 008:
 	//  00-05 - Date entered on file
 	//  06 - Type of date/Publication status
 	//  07-10 - Date 1
 	//  11-14 - Date 2
+	//  15-17 - Place of publication, production, or execution
+	//  18-34 Non-common elements
+	//  35-37 - Language
+	//  38 - Modified record
+	//  39 - Cataloging source
+
+	c.ControlNumber = rec.getCF("001")
+	c.ControlNumberIdentifier = rec.getCF("003")
+	c.LatestTransDateTime = rec.getCF("005")
+
+	b := []byte(rec.getCF("008"))
+	c.FileDate = string(b[0:6])
+	c.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
+	c.Date1 = string(b[7:11])
+	c.Date2 = string(b[11:15])
+	c.PlaceOfPublication = string(b[15:18])
+
+	c.Language = string(b[35:38])
+	c.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
+	c.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
+
+	code, label := rec.MaterialType()
+
+	c.MaterialType = CFValue{Code: code, Label: label}
+
+	md = make(CfData)
+
+	switch code {
+	case "BK":
+		md.parseBookCf(b[18:35])
+	case "CF":
+		md.parseComputerFilesCf(b[18:35])
+	case "MP":
+		md.parseMapCf(b[18:35])
+	case "MU":
+		md.parseMusicCf(b[18:35])
+	case "CR":
+		md.parseContinuingResourcesCf(b[18:35])
+	case "VM":
+		md.parseVisualMaterialsCf(b[18:35])
+	case "MX":
+		md.parseMixedMaterialsCf(b[18:35])
+	}
+
+	cf006 := rec.getCFs("006")
+	for _, x := range cf006 {
+		b := []byte(x)
+
+		// NOTE: The Material Form is b[0] and ignoring it *could*
+		// disconnect the material form from the corresponding values.
+		// However the material form *should* match the leader record type
+		// so that really shouldn't be an issue... should it?
+		// Perhaps a check to verify that b[0] matches?
+
+		switch code {
+		case "BK":
+			md.parseBookCf(b[1:])
+		case "CF":
+			md.parseComputerFilesCf(b[1:])
+		case "MP":
+			md.parseMapCf(b[1:])
+		case "MU":
+			md.parseMusicCf(b[1:])
+		case "CR":
+			md.parseContinuingResourcesCf(b[1:])
+		case "VM":
+			md.parseVisualMaterialsCf(b[1:])
+		case "MX":
+			md.parseMixedMaterialsCf(b[1:])
+		}
+	}
+
+	return c, md
+}
+
+// parseBookCf parses the control field data for Book (BK) material types.
+func (md CfData) parseBookCf(b []byte) {
+
+	// 008 (NR):
 	//  18-21 - Illustrations (006/01-04)
 	//  22 - Target audience (006/05)
 	//  23 - Form of item (006/06)
@@ -666,82 +743,63 @@ func (rec Record) ParseBookCf() (bcf ParsedBookCF) {
 	//  32 - Undefined
 	//  33 - Literary form (006/16)
 	//  34 - Biography (006/17)
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
 
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
+	// 006 (R):
+	//  00 - Form of material
+	//  01-04 - Illustrations
+	//  05 - Target audience
+	//  06 - Form of item
+	//  07-10 - Nature of contents
+	//  11 - Government publication
+	//  12 - Conference publication
+	//  13 - Festschrift
+	//  14 - Index
+	//  15 - Undefined
+	//  16 - Literary form
+	//  17 - Biography
 
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	for i := 18; i <= 21; i++ {
-		v := lookupCfCode(illustrations, b, i)
-		if i == 18 || v.Code != " " {
-			bcf.Illustrations = append(bcf.Illustrations, v)
-		}
+	for i := 0; i <= 3; i++ {
+		md.appendCfData("Illustrations", lookupCfCode(illustrations, b, i))
 	}
 
-	bcf.TargetAudience = lookupCfCode(targetAudience, b, 22)
-	bcf.ItemForm = lookupCfCode(itemForm, b, 23)
+	md.appendCfData("TargetAudience", lookupCfCode(targetAudience, b, 4))
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 5))
 
-	for i := 24; i <= 27; i++ {
-		v := lookupCfCode(natureOfContents, b, i)
-		if i == 24 || v.Code != " " {
-			bcf.NatureOfContents = append(bcf.NatureOfContents, v)
-		}
+	for i := 6; i <= 9; i++ {
+		md.appendCfData("NatureOfContents", lookupCfCode(natureOfContents, b, i))
 	}
 
-	bcf.GovernmentPublication = lookupCfCode(governmentPublication, b, 28)
-	bcf.ConferencePublication = lookupCfCode(conferencePublication, b, 29)
-	bcf.Festschrift = lookupCfCode(festschrift, b, 30)
-	bcf.Index = lookupCfCode(index, b, 31)
-
-	bcf.LiteraryForm = lookupCfCode(literaryForm, b, 33)
-	bcf.Biography = lookupCfCode(biography, b, 34)
-
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
+	md.appendCfData("GovernmentPublication", lookupCfCode(governmentPublication, b, 10))
+	md.appendCfData("ConferencePublication", lookupCfCode(conferencePublication, b, 11))
+	md.appendCfData("Festschrift", lookupCfCode(festschrift, b, 12))
+	md.appendCfData("Index", lookupCfCode(index, b, 13))
+	md.appendCfData("LiteraryForm", lookupCfCode(literaryForm, b, 15))
+	md.appendCfData("Biography", lookupCfCode(biography, b, 16))
 }
 
-type ParsedMapCF struct {
-	ControlNumber            string
-	ControlNumberIdentifier  string
-	LatestTransDateTime      string
-	FileDate                 string
-	DateTypePubStatus        CFValue
-	Date1                    string
-	Date2                    string
-	PlaceOfPublication       string
-	ItemForm                 CFValue
-	CartographicMaterialType CFValue
-	GovernmentPublication    CFValue
-	Index                    CFValue
-	Language                 string
-	ModifiedRecord           CFValue
-	CatalogingSource         CFValue
-	Relief                   []CFValue
-	Projection               []CFValue
-	SpecialFormat            []CFValue
+// parseComputerFilesCf parses the control field data for ComputerFiles (MU) material types.
+func (md CfData) parseComputerFilesCf(b []byte) {
+
+	// 008:
+	//  18-21 - Undefined
+	//  22 - Target audience (006/05)
+	//  23 - Form of item (006/06)
+	//  24-25 - Undefined
+	//  26 - Type of computer file (006/09)
+	//  27 - Undefined
+	//  28 - Government publication (006/11)
+	//  29-34 - Undefined
+
+	md.appendCfData("TargetAudience", lookupCfCode(targetAudience, b, 4))
+	md.appendCfData("ItemForm", lookupCfCode(computerItemForm, b, 5))
+	md.appendCfData("ComputerFileType", lookupCfCode(computerFileType, b, 8))
+	md.appendCfData("GovernmentPublication", lookupCfCode(governmentPublication, b, 9))
 }
 
 // parseMapCf parses the control field data for Map (MP) material types.
-func (rec Record) ParseMapCf() (bcf ParsedMapCF) {
+func (md CfData) parseMapCf(b []byte) {
 
 	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
 	//  18-21 - Relief (006/01-04)
 	//  22-23 - Projection (006/05-06)
 	//  24 - Undefined
@@ -753,84 +811,29 @@ func (rec Record) ParseMapCf() (bcf ParsedMapCF) {
 	//  31 - Index (006/14)
 	//  23 - Undefined
 	//  33-34 - Special format characteristics (006/16-17)
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
 
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	for i := 18; i <= 21; i++ {
-		v := lookupCfCode(mapRelief, b, i)
-		if i == 18 || v.Code != " " {
-			bcf.Relief = append(bcf.Relief, v)
-		}
+	for i := 0; i <= 3; i++ {
+		md.appendCfData("Relief", lookupCfCode(mapRelief, b, i))
 	}
 
-	for i := 22; i <= 23; i++ {
-		v := lookupCfCode(mapProjection, b, i)
-		if i == 22 || v.Code != " " {
-			bcf.Projection = append(bcf.Projection, v)
-		}
+	for i := 4; i <= 5; i++ {
+		md.appendCfData("Projection", lookupCfCode(mapProjection, b, i))
 	}
 
-	bcf.CartographicMaterialType = lookupCfCode(cartographicMaterialType, b, 25)
-	bcf.GovernmentPublication = lookupCfCode(governmentPublication, b, 28)
-	bcf.ItemForm = lookupCfCode(itemForm, b, 29)
-	bcf.Index = lookupCfCode(index, b, 31)
+	md.appendCfData("CartographicMaterialType", lookupCfCode(cartographicMaterialType, b, 7))
+	md.appendCfData("GovernmentPublication", lookupCfCode(governmentPublication, b, 10))
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 11))
+	md.appendCfData("Index", lookupCfCode(index, b, 13))
 
-	for i := 33; i <= 34; i++ {
-		v := lookupCfCode(mapSpecialFormat, b, i)
-		if i == 33 || v.Code != " " {
-			bcf.SpecialFormat = append(bcf.SpecialFormat, v)
-		}
+	for i := 15; i <= 16; i++ {
+		md.appendCfData("SpecialFormat", lookupCfCode(mapSpecialFormat, b, i))
 	}
-
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
-}
-
-type ParsedMusicCF struct {
-	ControlNumber               string
-	ControlNumberIdentifier     string
-	LatestTransDateTime         string
-	FileDate                    string
-	DateTypePubStatus           CFValue
-	Date1                       string
-	Date2                       string
-	PlaceOfPublication          string
-	MusicFormat                 CFValue
-	MusicParts                  CFValue
-	TargetAudience              CFValue
-	ItemForm                    CFValue
-	TranspositionAndArrangement CFValue
-	Language                    string
-	ModifiedRecord              CFValue
-	CatalogingSource            CFValue
-	CompositionForm             []CFValue
-	AccompanyingMatter          []CFValue
-	RecordingLiteraryText       []CFValue
 }
 
 // parseMusicCf parses the control field data for Music (MU) material types.
-func (rec Record) ParseMusicCf() (bcf ParsedMusicCF) {
+func (md CfData) parseMusicCf(b []byte) {
 
 	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
 	//  18-19 - Form of composition (006/01-02)
 	//  20 - Format of music (006/03)
 	//  21 - Music parts (006/04)
@@ -841,83 +844,65 @@ func (rec Record) ParseMusicCf() (bcf ParsedMusicCF) {
 	//  32 - Undefined
 	//  33 - Transposition and arrangement (006/16)
 	//  34 - Undefined
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
 
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	for i := 18; i <= 19; i++ {
-		v := lookupCfCode(compositionForm, b, i)
-		if i == 18 || v.Code != "||" {
-			bcf.CompositionForm = append(bcf.CompositionForm, v)
-		}
+	for i := 0; i <= 1; i++ {
+		md.appendCfData("CompositionForm", lookupCfCode(compositionForm, b, i))
 	}
 
-	bcf.MusicFormat = lookupCfCode(musicFormat, b, 20)
-	bcf.MusicParts = lookupCfCode(musicParts, b, 21)
-	bcf.TargetAudience = lookupCfCode(targetAudience, b, 22)
-	bcf.ItemForm = lookupCfCode(itemForm, b, 23)
+	md.appendCfData("MusicFormat", lookupCfCode(musicFormat, b, 2))
+	md.appendCfData("MusicParts", lookupCfCode(musicParts, b, 3))
+	md.appendCfData("TargetAudience", lookupCfCode(targetAudience, b, 4))
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 5))
 
-	for i := 24; i <= 29; i++ {
-		v := lookupCfCode(accompanyingMatter, b, i)
-		if i == 24 || v.Code != " " {
-			bcf.AccompanyingMatter = append(bcf.AccompanyingMatter, v)
-		}
+	for i := 6; i <= 11; i++ {
+		md.appendCfData("AccompanyingMatter", lookupCfCode(accompanyingMatter, b, i))
 	}
 
-	for i := 30; i <= 31; i++ {
-		v := lookupCfCode(recordingLiteraryText, b, i)
-		if i == 31 || v.Code != " " {
-			bcf.RecordingLiteraryText = append(bcf.RecordingLiteraryText, v)
-		}
+	for i := 12; i <= 13; i++ {
+		md.appendCfData("RecordingLiteraryText", lookupCfCode(recordingLiteraryText, b, i))
 	}
 
-	bcf.TranspositionAndArrangement = lookupCfCode(transpositionAndArrangement, b, 33)
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
+	md.appendCfData("TranspositionAndArrangement", lookupCfCode(transpositionAndArrangement, b, 15))
 }
 
-type ParsedVisualMaterialsCF struct {
-	ControlNumber           string
-	ControlNumberIdentifier string
-	LatestTransDateTime     string
-	FileDate                string
-	DateTypePubStatus       CFValue
-	Date1                   string
-	Date2                   string
-	PlaceOfPublication      string
-	RunningTime             CFValue
-	TargetAudience          CFValue
-	ItemForm                CFValue
-	GovernmentPublication   CFValue
-	VisualMaterialType      CFValue
-	Technique               CFValue
-	Language                string
-	ModifiedRecord          CFValue
-	CatalogingSource        CFValue
+// parseContinuingResourcesCf parses the control field data for ContinuingResources (MU) material types.
+func (md CfData) parseContinuingResourcesCf(b []byte) {
+
+	// 008:
+	//  18 - Frequency (006/01)
+	//  19 - Regularity (006/02)
+	//  20 - Undefined
+	//  21 - Type of continuing resource (006/04)
+	//  22 - Form of original item (006/05)
+	//  23 - Form of item (006/06)
+	//  24 - Nature of entire work (006/07)
+	//  25-27 - Nature of contents (006/08-10)
+	//  28 - Government publication (006/11)
+	//  29 - Conference publication (006/12)
+	//  30-32 - Undefined
+	//  33 - Original alphabet or script of title (006/16)
+	//  34 - Entry convention (006/17)
+
+	md.appendCfData("Frequency", lookupCfCode(frequency, b, 0))
+	md.appendCfData("Regularity", lookupCfCode(regularity, b, 1))
+	md.appendCfData("ContinuingResourceType", lookupCfCode(continuingResourceType, b, 3))
+	md.appendCfData("OriginalItemForm", lookupCfCode(itemForm, b, 4))
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 5))
+	md.appendCfData("NatureOfWork", lookupCfCode(natureOfContents, b, 6))
+
+	for i := 7; i <= 9; i++ {
+		md.appendCfData("NatureOfContents", lookupCfCode(natureOfContents, b, i))
+	}
+	md.appendCfData("GovernmentPublication", lookupCfCode(governmentPublication, b, 10))
+	md.appendCfData("ConferencePublication", lookupCfCode(conferencePublication, b, 11))
+	md.appendCfData("OriginalScriptOfTitle", lookupCfCode(originalScriptOfTitle, b, 15))
+	md.appendCfData("EntryConvention", lookupCfCode(entryConvention, b, 16))
 }
 
 // parseVisualMaterialsCf parses the control field data for VisualMaterials (MU) material types.
-func (rec Record) ParseVisualMaterialsCf() (bcf ParsedVisualMaterialsCF) {
+func (md CfData) parseVisualMaterialsCf(b []byte) {
 
 	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
 	//  18-20 - Running time for motion pictures and videorecordings (006/01-03)
 	//      000 - Running time exceeds three characters
 	//      001-999 - Running time
@@ -932,22 +917,8 @@ func (rec Record) ParseVisualMaterialsCf() (bcf ParsedVisualMaterialsCF) {
 	//  30-32 - Undefined
 	//  33 - Type of visual material (006/16)
 	//  34 - Technique (006/17)
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
 
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	rt := string(b[18:21])
+	rt := string(b[0:3])
 	var rl string
 	switch rt {
 	case "000":
@@ -961,257 +932,67 @@ func (rec Record) ParseVisualMaterialsCf() (bcf ParsedVisualMaterialsCF) {
 	default:
 		rl = "Running time"
 	}
-	bcf.RunningTime = CFValue{Code: rt, Label: rl}
+	md.appendCfData("RunningTime", CFValue{Code: rt, Label: rl})
 
-	bcf.TargetAudience = lookupCfCode(targetAudience, b, 22)
-	bcf.GovernmentPublication = lookupCfCode(governmentPublication, b, 28)
-	bcf.ItemForm = lookupCfCode(itemForm, b, 29)
-	bcf.VisualMaterialType = lookupCfCode(visualMaterialType, b, 33)
-	bcf.Technique = lookupCfCode(technique, b, 34)
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
-}
-
-type ParsedContinuingResourcesCF struct {
-	ControlNumber           string
-	ControlNumberIdentifier string
-	LatestTransDateTime     string
-	FileDate                string
-	DateTypePubStatus       CFValue
-	Date1                   string
-	Date2                   string
-	PlaceOfPublication      string
-	Frequency               CFValue
-	Regularity              CFValue
-	ContinuingResourceType  CFValue
-	OriginalItemForm        CFValue
-	ItemForm                CFValue
-	NatureOfWork            CFValue
-	GovernmentPublication   CFValue
-	ConferencePublication   CFValue
-	OriginalScriptOfTitle   CFValue
-	EntryConvention         CFValue
-	Language                string
-	ModifiedRecord          CFValue
-	CatalogingSource        CFValue
-	NatureOfContents        []CFValue
-}
-
-// parseContinuingResourcesCf parses the control field data for ContinuingResources (MU) material types.
-func (rec Record) ParseContinuingResourcesCf() (bcf ParsedContinuingResourcesCF) {
-
-	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
-	//  18 - Frequency (006/01)
-	//  19 - Regularity (006/02)
-	//  20 - Undefined
-	//  21 - Type of continuing resource (006/04)
-	//  22 - Form of original item (006/05)
-	//  23 - Form of item (006/06)
-	//  24 - Nature of entire work (006/07)
-	//  25-27 - Nature of contents (006/08-10)
-	//  28 - Government publication (006/11)
-	//  29 - Conference publication (006/12)
-	//  30-32 - Undefined
-	//  33 - Original alphabet or script of title (006/16)
-	//  34 - Entry convention (006/17)
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
-
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	bcf.Frequency = lookupCfCode(frequency, b, 18)
-	bcf.Regularity = lookupCfCode(regularity, b, 19)
-	bcf.ContinuingResourceType = lookupCfCode(continuingResourceType, b, 21)
-	bcf.OriginalItemForm = lookupCfCode(itemForm, b, 22)
-	bcf.ItemForm = lookupCfCode(itemForm, b, 23)
-	bcf.NatureOfWork = lookupCfCode(natureOfContents, b, 24)
-
-	for i := 25; i <= 27; i++ {
-		v := lookupCfCode(natureOfContents, b, i)
-		if i == 25 || v.Code != " " {
-			bcf.NatureOfContents = append(bcf.NatureOfContents, v)
-		}
-	}
-	bcf.GovernmentPublication = lookupCfCode(governmentPublication, b, 28)
-	bcf.ConferencePublication = lookupCfCode(conferencePublication, b, 29)
-
-	bcf.OriginalScriptOfTitle = lookupCfCode(originalScriptOfTitle, b, 33)
-	bcf.EntryConvention = lookupCfCode(entryConvention, b, 34)
-
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
-}
-
-type ParsedMixedMaterialsCF struct {
-	ControlNumber           string
-	ControlNumberIdentifier string
-	LatestTransDateTime     string
-	FileDate                string
-	DateTypePubStatus       CFValue
-	Date1                   string
-	Date2                   string
-	PlaceOfPublication      string
-	ItemForm                CFValue
-	Language                string
-	ModifiedRecord          CFValue
-	CatalogingSource        CFValue
+	md.appendCfData("TargetAudience", lookupCfCode(targetAudience, b, 4))
+	md.appendCfData("GovernmentPublication", lookupCfCode(governmentPublication, b, 10))
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 11))
+	md.appendCfData("VisualMaterialType", lookupCfCode(visualMaterialType, b, 15))
+	md.appendCfData("Technique", lookupCfCode(technique, b, 16))
 }
 
 // parseMixedMaterialsCf parses the control field data for MixedMaterials (MU) material types.
-func (rec Record) ParseMixedMaterialsCf() (bcf ParsedMixedMaterialsCF) {
+func (md CfData) parseMixedMaterialsCf(b []byte) {
 
 	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
 	//  18-22 - Undefined
 	//  23 - Form of item (006/06)
 	//  24-34 - Undefined
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
 
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	bcf.ItemForm = lookupCfCode(itemForm, b, 23)
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
+	md.appendCfData("ItemForm", lookupCfCode(itemForm, b, 5))
 }
 
-type ParsedComputerFilesCF struct {
-	ControlNumber           string
-	ControlNumberIdentifier string
-	LatestTransDateTime     string
-	FileDate                string
-	DateTypePubStatus       CFValue
-	Date1                   string
-	Date2                   string
-	PlaceOfPublication      string
-	TargetAudience          CFValue
-	ItemForm                CFValue
-	ComputerFileType        CFValue
-	GovernmentPublication   CFValue
-	Language                string
-	ModifiedRecord          CFValue
-	CatalogingSource        CFValue
-}
+func (md CfData) appendCfData(k string, c CFValue) {
 
-// parseComputerFilesCf parses the control field data for ComputerFiles (MU) material types.
-func (rec Record) ParseComputerFilesCf() (bcf ParsedComputerFilesCF) {
-
-	// 008:
-	//  00-05 - Date entered on file
-	//  06 - Type of date/Publication status
-	//  07-10 - Date 1
-	//  11-14 - Date 2
-	//  18-21 - Undefined
-	//  22 - Target audience (006/05)
-	//  23 - Form of item (006/06)
-	//  24-25 - Undefined
-	//  26 - Type of computer file (006/09)
-	//  27 - Undefined
-	//  28 - Government publication (006/11)
-	//  29-34 - Undefined
-	//  35-37 - Language
-	//  38 - Modified record
-	//  39 - Cataloging source
-
-	bcf.ControlNumber = rec.getCF001()
-	bcf.ControlNumberIdentifier = rec.getCF003()
-	bcf.LatestTransDateTime = rec.getCF005()
-
-	b := []byte(rec.getCF008())
-	bcf.FileDate = string(b[0:6])
-	bcf.DateTypePubStatus = lookupCfCode(dateTypePubStatus, b, 6)
-	bcf.Date1 = string(b[7:11])
-	bcf.Date2 = string(b[11:15])
-	bcf.PlaceOfPublication = string(b[15:18])
-
-	bcf.TargetAudience = lookupCfCode(targetAudience, b, 22)
-	bcf.ItemForm = lookupCfCode(computerItemForm, b, 23)
-	bcf.ComputerFileType = lookupCfCode(computerFileType, b, 26)
-
-	bcf.GovernmentPublication = lookupCfCode(governmentPublication, b, 28)
-
-	bcf.Language = string(b[35:38])
-	bcf.ModifiedRecord = lookupCfCode(modifiedRecord, b, 38)
-	bcf.CatalogingSource = lookupCfCode(catalogingSource, b, 39)
-
-	return bcf
-}
-
-func (rec Record) getCF001() (s string) {
-	t := rec.getCF("001")
-	if len(t) == 1 {
-		s = t[0]
-	}
-	return s
-}
-
-func (rec Record) getCF003() (s string) {
-	t := rec.getCF("003")
-	if len(t) == 1 {
-		s = t[0]
-	}
-	return s
-}
-
-func (rec Record) getCF005() (s string) {
-	t := rec.getCF("005")
-	if len(t) == 1 {
-		s = t[0]
-	}
-	return s
-}
-
-func (rec Record) getCF008() (s string) {
-	t := rec.getCF("008")
-	if len(t) == 1 {
-		s = t[0]
-	}
-	return s
-}
-
-// getCF returns the control field(s) for the specified tag
-func (rec Record) getCF(tag string) (t []string) {
-	for _, cf := range rec.Controlfields {
-		if cf.Tag == tag {
-			t = append(t, cf.Text)
+	// Ensure that the code/label hasn't already been appended (no duplicate code/labels)
+	exists := false
+	for _, x := range md[k] {
+		if x.Code == c.Code {
+			exists = true
+			break
 		}
 	}
+
+	if !exists {
+		md[k] = append(md[k], c)
+	}
+}
+
+// getCF returns the control field for the specified non-repeating tag
+func (rec Record) getCF(tag string) string {
+	for _, cf := range rec.Controlfields {
+		if cf.Tag == tag {
+			return cf.Text
+		}
+	}
+	return ""
+}
+
+// getCFs returns the unique control field(s) for the specified repeating tag
+func (rec Record) getCFs(tag string) (t []string) {
+
+	uniq := make(map[string]bool)
+
+	for _, cf := range rec.Controlfields {
+		if cf.Tag == tag {
+			uniq[cf.Text] = true
+		}
+	}
+
+	for k := range uniq {
+		t = append(t, k)
+	}
+
 	return t
 }
 
