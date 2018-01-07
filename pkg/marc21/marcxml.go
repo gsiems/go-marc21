@@ -98,9 +98,9 @@ func (c Collection) AsXML() (ret string, err error) {
 func (rec Record) AsXML() (ret string, err error) {
 
 	ret = "\t<record>\n"
-	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", rec.Leader.Text)
+	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", escapeXML(rec.Leader.Text))
 	for _, cf := range rec.Controlfields {
-		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, cf.Text)
+		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, escapeXML(cf.Text))
 	}
 	for _, df := range rec.Datafields {
 		rx, err := df.AsXML()
@@ -117,8 +117,13 @@ func (df Datafield) AsXML() (ret string, err error) {
 
 	ret = fmt.Sprintf("\t\t<datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
 	for _, sf := range df.Subfields {
-		ret += fmt.Sprintf("\t\t\t<subfield code=%q>%s</subfield>\n", sf.Code, sf.Text)
+		ret += fmt.Sprintf("\t\t\t<subfield code=%q>%s</subfield>\n", sf.Code, escapeXML(sf.Text))
 	}
 	ret += fmt.Sprintf("\t\t</datafield>\n")
 	return ret, nil
+}
+
+func escapeXML(txt string) string {
+
+	return txt
 }
