@@ -72,7 +72,18 @@ func TestMARC(t *testing.T) {
 			t.Errorf("MultipartResourceRecordLevel() failed")
 		}
 
-		out := fmt.Sprint(rec)
+		code, _ = rec.MaterialType()
+		if code == "" {
+			t.Errorf("MaterialType() failed")
+		}
+
+		out := rec.parseControlfields()
+		if out == "" {
+			t.Errorf("Record.parseControlfields() failed")
+		}
+		//fmt.Printf("%q\n", cd)
+
+		out = fmt.Sprint(rec)
 		if out == "" {
 			t.Errorf("Record.Print() failed")
 		}
