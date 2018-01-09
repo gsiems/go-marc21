@@ -249,8 +249,8 @@ Example:
 
 // TODO: Do we want to/have use for leader validation?
 
-// parseLeader extracts the leader information from the raw MARC record bytes
-func parseLeader(b []byte) (l *ParsedLeader, err error) {
+// ParseLeader extracts the leader information from the raw MARC record bytes
+func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l = new(ParsedLeader)
 
 	l.RecordLength, err = strconv.Atoi(string(b[0:5]))
