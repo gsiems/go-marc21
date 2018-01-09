@@ -34,11 +34,6 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 //http://www.loc.gov/marc/bibliographic/bd00x.html
 
-// TODO: validate control fields?
-// TODO: ensure there are no duplicate control (001, 003, 005, 006, 008) fields?
-// TODO: create/update control fields for new/update record?
-//          005 -> last updated: yyyymmddhhmmss.f
-
 type CfValue struct {
 	Code  string
 	Label string
@@ -98,6 +93,8 @@ type CfData struct {
 	PhysicalDescription     []CfPhysDesc
 }
 
+// ParseControlfields extracts the information encoded in the control
+// fields.
 func (rec Record) ParseControlfields() (c CfData) {
 
 	// 008:
