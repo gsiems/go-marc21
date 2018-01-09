@@ -4,6 +4,9 @@
 
 package marc21
 
+// http://www.loc.gov/marc/bibliographic/bd006.html
+// http://www.loc.gov/marc/bibliographic/bd008.html
+
 type CfMatlDesc map[string][]CfValue
 
 var dateTypePubStatus = map[string]string{

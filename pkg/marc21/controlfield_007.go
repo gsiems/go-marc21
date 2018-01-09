@@ -4,6 +4,8 @@
 
 package marc21
 
+// http://www.loc.gov/marc/bibliographic/bd007.html
+
 type CfPhysDesc map[string]CfValue
 
 // 01 - Specific material designation
