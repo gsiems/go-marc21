@@ -124,6 +124,7 @@ func (df Datafield) AsXML() (ret string, err error) {
 }
 
 func escapeXML(txt string) string {
-
+	// TODO: either add escaping, or revamp the structures so that they
+	// marshall correctly...
 	return txt
 }
