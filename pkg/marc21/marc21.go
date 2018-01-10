@@ -296,3 +296,27 @@ func termToByte(i int) (b []byte) {
 
 	return b
 }
+
+// Field returns datafields for the record that match the specified tags
+func (rec Record) Field(tags []string) (f []*Datafield) {
+	for _, t := range tags {
+		for _, d := range rec.Datafields {
+			if d.Tag == t {
+				f = append(f, d)
+			}
+		}
+	}
+	return f
+}
+
+// Subfield returns subfields for the datafield that match the specified codes
+func (d Datafield) Subfield(codes []string) (sf []*Subfield) {
+	for _, c := range codes {
+		for _, s := range d.Subfields {
+			if s.Code == c {
+				sf = append(sf, s)
+			}
+		}
+	}
+	return sf
+}
