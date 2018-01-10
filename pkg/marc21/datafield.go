@@ -79,8 +79,6 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     content, such as cataloging rules.
 */
 
-// TODO: validate data fields?
-
 // extractDatafields extracts the data fields/sub-fields from the raw MARC record bytes
 func extractDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*Datafield, err error) {
 

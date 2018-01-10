@@ -247,8 +247,6 @@ Example:
     0       | Undefined              byte  | 0 - Undefined
 */
 
-// TODO: Do we want to/have use for leader validation?
-
 // ParseLeader extracts the leader information from the raw MARC record bytes
 func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l = new(ParsedLeader)

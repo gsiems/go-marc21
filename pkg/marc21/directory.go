@@ -59,8 +59,6 @@ http://www.loc.gov/marc/bibliographic/bddirectory.html
         justified and unused positions contain zeros.
 */
 
-// TODO: should/how do we detect corrupted data?
-
 // parseDirectory extracts the directory from the raw MARC record bytes
 func parseDirectory(r []byte) (dir []*Directory, err error) {
 
