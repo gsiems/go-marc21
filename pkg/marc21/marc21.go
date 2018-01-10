@@ -17,29 +17,10 @@ import (
 )
 
 /*
-PRIMARY GOALS:
-
-    Read MARC21 records
-    Read MARCXML records/collections
-
-    Write MARC21 records
-    Write MARCXML records/collections
-    Write "Pretty-print" text (compatible with perl MARC::Record->as_formatted() output)
-
-    Convert between MARC21 and MarcXML
-
-    MARC-8 vs. UTF-8 encoding
-        * leader.CharacterCodingScheme == "a" is UCS/Unicode
-        * https://www.loc.gov/marc/specifications/speccharucs.html
-        * https://www.loc.gov/marc/specifications/codetables.xml
-
-Someday, maybe, secondary goals:
-
-    Functions for "human-friendly" extraction of titles, authors, etc.
-    Perform [some] validation
-    Read/write MARCMaker?? https://www.loc.gov/marc/makrbrkr.html
-    Read "Pretty-print" text
-    Edit records
+   MARC-8 vs. UTF-8 encoding
+       * leader.CharacterCodingScheme == "a" is UCS/Unicode
+       * https://www.loc.gov/marc/specifications/speccharucs.html
+       * https://www.loc.gov/marc/specifications/codetables.xml
 
 */
 
