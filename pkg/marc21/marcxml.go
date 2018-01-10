@@ -7,6 +7,7 @@ package marc21
 import (
 	"encoding/xml"
 	"fmt"
+	"html"
 	"os"
 )
 
@@ -47,15 +48,10 @@ type Collection struct {
 }
 */
 
-// TODO: indent or not to indent marshalled XML? make it optional? user
-//      specified indent chars?
-// TODO: escape XML (a-la xml func EscapeText(w io.Writer, s []byte) error)
-//      current is more performant than xml.MarshalIndent, yet...
-
 var CollectionXMLHeader string = `<?xml version="1.0" encoding="UTF-8"?>
-<collection xmlns="http://www.loc.gov/MARC21/slim>"
+<marc:collection xmlns="http://www.loc.gov/MARC21/slim>"
 `
-var CollectionXMLFooter string = "</collection>\n"
+var CollectionXMLFooter string = "</marc:collection>\n"
 
 // LoadXML reads a MARCXML document
 func LoadXML(filename string) (Collection, error) {
@@ -80,6 +76,7 @@ func LoadXML(filename string) (Collection, error) {
 // <collection xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 // looks like various samples do not mess with the <marc:TAG> and simply use <TAG>
 
+// AsXML converts an entire collection to XML
 func (c Collection) AsXML() (ret string, err error) {
 
 	ret = CollectionXMLHeader
@@ -95,36 +92,21 @@ func (c Collection) AsXML() (ret string, err error) {
 	return ret, nil
 }
 
+// AsXML converts record to XML
 func (rec Record) AsXML() (ret string, err error) {
 
-	ret = "\t<record>\n"
-	ret += fmt.Sprintf("\t\t<leader>%s</leader>\n", escapeXML(rec.Leader.Text))
+	ret = "\t<marc:record>\n"
+	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", html.EscapeString(rec.Leader.Text))
 	for _, cf := range rec.Controlfields {
-		ret += fmt.Sprintf("\t\t<controlfield tag=%q>%s</controlfield>\n", cf.Tag, escapeXML(cf.Text))
+		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.Tag, html.EscapeString(cf.Text))
 	}
 	for _, df := range rec.Datafields {
-		rx, err := df.AsXML()
-		if err != nil {
-			return "", err
+		ret += fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
+		for _, sf := range df.Subfields {
+			ret += fmt.Sprintf("\t\t\t<marc:subfield code=%q>%s</marc:subfield>\n", sf.Code, html.EscapeString(sf.Text))
 		}
-		ret += rx
+		ret += fmt.Sprintf("\t\t</marc:datafield>\n")
 	}
-	ret += "\t</record>\n"
+	ret += "\t</marc:record>\n"
 	return ret, nil
-}
-
-func (df Datafield) AsXML() (ret string, err error) {
-
-	ret = fmt.Sprintf("\t\t<datafield tag=%q ind1=%q ind2=%q>\n", df.Tag, df.Ind1, df.Ind2)
-	for _, sf := range df.Subfields {
-		ret += fmt.Sprintf("\t\t\t<subfield code=%q>%s</subfield>\n", sf.Code, escapeXML(sf.Text))
-	}
-	ret += fmt.Sprintf("\t\t</datafield>\n")
-	return ret, nil
-}
-
-func escapeXML(txt string) string {
-	// TODO: either add escaping, or revamp the structures so that they
-	// marshall correctly...
-	return txt
 }
