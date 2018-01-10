@@ -32,13 +32,15 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     data elements identified by relative character position.
 */
 
-//http://www.loc.gov/marc/bibliographic/bd00x.html
+// http://www.loc.gov/marc/bibliographic/bd00x.html
 
 type CfValue struct {
 	Code  string
 	Label string
 }
 
+// cfShortCode performs lookups on single-character reference tables (maps)
+// and returns the code and, if found, the descriptive label for the code.
 func cfShortCode(codeList map[string]string, b []byte, i int) (v CfValue) {
 
 	var code, label string
@@ -53,6 +55,8 @@ func cfShortCode(codeList map[string]string, b []byte, i int) (v CfValue) {
 	return CfValue{Code: code, Label: label}
 }
 
+// cfWideCode performs lookups on multi-character reference tables (maps)
+// and returns the code and, if found, the descriptive label for the code.
 func cfWideCode(codeList map[string]string, b []byte, i, w int) (v CfValue) {
 
 	var code, label string
