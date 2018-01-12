@@ -62,7 +62,11 @@ func LoadXML(filename string) (Collection, error) {
 	if err != nil {
 		return doc, err
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	dec := xml.NewDecoder(f)
 	err = dec.Decode(&doc)
