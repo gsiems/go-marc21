@@ -24,7 +24,11 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Printf("File open failed: %q", err))
 	}
-	defer fi.Close()
+	defer func() {
+		if cerr := fi.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	fmt.Print(marc21.CollectionXMLHeader)
 
