@@ -48,7 +48,7 @@ func cfShortCode(codeList map[string]string, b []byte, i int) (v CfValue) {
 	if len(b) > i {
 		code = string(b[i])
 		if code != "" {
-			label, _ = codeList[code]
+			label = codeList[code]
 		}
 	}
 
@@ -64,7 +64,7 @@ func cfWideCode(codeList map[string]string, b []byte, i, w int) (v CfValue) {
 	if len(b) > i+w {
 		code = string(b[i : i+w])
 		if code != "" {
-			label, _ = codeList[code]
+			label = codeList[code]
 		}
 	}
 
