@@ -28,9 +28,9 @@ func TestXML(t *testing.T) {
 
 func TestMARC(t *testing.T) {
 
-	marc_file := os.Getenv("TEST_MARC_FILE")
+	marcFile := os.Getenv("TEST_MARC_FILE")
 
-	fi, err := os.Open(marc_file)
+	fi, err := os.Open(marcFile)
 	if err != nil {
 		t.Errorf("os.Open() failed: %q", err)
 	}
@@ -104,9 +104,9 @@ func TestMARC(t *testing.T) {
 
 func TestMARC2XML(t *testing.T) {
 
-	marc_file := os.Getenv("TEST_MARC_FILE")
+	marcFile := os.Getenv("TEST_MARC_FILE")
 
-	fi, err := os.Open(marc_file)
+	fi, err := os.Open(marcFile)
 	if err != nil {
 		t.Errorf("os.Open() failed: %q", err)
 	}
@@ -147,9 +147,9 @@ func TestXML2PrettyPrint(t *testing.T) {
 
 func TestRecordAsMARC(t *testing.T) {
 
-	marc_file := os.Getenv("TEST_MARC_FILE")
+	marcFile := os.Getenv("TEST_MARC_FILE")
 
-	fi, err := os.Open(marc_file)
+	fi, err := os.Open(marcFile)
 	if err != nil {
 		t.Errorf("os.Open() failed: %q", err)
 	}
