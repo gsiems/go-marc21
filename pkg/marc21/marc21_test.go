@@ -9,9 +9,9 @@ import (
 
 func TestXML(t *testing.T) {
 
-	xml_file := os.Getenv("TEST_MARCXML_FILE")
+	xmlFile := os.Getenv("TEST_MARCXML_FILE")
 
-	doc, err := LoadXML(xml_file)
+	doc, err := LoadXML(xmlFile)
 
 	if err != nil {
 		t.Errorf("LoadXML() failed: %q", err)
@@ -130,9 +130,9 @@ func TestMARC2XML(t *testing.T) {
 
 func TestXML2PrettyPrint(t *testing.T) {
 
-	xml_file := os.Getenv("TEST_MARCXML_FILE")
+	xmlFile := os.Getenv("TEST_MARCXML_FILE")
 
-	doc, err := LoadXML(xml_file)
+	doc, err := LoadXML(xmlFile)
 	if err != nil {
 		t.Errorf("LoadXML() failed: %q", err)
 	}
