@@ -27,6 +27,8 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     first field of a MARC record.
 */
 
+// ParsedLeader contains the results of a parsed MARC leader (return
+// value of ParseLeader)
 type ParsedLeader struct {
 	RecordLength           int
 	RecordStatus           byte
@@ -60,6 +62,8 @@ var recordStatus = map[string]string{
 	"p": "Increase in encoding level from prepublication",
 }
 
+// RecordStatus returns the one character code and label indicating
+// the "05 Record status"
 func (rec Record) RecordStatus() (code, label string) {
 	if len(rec.Leader.Text) > 5 {
 		code = string(rec.Leader.Text[5])
@@ -87,7 +91,8 @@ var recordType = map[string]string{
 }
 
 // RecordType returns the one character code and label indicating
-// the type of content and material documented by the record.
+// the "06 - Type of record" (type of content and material) documented
+// by the record.
 func (rec Record) RecordType() (code, label string) {
 	if len(rec.Leader.Text) > 6 {
 		code = string(rec.Leader.Text[6])
@@ -108,7 +113,7 @@ var bibliographicLevel = map[string]string{
 }
 
 // BibliographicLevel returns the code and label indicating the
-// bibliographic level of the record.
+// "07 - Bibliographic level" of the record.
 func (rec Record) BibliographicLevel() (code, label string) {
 	if len(rec.Leader.Text) > 7 {
 		code = string(rec.Leader.Text[7])
@@ -123,6 +128,8 @@ var controlType = map[string]string{
 	"a": "Archival",
 }
 
+// ControlType returns the code and label indicating the
+// "08 - Type of control" of the record.
 func (rec Record) ControlType() (code, label string) {
 	if len(rec.Leader.Text) > 8 {
 		code = string(rec.Leader.Text[8])
@@ -137,6 +144,8 @@ var characterCodingScheme = map[string]string{
 	"a": "UCS/Unicode",
 }
 
+// CharacterCodingScheme returns the code and label indicating the
+// "09 - Character coding scheme" of the record (MARC-8 or UCS/Unicode).
 func (rec Record) CharacterCodingScheme() (code, label string) {
 	if len(rec.Leader.Text) > 9 {
 		code = string(rec.Leader.Text[9])
@@ -168,6 +177,8 @@ var encodingLevel = map[string]string{
 	"z": "Not applicable",
 }
 
+// EncodingLevel returns the code and label indicating the
+// "17 - Encoding level" of the record
 func (rec Record) EncodingLevel() (code, label string) {
 	if len(rec.Leader.Text) > 17 {
 		code = string(rec.Leader.Text[17])
@@ -186,6 +197,8 @@ var descriptiveCatalogingForm = map[string]string{
 	"u": "Unknown",
 }
 
+// CatalogingForm returns the code and label indicating the
+// "18 - Descriptive cataloging form" of the record
 func (rec Record) CatalogingForm() (code, label string) {
 	if len(rec.Leader.Text) > 18 {
 		code = string(rec.Leader.Text[18])
@@ -202,6 +215,8 @@ var multipartResourceRecordLevel = map[string]string{
 	"c": "Part with dependent title",
 }
 
+// MultipartResourceRecordLevel returns the code and label indicating the
+// "19 - Multipart resource record level" of the record
 func (rec Record) MultipartResourceRecordLevel() (code, label string) {
 	if len(rec.Leader.Text) > 19 {
 		code = string(rec.Leader.Text[19])
