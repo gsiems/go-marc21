@@ -6,6 +6,7 @@ package marc21
 
 // http://www.loc.gov/marc/bibliographic/bd007.html
 
+// CfPhysDesc contains the values for a 007 controlfield entry
 type CfPhysDesc map[string]CfValue
 
 // 01 - Specific material designation
