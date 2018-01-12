@@ -63,7 +63,7 @@ var recordStatus = map[string]string{
 func (rec Record) RecordStatus() (code, label string) {
 	if len(rec.Leader.Text) > 5 {
 		code = string(rec.Leader.Text[5])
-		label, _ = recordStatus[code]
+		label = recordStatus[code]
 	}
 	return code, label
 }
@@ -91,7 +91,7 @@ var recordType = map[string]string{
 func (rec Record) RecordType() (code, label string) {
 	if len(rec.Leader.Text) > 6 {
 		code = string(rec.Leader.Text[6])
-		label, _ = recordType[code]
+		label = recordType[code]
 	}
 	return code, label
 }
@@ -112,7 +112,7 @@ var bibliographicLevel = map[string]string{
 func (rec Record) BibliographicLevel() (code, label string) {
 	if len(rec.Leader.Text) > 7 {
 		code = string(rec.Leader.Text[7])
-		label, _ = bibliographicLevel[code]
+		label = bibliographicLevel[code]
 	}
 	return code, label
 }
@@ -126,7 +126,7 @@ var controlType = map[string]string{
 func (rec Record) ControlType() (code, label string) {
 	if len(rec.Leader.Text) > 8 {
 		code = string(rec.Leader.Text[8])
-		label, _ = controlType[code]
+		label = controlType[code]
 	}
 	return code, label
 }
@@ -140,7 +140,7 @@ var characterCodingScheme = map[string]string{
 func (rec Record) CharacterCodingScheme() (code, label string) {
 	if len(rec.Leader.Text) > 9 {
 		code = string(rec.Leader.Text[9])
-		label, _ = characterCodingScheme[code]
+		label = characterCodingScheme[code]
 	}
 	return code, label
 }
@@ -171,7 +171,7 @@ var encodingLevel = map[string]string{
 func (rec Record) EncodingLevel() (code, label string) {
 	if len(rec.Leader.Text) > 17 {
 		code = string(rec.Leader.Text[17])
-		label, _ = encodingLevel[code]
+		label = encodingLevel[code]
 	}
 	return code, label
 }
@@ -189,7 +189,7 @@ var descriptiveCatalogingForm = map[string]string{
 func (rec Record) CatalogingForm() (code, label string) {
 	if len(rec.Leader.Text) > 18 {
 		code = string(rec.Leader.Text[18])
-		label, _ = descriptiveCatalogingForm[code]
+		label = descriptiveCatalogingForm[code]
 	}
 	return code, label
 }
@@ -205,7 +205,7 @@ var multipartResourceRecordLevel = map[string]string{
 func (rec Record) MultipartResourceRecordLevel() (code, label string) {
 	if len(rec.Leader.Text) > 19 {
 		code = string(rec.Leader.Text[19])
-		label, _ = multipartResourceRecordLevel[code]
+		label = multipartResourceRecordLevel[code]
 	}
 	return code, label
 }
@@ -287,35 +287,35 @@ func (ldr Leader) String() string {
 	ret += fmt.Sprintf("    %s: ( RecordLength )\n", code)
 
 	code = string(b[5])
-	label, _ := recordStatus[code]
+	label := recordStatus[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( RecordStatus = %q )\n", code, label)
 
 	code = string(b[6])
-	label, _ = recordType[code]
+	label = recordType[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( RecordType = %q )\n", code, label)
 
 	code = string(b[7])
-	label, _ = bibliographicLevel[code]
+	label = bibliographicLevel[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( BibliographicLevel = %q )\n", code, label)
 
 	code = string(b[8])
-	label, _ = controlType[code]
+	label = controlType[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( ControlType = %q )\n", code, label)
 
 	code = string(b[9])
-	label, _ = characterCodingScheme[code]
+	label = characterCodingScheme[code]
 	if code == " " {
 		code = "#"
 	}
@@ -331,21 +331,21 @@ func (ldr Leader) String() string {
 	ret += fmt.Sprintf("    %s: ( BaseAddressOfData )\n", code)
 
 	code = string(b[17])
-	label, _ = encodingLevel[code]
+	label = encodingLevel[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( EncodingLevel = %q )\n", code, label)
 
 	code = string(b[18])
-	label, _ = descriptiveCatalogingForm[code]
+	label = descriptiveCatalogingForm[code]
 	if code == " " {
 		code = "#"
 	}
 	ret += fmt.Sprintf("        %s: ( DescriptiveCatalogingForm = %q )\n", code, label)
 
 	code = string(b[19])
-	label, _ = multipartResourceRecordLevel[code]
+	label = multipartResourceRecordLevel[code]
 	if code == " " {
 		code = "#"
 	}
