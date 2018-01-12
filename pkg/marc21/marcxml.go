@@ -48,10 +48,10 @@ type Collection struct {
 }
 */
 
-var CollectionXMLHeader string = `<?xml version="1.0" encoding="UTF-8"?>
+var CollectionXMLHeader = `<?xml version="1.0" encoding="UTF-8"?>
 <marc:collection xmlns="http://www.loc.gov/MARC21/slim>"
 `
-var CollectionXMLFooter string = "</marc:collection>\n"
+var CollectionXMLFooter = "</marc:collection>\n"
 
 // LoadXML reads a MARCXML document
 func LoadXML(filename string) (Collection, error) {
@@ -65,7 +65,7 @@ func LoadXML(filename string) (Collection, error) {
 	defer f.Close()
 
 	dec := xml.NewDecoder(f)
-	err := dec.Decode(&doc)
+	err = dec.Decode(&doc)
 	return doc, err
 }
 
