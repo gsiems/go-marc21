@@ -34,9 +34,21 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 
 // http://www.loc.gov/marc/bibliographic/bd00x.html
 
+// CfValue contains a code and it's corresponding descriptive label
+// for a controlfield entry.
 type CfValue struct {
 	Code  string
 	Label string
+}
+
+var materialType = map[string]string{
+	"BK": "Books",
+	"CF": "Computer Files",
+	"MP": "Maps",
+	"MU": "Music",
+	"CR": "Continuing Resources",
+	"VM": "Visual Materials",
+	"MX": "Mixed Materials",
 }
 
 // cfShortCode performs lookups on single-character reference tables (maps)
@@ -80,6 +92,8 @@ func cfPluckVal(b []byte, i, w int) (s string) {
 	return s
 }
 
+// CfData contains the results from parsing the controlfields for a MARC
+// record.
 type CfData struct {
 	ControlNumber           string
 	ControlNumberIdentifier string
@@ -131,7 +145,7 @@ func (rec Record) ParseControlfields() (c CfData) {
 		// MARC data can be really dorky...
 		log.Printf("Error determining Material Type for ControlNumber %q (defaulting to BK/Book)\n", c.ControlNumber)
 		mt = "BK"
-		label = "Books"
+		label = materialType[mt]
 	}
 	c.MaterialType = CfValue{Code: mt, Label: label}
 
@@ -276,28 +290,29 @@ func (rec Record) MaterialType() (code, label string) {
 
 	switch rt {
 	case "c", "d", "i", "j":
-		return "MU", "Music"
+		code = "MU"
 	case "e", "f":
-		return "MP", "Maps"
+		code = "MP"
 	case "g", "k", "o", "r":
-		return "VM", "Visual Materials"
+		code = "VM"
 	case "m":
-		return "CF", "Computer Files"
+		code = "CF"
 	case "p":
-		return "MX", "Mixed Materials"
+		code = "MX"
 	case "t":
 		switch bl {
 		case "a", "c", "d", "m":
-			return "BK", "Books"
+			code = "BK"
 		}
 	case "a":
 		switch bl {
 		case "a", "c", "d", "m":
-			return "BK", "Books"
+			code = "BK"
 		case "b", "i", "s":
-			return "CR", "Continuing Resources"
+			code = "CR"
 		}
 	}
+	label = materialType[code]
 	return code, label
 }
 

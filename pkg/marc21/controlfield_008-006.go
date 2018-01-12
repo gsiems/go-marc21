@@ -7,6 +7,8 @@ package marc21
 // http://www.loc.gov/marc/bibliographic/bd006.html
 // http://www.loc.gov/marc/bibliographic/bd008.html
 
+// CfMatlDesc contains the parsed data from all 008/006 controlfields
+// for a MARC record
 type CfMatlDesc map[string][]CfValue
 
 var dateTypePubStatus = map[string]string{
@@ -569,16 +571,6 @@ var runningTime = map[string]string{
 	"nnn": "Not applicable",
 	"---": "Unknown",
 	"|||": "No attempt to code",
-}
-
-var materialType = map[string]string{
-	"BK": "Books",
-	"CF": "Computer Files",
-	"MP": "Maps",
-	"MU": "Music",
-	"CR": "Continuing Resources",
-	"VM": "Visual Materials",
-	"MX": "Mixed Materials",
 }
 
 var materialCategory = map[string]string{
