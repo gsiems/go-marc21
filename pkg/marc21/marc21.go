@@ -181,7 +181,7 @@ func (rec Record) String() string {
 func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
 	if rec.Leader.Text == "" {
-		err = errors.New("Record Leader is undefined.")
+		err = errors.New("record Leader is undefined")
 		return marc, err
 	}
 
