@@ -65,11 +65,8 @@ func LoadXML(filename string) (Collection, error) {
 	defer f.Close()
 
 	dec := xml.NewDecoder(f)
-	if err := dec.Decode(&doc); err != nil {
-		return doc, err
-	}
-
-	return doc, nil
+	err := dec.Decode(&doc)
+	return doc, err
 }
 
 // https://www.loc.gov/standards/marcxml/
