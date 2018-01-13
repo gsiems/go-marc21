@@ -1247,7 +1247,52 @@ var pdSpecificDesignationZ = map[string]string{
 	"|": "No attempt to code",
 }
 
-func (pd CfPhysDesc) parsePdA(b []byte) {
+func (rec Record) parse007fields() (c []CfPhysDesc) {
+
+	type fn func(b []byte) (pd CfPhysDesc)
+
+	m := map[string]fn{
+		"a": parsePdA, // "Map",
+		"c": parsePdC, // "Electronic resource",
+		"d": parsePdD, // "Globe",
+		"f": parsePdF, // "Tactile material",
+		"g": parsePdG, // "Projected graphic",
+		"h": parsePdH, // "Microform",
+		"k": parsePdK, // "Nonprojected graphic",
+		"m": parsePdM, // "Motion picture",
+		"o": parsePdO, // "Kit",
+		"q": parsePdQ, // "Notated music",
+		"r": parsePdR, // "Remote-sensing image",
+		"s": parsePdS, // "Sound recording",
+		"t": parsePdT, // "Text",
+		"v": parsePdV, // "Videorecording",
+		"z": parsePdZ, // "Unspecified",
+	}
+
+	// Each 007 needs to hang as a unit.
+	cf007 := rec.getCFs("007")
+	for _, x := range cf007 {
+		b := []byte(x)
+		if len(b) > 1 {
+
+			var pd CfPhysDesc
+
+			fcn, ok := m[string(b[0])]
+			if ok {
+				pd = fcn(b)
+
+				if pd != nil {
+					pd["MaterialCategory"] = cfShortCode(materialCategory, b, 0)
+					c = append(c, pd)
+				}
+			}
+		}
+	}
+
+	return c
+}
+
+func parsePdA(b []byte) (pd CfPhysDesc) {
 	// Map (007/00=a)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1257,15 +1302,17 @@ func (pd CfPhysDesc) parsePdA(b []byte) {
 	// 05 - Type of reproduction
 	// 06 - Production/reproduction details
 	// 07 - Positive/negative aspect
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationA, b, 1)
 	pd["Color"] = cfShortCode(pdColorA, b, 3)
 	pd["PhysicalMedium"] = cfShortCode(pdPhysicalMediumA, b, 4)
 	pd["ReproductionType"] = cfShortCode(pdReproductionTypeA, b, 5)
 	pd["ProductionReproductionDetails"] = cfShortCode(pdProductionDetailsA, b, 6)
 	pd["PositiveNegativeAspect"] = cfShortCode(pdPositiveNegativeAspectA, b, 7)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdC(b []byte) {
+func parsePdC(b []byte) (pd CfPhysDesc) {
 	// Electronic resource (007/00=c)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1279,6 +1326,7 @@ func (pd CfPhysDesc) parsePdC(b []byte) {
 	// 11 - Antecedent/source
 	// 12 - Level of compression
 	// 13 - Reformatting quality
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationC, b, 1)
 	pd["Color"] = cfShortCode(pdColorC, b, 3)
 	pd["Dimensions"] = cfShortCode(pdDimensionsC, b, 4)
@@ -1295,9 +1343,10 @@ func (pd CfPhysDesc) parsePdC(b []byte) {
 	pd["AntecedentSource"] = cfShortCode(pdSourceC, b, 11)
 	pd["CompressionLevel"] = cfShortCode(pdCompressionC, b, 12)
 	pd["ReformattingQuality"] = cfShortCode(pdReformattingQualityC, b, 13)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdD(b []byte) {
+func parsePdD(b []byte) (pd CfPhysDesc) {
 	// Globe (007/00=d)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1305,13 +1354,15 @@ func (pd CfPhysDesc) parsePdD(b []byte) {
 	// 03 - Color
 	// 04 - Physical medium
 	// 05 - Type of reproduction
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationD, b, 1)
 	pd["Color"] = cfShortCode(pdColorD, b, 3)
 	pd["PhysicalMedium"] = cfShortCode(pdPhysicalMediumD, b, 4)
 	pd["ReproductionType"] = cfShortCode(pdReproductionTypeD, b, 5)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdF(b []byte) {
+func parsePdF(b []byte) (pd CfPhysDesc) {
 	// Tactile material (007/00=f)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1326,15 +1377,17 @@ func (pd CfPhysDesc) parsePdF(b []byte) {
 	//var pdBrailleWritingClassF = map[string]string{
 	// 06-08 - Braille music format
 	//var pdBrailleMusicFormatF = map[string]string{
+	pd = make(CfPhysDesc)
 
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationF, b, 1)
 	//	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationD, b, 1)
 	pd["ContractionLevel"] = cfShortCode(pdContractionLevelF, b, 5)
 	//	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationD, b, 1)
 	pd["SpecialPhysicalCharacteristics"] = cfShortCode(pdSpecialCharacteristicsF, b, 9)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdG(b []byte) {
+func parsePdG(b []byte) (pd CfPhysDesc) {
 	// Projected graphic (007/00=g)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1345,6 +1398,7 @@ func (pd CfPhysDesc) parsePdG(b []byte) {
 	// 06 - Medium for sound
 	// 07 - Dimensions
 	// 08 - Secondary support material
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationG, b, 1)
 	pd["Color"] = cfShortCode(pdColorG, b, 3)
 	pd["EmulsionBase"] = cfShortCode(pdEmulsionBaseG, b, 4)
@@ -1352,9 +1406,10 @@ func (pd CfPhysDesc) parsePdG(b []byte) {
 	pd["SoundMedium"] = cfShortCode(pdSoundMediumG, b, 6)
 	pd["Dimensions"] = cfShortCode(pdDimensionsG, b, 7)
 	pd["SecondarySupportMaterial"] = cfShortCode(pdSecondarySupportMaterialG, b, 8)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdH(b []byte) {
+func parsePdH(b []byte) (pd CfPhysDesc) {
 	// Microform (007/00=h)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1367,6 +1422,7 @@ func (pd CfPhysDesc) parsePdH(b []byte) {
 	// 10 - Emulsion on film
 	// 11 - Generation
 	// 12 - Base of film
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationH, b, 1)
 	pd["PositiveNegativeAspect"] = cfShortCode(pdPositiveNegativeAspectH, b, 3)
 	pd["Dimensions"] = cfShortCode(pdDimensionsH, b, 4)
@@ -1376,9 +1432,10 @@ func (pd CfPhysDesc) parsePdH(b []byte) {
 	pd["FilmEmulsion"] = cfShortCode(pdFilmEmulsionH, b, 10)
 	pd["Generation"] = cfShortCode(pdGenerationH, b, 11)
 	pd["FilmBase"] = cfShortCode(pdFilmBaseH, b, 12)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdK(b []byte) {
+func parsePdK(b []byte) (pd CfPhysDesc) {
 	// Nonprojected graphic (007/00=k)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1386,13 +1443,15 @@ func (pd CfPhysDesc) parsePdK(b []byte) {
 	// 03 - Color
 	// 04 - Primary support material
 	// 05 - Secondary support material
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationK, b, 1)
 	pd["Color"] = cfShortCode(pdColorK, b, 3)
 	pd["PrimarySupportMaterial"] = cfShortCode(pdPrimarySupportMaterialK, b, 4)
 	pd["SecondarySupportMaterial"] = cfShortCode(pdSecondarySupportMaterialK, b, 5)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdM(b []byte) {
+func parsePdM(b []byte) (pd CfPhysDesc) {
 	// Motion picture (007/00=m)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1412,6 +1471,7 @@ func (pd CfPhysDesc) parsePdM(b []byte) {
 	// 15 - Deterioration stage
 	// 16 - Completeness
 	// 17-22 - Film inspection date
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationM, b, 1)
 	pd["Color"] = cfShortCode(pdColorM, b, 3)
 	pd["PresentationFormat"] = cfShortCode(pdPresentationFormatM, b, 4)
@@ -1429,23 +1489,28 @@ func (pd CfPhysDesc) parsePdM(b []byte) {
 	pd["Completeness"] = cfShortCode(pdCompletenessM, b, 16)
 
 	pd["FilmInspectionDate"] = CfValue{Code: string(b[17:]), Label: "Film inspection date"}
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdO(b []byte) {
+func parsePdO(b []byte) (pd CfPhysDesc) {
 	// Kit (007/00=o)
 	// 00 - Category of material
 	// 01 - Specific material designation
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationO, b, 1)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdQ(b []byte) {
+func parsePdQ(b []byte) (pd CfPhysDesc) {
 	// Notated music (007/00=q)
 	// 00 - Category of material
 	// 01 - Specific material designation
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationQ, b, 1)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdR(b []byte) {
+func parsePdR(b []byte) (pd CfPhysDesc) {
 	// Remote-sensing image (007/00=r)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1462,6 +1527,7 @@ func (pd CfPhysDesc) parsePdR(b []byte) {
 	// var pdDataTypeR = map[string]string{
 	// "aa": "Visible light",
 
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationR, b, 1)
 	pd["SensorAltitude"] = cfShortCode(pdSensorAltitudeR, b, 3)
 	pd["SensorAttitudeR"] = cfShortCode(pdSensorAttitudeR, b, 4)
@@ -1470,10 +1536,11 @@ func (pd CfPhysDesc) parsePdR(b []byte) {
 	pd["PlatformUseCategory"] = cfShortCode(pdPlatformUseCategoryR, b, 7)
 	pd["SensorType"] = cfShortCode(pdSensorTypeR, b, 8)
 	pd["DataType"] = cfWideCode(pdDataTypeR, b, 9, 2)
+	return pd
 
 }
 
-func (pd CfPhysDesc) parsePdS(b []byte) {
+func parsePdS(b []byte) (pd CfPhysDesc) {
 	// Sound recording (007/00=s)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1489,6 +1556,7 @@ func (pd CfPhysDesc) parsePdS(b []byte) {
 	// 11 - Kind of cutting
 	// 12 - Special playback characteristics
 	// 13 - Capture and storage technique
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationS, b, 1)
 	pd["Speed"] = cfShortCode(pdSpeedS, b, 3)
 	pd["PlaybackChannelConfig"] = cfShortCode(pdPlaybackConfigS, b, 4)
@@ -1501,16 +1569,29 @@ func (pd CfPhysDesc) parsePdS(b []byte) {
 	pd["CuttingType"] = cfShortCode(pdCuttingTypeS, b, 11)
 	pd["SpecialPlaybackCharacteristics"] = cfShortCode(pdSpecialPlaybackS, b, 12)
 	pd["CaptureAndStorageTechnique"] = cfShortCode(pdCaptureStorageS, b, 13)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdT(b []byte) {
+func parsePdT(b []byte) (pd CfPhysDesc) {
 	// Text (007/00=t)
 	// 00 - Category of material
 	// 01 - Specific material designation
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationT, b, 1)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdV(b []byte) {
+func parsePdTx(b []byte) (pd CfPhysDesc) {
+	// Text (007/00=t)
+	// 00 - Category of material
+	// 01 - Specific material designation
+	pd = make(CfPhysDesc)
+
+	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationT, b, 1)
+	return pd
+}
+
+func parsePdV(b []byte) (pd CfPhysDesc) {
 	// Videorecording (007/00=v)
 	// 00 - Category of material
 	// 01 - Specific material designation
@@ -1521,6 +1602,7 @@ func (pd CfPhysDesc) parsePdV(b []byte) {
 	// 06 - Medium for sound
 	// 07 - Dimensions
 	// 08 - Configuration of playback channels
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationV, b, 1)
 	pd["Color"] = cfShortCode(pdColorV, b, 3)
 	pd["VideorecordingFormat"] = cfShortCode(pdFormatV, b, 4)
@@ -1528,11 +1610,14 @@ func (pd CfPhysDesc) parsePdV(b []byte) {
 	pd["SoundMedium"] = cfShortCode(pdSoundMediumV, b, 6)
 	pd["Dimensions"] = cfShortCode(pdDimensionsV, b, 7)
 	pd["PlaybackChannelConfig"] = cfShortCode(pdPlaybackChannelsV, b, 8)
+	return pd
 }
 
-func (pd CfPhysDesc) parsePdZ(b []byte) {
+func parsePdZ(b []byte) (pd CfPhysDesc) {
 	// Unspecified (007/00=z)
 	// 00 - Category of material
 	// 01 - Specific material designation
+	pd = make(CfPhysDesc)
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationZ, b, 1)
+	return pd
 }

@@ -157,6 +157,7 @@ func (rec Record) ParseControlfields() (c CfData) {
 		// parse functions will ignore any extra bytes and, even though
 		// some 008 fields are "short", we'd still like to get as
 		// much data as possible.
+
 		switch mt {
 		case "BK":
 			c.MaterialCharactor.parseBookCf(b[18:])
@@ -205,51 +206,7 @@ func (rec Record) ParseControlfields() (c CfData) {
 		}
 	}
 
-	// Each 007 needs to hang as a unit.
-	cf007 := rec.getCFs("007")
-	for _, x := range cf007 {
-		b := []byte(x)
-		if len(b) > 1 {
-			pd := make(CfPhysDesc)
-
-			pd["MaterialCategory"] = cfShortCode(materialCategory, b, 0)
-
-			switch string(b[0]) {
-			case "a":
-				pd.parsePdA(b) // "Map",
-			case "c":
-				pd.parsePdC(b) // "Electronic resource",
-			case "d":
-				pd.parsePdD(b) // "Globe",
-			case "f":
-				pd.parsePdF(b) // "Tactile material",
-			case "g":
-				pd.parsePdG(b) // "Projected graphic",
-			case "h":
-				pd.parsePdH(b) // "Microform",
-			case "k":
-				pd.parsePdK(b) // "Nonprojected graphic",
-			case "m":
-				pd.parsePdM(b) // "Motion picture",
-			case "o":
-				pd.parsePdO(b) // "Kit",
-			case "q":
-				pd.parsePdQ(b) // "Notated music",
-			case "r":
-				pd.parsePdR(b) // "Remote-sensing image",
-			case "s":
-				pd.parsePdS(b) // "Sound recording",
-			case "t":
-				pd.parsePdT(b) // "Text",
-			case "v":
-				pd.parsePdV(b) // "Videorecording",
-			case "z":
-				pd.parsePdZ(b) // "Unspecified",
-			}
-
-			c.PhysicalDescription = append(c.PhysicalDescription, pd)
-		}
-	}
+	c.PhysicalDescription = rec.parse007fields()
 	return c
 }
 
