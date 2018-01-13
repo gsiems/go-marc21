@@ -626,7 +626,8 @@ func (mc CfMatlDesc) parseBookCf(b []byte) {
 	mc.appendCfMatlDesc("Biography", cfShortCode(biography, b, 16))
 }
 
-// parseComputerFilesCf parses the control field data for ComputerFiles (CF) material types.
+// parseComputerFilesCf parses the control field data for
+// ComputerFiles (CF) material types.
 func (mc CfMatlDesc) parseComputerFilesCf(b []byte) {
 
 	// 008:
@@ -708,7 +709,8 @@ func (mc CfMatlDesc) parseMusicCf(b []byte) {
 	mc.appendCfMatlDesc("TranspositionAndArrangement", cfShortCode(transpositionAndArrangement, b, 15))
 }
 
-// parseContinuingResourcesCf parses the control field data for ContinuingResources (CR) material types.
+// parseContinuingResourcesCf parses the control field data for
+// ContinuingResources (CR) material types.
 func (mc CfMatlDesc) parseContinuingResourcesCf(b []byte) {
 
 	// 008:
@@ -742,7 +744,8 @@ func (mc CfMatlDesc) parseContinuingResourcesCf(b []byte) {
 	mc.appendCfMatlDesc("EntryConvention", cfShortCode(entryConvention, b, 16))
 }
 
-// parseVisualMaterialsCf parses the control field data for VisualMaterials (VM) material types.
+// parseVisualMaterialsCf parses the control field data for
+// VisualMaterials (VM) material types.
 func (mc CfMatlDesc) parseVisualMaterialsCf(b []byte) {
 
 	// 008:
@@ -774,7 +777,8 @@ func (mc CfMatlDesc) parseVisualMaterialsCf(b []byte) {
 	mc.appendCfMatlDesc("Technique", cfShortCode(technique, b, 16))
 }
 
-// parseMixedMaterialsCf parses the control field data for MixedMaterials (MX) material types.
+// parseMixedMaterialsCf parses the control field data for
+// MixedMaterials (MX) material types.
 func (mc CfMatlDesc) parseMixedMaterialsCf(b []byte) {
 
 	// 008:
