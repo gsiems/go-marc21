@@ -1247,6 +1247,24 @@ var pdSpecificDesignationZ = map[string]string{
 	"|": "No attempt to code",
 }
 
+var materialCategory = map[string]string{
+	"a": "Map",
+	"c": "Electronic resource",
+	"d": "Globe",
+	"f": "Tactile material",
+	"g": "Projected graphic",
+	"h": "Microform",
+	"k": "Nonprojected graphic",
+	"m": "Motion picture",
+	"o": "Kit",
+	"q": "Notated music",
+	"r": "Remote-sensing image",
+	"s": "Sound recording",
+	"t": "Text",
+	"v": "Videorecording",
+	"z": "Unspecified",
+}
+
 func (rec Record) parse007fields() (c []CfPhysDesc) {
 
 	type fn func(b []byte) (pd CfPhysDesc)
@@ -1577,16 +1595,6 @@ func parsePdT(b []byte) (pd CfPhysDesc) {
 	// 00 - Category of material
 	// 01 - Specific material designation
 	pd = make(CfPhysDesc)
-	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationT, b, 1)
-	return pd
-}
-
-func parsePdTx(b []byte) (pd CfPhysDesc) {
-	// Text (007/00=t)
-	// 00 - Category of material
-	// 01 - Specific material designation
-	pd = make(CfPhysDesc)
-
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationT, b, 1)
 	return pd
 }
