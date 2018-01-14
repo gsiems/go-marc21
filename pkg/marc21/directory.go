@@ -60,23 +60,23 @@ http://www.loc.gov/marc/bibliographic/bddirectory.html
 */
 
 // parseDirectory extracts the directory from the raw MARC record bytes
-func parseDirectory(r []byte) (dir []*Directory, err error) {
+func parseDirectory(r []byte) (dir []*directoryEntry, err error) {
 
 	for i := LeaderLen; r[i] != FieldTerminator; i += 12 {
-		var d Directory
+		var de directoryEntry
 
-		d.Tag = string(r[i : i+3])
-		d.FieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
+		de.Tag = string(r[i : i+3])
+		de.FieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
 		if err != nil {
 			return nil, err
 		}
 
-		d.StartingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
+		de.StartingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
 		if err != nil {
 			return nil, err
 		}
 
-		dir = append(dir, &d)
+		dir = append(dir, &de)
 	}
 	return dir, nil
 }

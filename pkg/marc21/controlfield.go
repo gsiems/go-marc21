@@ -259,7 +259,7 @@ func (rec Record) MaterialType() (code, label string) {
 }
 
 // extractControlfields extracts the control fields from the raw MARC record bytes
-func extractControlfields(rawRec []byte, baseAddress int, dir []*Directory) (cfs []*Controlfield, err error) {
+func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry) (cfs []*Controlfield, err error) {
 
 	// There are records where the 003 and 007 fields are dorky (this
 	// may happen to other fields also??) where the first byte is a

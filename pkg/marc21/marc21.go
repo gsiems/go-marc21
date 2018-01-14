@@ -36,32 +36,38 @@ const (
 	MaxRecordSize    = 99999
 )
 
+// Collection is fo containing zero or more MARC records
 type Collection struct {
 	Name    xml.Name  `xml:"collection"`
 	Records []*Record `xml:"record"`
 }
 
+// Leader is for containing the text string of the MARC record Leader
 type Leader struct {
 	Text string `xml:",chardata"`
 }
 
+// Record is for containing a MARC record
 type Record struct {
 	Leader        Leader          `xml:"leader"`
 	Controlfields []*Controlfield `xml:"controlfield"`
 	Datafields    []*Datafield    `xml:"datafield"`
 }
 
-type Directory struct {
+// directoryEntry contains a single directory entry
+type directoryEntry struct {
 	Tag         string
 	StartingPos int
 	FieldLength int
 }
 
+// Controlfield contains a controlfield entry
 type Controlfield struct {
 	Tag  string `xml:"tag,attr"`
 	Text string `xml:",chardata"`
 }
 
+// Datafield contains a datafield entry
 type Datafield struct {
 	Tag       string      `xml:"tag,attr"`
 	Ind1      string      `xml:"ind1,attr"`
@@ -69,11 +75,14 @@ type Datafield struct {
 	Subfields []*Subfield `xml:"subfield"`
 }
 
+// Subfield contains a subfield entry
 type Subfield struct {
 	Code string `xml:"code,attr"`
 	Text string `xml:",chardata"`
 }
 
+// ParseNextRecord reads the next MARC record and returns the parsed
+// record stucture
 func ParseNextRecord(r io.Reader) (rec *Record, err error) {
 
 	rawRec, err := NextRecord(r)
@@ -89,6 +98,7 @@ func ParseNextRecord(r io.Reader) (rec *Record, err error) {
 	return rec, nil
 }
 
+// NextRecord reads the next MARC record and returns the unparsed bytes
 func NextRecord(r io.Reader) (rawRec []byte, err error) {
 
 	// Read the first 5 bytes, determine the record length and
@@ -131,6 +141,8 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 	return rawRec, nil
 }
 
+// ParseRecord takes the bytes for a MARC record and returns the parsed
+// record stucture
 func ParseRecord(rawRec []byte) (rec *Record, err error) {
 
 	rec = new(Record)
@@ -189,8 +201,8 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	ft := termToByte(FieldTerminator)
 	rt := termToByte(RecordTerminator)
 
-	var Dir []Directory
-	var dir []byte
+	var dir []directoryEntry
+	var rawDir []byte
 	var cfs []byte
 	var dfs []byte
 	var startPos int
@@ -206,7 +218,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		cfs = append(cfs, b...)
 
-		Dir = append(Dir, Directory{Tag: cf.Tag, StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{Tag: cf.Tag, StartingPos: startPos, FieldLength: len(b)})
 
 		startPos += len(b)
 	}
@@ -234,22 +246,22 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		Dir = append(Dir, Directory{Tag: df.Tag, StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{Tag: df.Tag, StartingPos: startPos, FieldLength: len(b)})
 
 		startPos += len(b)
 	}
 
 	// Generate the directory
-	for _, d := range Dir {
-		dir = append(dir, []byte(d.Tag)...)
-		dir = append(dir, []byte(fmt.Sprintf("%04d", d.FieldLength))...)
-		dir = append(dir, []byte(fmt.Sprintf("%05d", d.StartingPos))...)
+	for _, de := range dir {
+		rawDir = append(rawDir, []byte(de.Tag)...)
+		rawDir = append(rawDir, []byte(fmt.Sprintf("%04d", de.FieldLength))...)
+		rawDir = append(rawDir, []byte(fmt.Sprintf("%05d", de.StartingPos))...)
 	}
-	dir = append(dir, ft...)
+	rawDir = append(rawDir, ft...)
 
 	// Build the leader
-	recLen := []byte(fmt.Sprintf("%05d", 24+len(dir)+len(cfs)+len(dfs)+1))
-	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(dir)))
+	recLen := []byte(fmt.Sprintf("%05d", 24+len(rawDir)+len(cfs)+len(dfs)+1))
+	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(rawDir)))
 
 	ldr := []byte(rec.Leader.Text)
 	for i := 0; i <= 4; i++ {
@@ -259,7 +271,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
 	// Final assembly
 	marc = append(marc, ldr...)
-	marc = append(marc, dir...)
+	marc = append(marc, rawDir...)
 	marc = append(marc, cfs...)
 	marc = append(marc, dfs...)
 	marc = append(marc, rt...)

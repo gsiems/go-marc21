@@ -80,24 +80,24 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 */
 
 // extractDatafields extracts the data fields/sub-fields from the raw MARC record bytes
-func extractDatafields(rawRec []byte, baseAddress int, dir []*Directory) (dfs []*Datafield, err error) {
+func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (dfs []*Datafield, err error) {
 
-	for _, d := range dir {
-		if !strings.HasPrefix(d.Tag, "00") {
-			start := baseAddress + d.StartingPos
-			b := rawRec[start : start+d.FieldLength]
+	for _, de := range dir {
+		if !strings.HasPrefix(de.Tag, "00") {
+			start := baseAddress + de.StartingPos
+			b := rawRec[start : start+de.FieldLength]
 
-			if b[d.FieldLength-1] != FieldTerminator {
+			if b[de.FieldLength-1] != FieldTerminator {
 				return nil, errors.New("extractDatafields: Field terminator not found at end of field")
 			}
 
 			df := Datafield{
-				Tag:  d.Tag,
+				Tag:  de.Tag,
 				Ind1: string(b[0]),
 				Ind2: string(b[1]),
 			}
 
-			for _, t := range bytes.Split(b[2:d.FieldLength-1], []byte{Delimiter}) {
+			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{Delimiter}) {
 				if len(t) > 0 {
 					df.Subfields = append(df.Subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
 				}
