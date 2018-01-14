@@ -62,7 +62,7 @@ http://www.loc.gov/marc/bibliographic/bddirectory.html
 // parseDirectory extracts the directory from the raw MARC record bytes
 func parseDirectory(r []byte) (dir []*directoryEntry, err error) {
 
-	for i := LeaderLen; r[i] != FieldTerminator; i += 12 {
+	for i := leaderLen; r[i] != fieldTerminator; i += 12 {
 		var de directoryEntry
 
 		de.Tag = string(r[i : i+3])

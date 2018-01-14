@@ -285,7 +285,7 @@ func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry)
 			start := baseAddress + d.StartingPos
 			b := rawRec[start : start+d.FieldLength]
 
-			if b[len(b)-1] == FieldTerminator {
+			if b[len(b)-1] == fieldTerminator {
 				cfs = append(cfs, &Controlfield{Tag: d.Tag, Text: string(b[:len(b)-1])})
 			} else {
 				parseError = true

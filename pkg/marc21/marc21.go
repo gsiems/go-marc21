@@ -29,11 +29,11 @@ https://www.loc.gov/marc/specifications/specrecstruc.html
 */
 
 const (
-	Delimiter        = 0x1f
-	FieldTerminator  = 0x1e
-	RecordTerminator = 0x1d
-	LeaderLen        = 24
-	MaxRecordSize    = 99999
+	delimiter        = 0x1f
+	fieldTerminator  = 0x1e
+	recordTerminator = 0x1d
+	leaderLen        = 24
+	maxRecordSize    = 99999
 )
 
 // Collection is fo containing zero or more MARC records
@@ -115,10 +115,10 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 	}
 
 	// Ensure that we have a "sane" record length?
-	if recLen <= LeaderLen {
+	if recLen <= leaderLen {
 		err = errors.New("MARC record is too short")
 		return nil, err
-	} else if recLen > MaxRecordSize {
+	} else if recLen > maxRecordSize {
 		err = errors.New("MARC record is too long")
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 	}
 
 	// The last byte should be a record terminator
-	if rawRec[len(rawRec)-1] != RecordTerminator {
+	if rawRec[len(rawRec)-1] != recordTerminator {
 		return nil, errors.New("Record terminator not found at end of record")
 	}
 
@@ -197,9 +197,9 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		return marc, err
 	}
 
-	dl := termToByte(Delimiter)
-	ft := termToByte(FieldTerminator)
-	rt := termToByte(RecordTerminator)
+	dl := termToByte(delimiter)
+	ft := termToByte(fieldTerminator)
+	rt := termToByte(recordTerminator)
 
 	var dir []directoryEntry
 	var rawDir []byte

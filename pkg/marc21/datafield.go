@@ -87,7 +87,7 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 			start := baseAddress + de.StartingPos
 			b := rawRec[start : start+de.FieldLength]
 
-			if b[de.FieldLength-1] != FieldTerminator {
+			if b[de.FieldLength-1] != fieldTerminator {
 				return nil, errors.New("extractDatafields: Field terminator not found at end of field")
 			}
 
@@ -97,7 +97,7 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 				Ind2: string(b[1]),
 			}
 
-			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{Delimiter}) {
+			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{delimiter}) {
 				if len(t) > 0 {
 					df.Subfields = append(df.Subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
 				}
