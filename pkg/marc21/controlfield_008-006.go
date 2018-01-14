@@ -573,26 +573,8 @@ var runningTime = map[string]string{
 	"|||": "No attempt to code",
 }
 
-var materialCategory = map[string]string{
-	"a": "Map",
-	"c": "Electronic resource",
-	"d": "Globe",
-	"f": "Tactile material",
-	"g": "Projected graphic",
-	"h": "Microform",
-	"k": "Nonprojected graphic",
-	"m": "Motion picture",
-	"o": "Kit",
-	"q": "Notated music",
-	"r": "Remote-sensing image",
-	"s": "Sound recording",
-	"t": "Text",
-	"v": "Videorecording",
-	"z": "Unspecified",
-}
-
 // parseBookCf parses the control field data for Book (BK) material types.
-func (mc CfMatlDesc) parseBookCf(b []byte) {
+func parseBookCf(mc *CfMatlDesc, b []byte) {
 
 	// 008 (NR):
 	//  18-21 - Illustrations (006/01-04)
@@ -606,6 +588,8 @@ func (mc CfMatlDesc) parseBookCf(b []byte) {
 	//  32 - Undefined
 	//  33 - Literary form (006/16)
 	//  34 - Biography (006/17)
+
+	// mc := make(CfMatlDesc)
 
 	for i := 0; i <= 3; i++ {
 		mc.appendCfMatlDesc("Illustrations", cfShortCode(illustrations, b, i))
@@ -624,11 +608,13 @@ func (mc CfMatlDesc) parseBookCf(b []byte) {
 	mc.appendCfMatlDesc("Index", cfShortCode(index, b, 13))
 	mc.appendCfMatlDesc("LiteraryForm", cfShortCode(literaryForm, b, 15))
 	mc.appendCfMatlDesc("Biography", cfShortCode(biography, b, 16))
+
+	// return mc
 }
 
 // parseComputerFilesCf parses the control field data for
 // ComputerFiles (CF) material types.
-func (mc CfMatlDesc) parseComputerFilesCf(b []byte) {
+func parseComputerFilesCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18-21 - Undefined
@@ -647,7 +633,7 @@ func (mc CfMatlDesc) parseComputerFilesCf(b []byte) {
 }
 
 // parseMapCf parses the control field data for Map (MP) material types.
-func (mc CfMatlDesc) parseMapCf(b []byte) {
+func parseMapCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18-21 - Relief (006/01-04)
@@ -678,7 +664,7 @@ func (mc CfMatlDesc) parseMapCf(b []byte) {
 }
 
 // parseMusicCf parses the control field data for Music (MU) material types.
-func (mc CfMatlDesc) parseMusicCf(b []byte) {
+func parseMusicCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18-19 - Form of composition (006/01-02)
@@ -711,7 +697,7 @@ func (mc CfMatlDesc) parseMusicCf(b []byte) {
 
 // parseContinuingResourcesCf parses the control field data for
 // ContinuingResources (CR) material types.
-func (mc CfMatlDesc) parseContinuingResourcesCf(b []byte) {
+func parseContinuingResourcesCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18 - Frequency (006/01)
@@ -746,7 +732,7 @@ func (mc CfMatlDesc) parseContinuingResourcesCf(b []byte) {
 
 // parseVisualMaterialsCf parses the control field data for
 // VisualMaterials (VM) material types.
-func (mc CfMatlDesc) parseVisualMaterialsCf(b []byte) {
+func parseVisualMaterialsCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18-20 - Running time for motion pictures and videorecordings (006/01-03)
@@ -779,7 +765,7 @@ func (mc CfMatlDesc) parseVisualMaterialsCf(b []byte) {
 
 // parseMixedMaterialsCf parses the control field data for
 // MixedMaterials (MX) material types.
-func (mc CfMatlDesc) parseMixedMaterialsCf(b []byte) {
+func parseMixedMaterialsCf(mc *CfMatlDesc, b []byte) {
 
 	// 008:
 	//  18-22 - Undefined
