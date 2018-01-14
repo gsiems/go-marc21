@@ -151,28 +151,27 @@ func (rec Record) ParseControlfields() (c CfData) {
 
 	c.MaterialCharactor = make(CfMatlDesc)
 
+	type fn func(md *CfMatlDesc, b []byte)
+
+	m := map[string]fn{
+		"BK": parseBookCf,
+		"CF": parseComputerFilesCf,
+		"MP": parseMapCf,
+		"MU": parseMusicCf,
+		"CR": parseContinuingResourcesCf,
+		"VM": parseVisualMaterialsCf,
+		"MX": parseMixedMaterialsCf,
+	}
+
 	if len(b) > 18 {
 		// Call the parse function with everything 18 and beyond
 		// even though the bytes after 34 aren't material specific. The
 		// parse functions will ignore any extra bytes and, even though
 		// some 008 fields are "short", we'd still like to get as
 		// much data as possible.
-
-		switch mt {
-		case "BK":
-			c.MaterialCharactor.parseBookCf(b[18:])
-		case "CF":
-			c.MaterialCharactor.parseComputerFilesCf(b[18:])
-		case "MP":
-			c.MaterialCharactor.parseMapCf(b[18:])
-		case "MU":
-			c.MaterialCharactor.parseMusicCf(b[18:])
-		case "CR":
-			c.MaterialCharactor.parseContinuingResourcesCf(b[18:])
-		case "VM":
-			c.MaterialCharactor.parseVisualMaterialsCf(b[18:])
-		case "MX":
-			c.MaterialCharactor.parseMixedMaterialsCf(b[18:])
+		fcn, ok := m[mt]
+		if ok {
+			fcn(&c.MaterialCharactor, b[18:])
 		}
 	}
 
@@ -180,28 +179,14 @@ func (rec Record) ParseControlfields() (c CfData) {
 	for _, x := range cf006 {
 		b := []byte(x)
 		if len(b) > 1 {
-
 			// NOTE: The Material Form is b[0] and ignoring it *could*
 			// disconnect the material form from the corresponding values.
 			// However the material form *should* match the leader record
 			// type so that really shouldn't be an issue... should it?
 			// Perhaps a check to verify that b[0] matches?
-
-			switch mt {
-			case "BK":
-				c.MaterialCharactor.parseBookCf(b[1:])
-			case "CF":
-				c.MaterialCharactor.parseComputerFilesCf(b[1:])
-			case "MP":
-				c.MaterialCharactor.parseMapCf(b[1:])
-			case "MU":
-				c.MaterialCharactor.parseMusicCf(b[1:])
-			case "CR":
-				c.MaterialCharactor.parseContinuingResourcesCf(b[1:])
-			case "VM":
-				c.MaterialCharactor.parseVisualMaterialsCf(b[1:])
-			case "MX":
-				c.MaterialCharactor.parseMixedMaterialsCf(b[1:])
+			fcn, ok := m[mt]
+			if ok {
+				fcn(&c.MaterialCharactor, b[1:])
 			}
 		}
 	}
