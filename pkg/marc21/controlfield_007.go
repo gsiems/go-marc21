@@ -283,23 +283,23 @@ var pdContractionLevelF = map[string]string{
 
 // 06-08 - Braille music format
 var pdBrailleMusicFormatF = map[string]string{
-	" ":   "No specified braille music format",
-	"a":   "Bar over bar",
-	"b":   "Bar by bar",
-	"c":   "Line over line",
-	"d":   "Paragraph",
-	"e":   "Single line",
-	"f":   "Section by section",
-	"g":   "Line by line",
-	"h":   "Open score",
-	"i":   "Spanner short form scoring",
-	"j":   "Short form scoring",
-	"k":   "Outline",
-	"l":   "Vertical score",
-	"n":   "Not applicable",
-	"u":   "Unknown",
-	"z":   "Other",
-	"|||": "No attempt to code",
+	" ": "No specified braille music format",
+	"a": "Bar over bar",
+	"b": "Bar by bar",
+	"c": "Line over line",
+	"d": "Paragraph",
+	"e": "Single line",
+	"f": "Section by section",
+	"g": "Line by line",
+	"h": "Open score",
+	"i": "Spanner short form scoring",
+	"j": "Short form scoring",
+	"k": "Outline",
+	"l": "Vertical score",
+	"n": "Not applicable",
+	"u": "Unknown",
+	"z": "Other",
+	"|": "No attempt to code",
 }
 
 // 09 - Special physical characteristics
@@ -1389,18 +1389,14 @@ func parsePdF(b []byte) (pd CfPhysDesc) {
 	// 05 - Level of contraction
 	// 06-08 - Braille music format
 	// 09 - Special physical characteristics
-
-	// TODO:
-	// 03-04 - Class of braille writing
-	//var pdBrailleWritingClassF = map[string]string{
-	// 06-08 - Braille music format
-	//var pdBrailleMusicFormatF = map[string]string{
 	pd = make(CfPhysDesc)
-
 	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationF, b, 1)
-	//	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationD, b, 1)
+	pd["BrailleWritingClass1"] = cfShortCode(pdBrailleWritingClassF, b, 3)
+	pd["BrailleWritingClass2"] = cfShortCode(pdBrailleWritingClassF, b, 4)
 	pd["ContractionLevel"] = cfShortCode(pdContractionLevelF, b, 5)
-	//	pd["SpecificMaterialDesignation"] = cfShortCode(pdSpecificDesignationD, b, 1)
+	pd["BrailleMusicFormat1"] = cfShortCode(pdBrailleMusicFormatF, b, 6)
+	pd["BrailleMusicFormat2"] = cfShortCode(pdBrailleMusicFormatF, b, 7)
+	pd["BrailleMusicFormat3"] = cfShortCode(pdBrailleMusicFormatF, b, 8)
 	pd["SpecialPhysicalCharacteristics"] = cfShortCode(pdSpecialCharacteristicsF, b, 9)
 	return pd
 }
