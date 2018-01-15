@@ -48,10 +48,18 @@ type Collection struct {
 }
 */
 
+// CollectionXMLHeader being the header (XML declaration and opening
+// collection tag) of a MARCXML document
 const CollectionXMLHeader = `<?xml version="1.0" encoding="UTF-8"?>
-<marc:collection xmlns="http://www.loc.gov/MARC21/slim>"
+<marc:collection xmlns:marc="http://www.loc.gov/MARC21/slim"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 `
-const CollectionXMLFooter = "</marc:collection>\n"
+
+// CollectionXMLFooter being the footer (closing collection tag) of a
+// MARCXML document
+const CollectionXMLFooter = `</marc:collection>
+`
 
 // LoadXML reads a MARCXML document
 func LoadXML(filename string) (Collection, error) {
