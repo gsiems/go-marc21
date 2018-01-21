@@ -79,11 +79,6 @@ func TestMARC(t *testing.T) {
 			t.Errorf("MultipartResourceRecordLevel() failed")
 		}
 
-		code, _ = rec.MaterialType()
-		if code == "" {
-			fmt.Printf("MaterialType() failed for %q\n", rec.Leader.Text)
-		}
-
 		cfd := rec.ParseControlfields()
 		if false {
 			fmt.Printf("%q\n", cfd)
