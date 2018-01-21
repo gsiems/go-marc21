@@ -99,7 +99,7 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 
 			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{delimiter}) {
 				if len(t) > 0 {
-					df.subfields = append(df.subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
+					df.subfields = append(df.subfields, &Subfield{code: string(t[0]), text: string(t[1:])})
 				}
 			}
 			dfs = append(dfs, &df)
@@ -137,7 +137,7 @@ func (d Datafield) Subfields(codes string) (sf []*Subfield) {
 
 	for _, c := range []byte(codes) {
 		for _, s := range d.subfields {
-			if s.Code == string(c) {
+			if s.code == string(c) {
 				sf = append(sf, s)
 			}
 		}
@@ -164,4 +164,14 @@ func (d Datafield) Ind2() (ind string) {
 		return " "
 	}
 	return d.ind2
+}
+
+// Code returns the code for the subfield.
+func (sf Subfield) Code() (c string) {
+	return sf.code
+}
+
+// Text returns the text for the subfield.
+func (sf Subfield) Text() (t string) {
+	return sf.text
 }

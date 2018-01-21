@@ -77,8 +77,8 @@ type Datafield struct {
 
 // Subfield contains a subfield entry
 type Subfield struct {
-	Code string `xml:"code,attr"`
-	Text string `xml:",chardata"`
+	code string `xml:"code,attr"`
+	text string `xml:",chardata"`
 }
 
 // ParseNextRecord reads the next MARC record and returns the parsed
@@ -182,7 +182,7 @@ func (rec Record) String() string {
 	for _, df := range rec.datafields {
 		pre := fmt.Sprintf("%s %s%s _", df.Tag(), df.Ind1(), df.Ind2())
 		for _, sf := range df.subfields {
-			ret += fmt.Sprintf("%s%s%s\n", pre, sf.Code, sf.Text)
+			ret += fmt.Sprintf("%s%s%s\n", pre, sf.Code(), sf.Text())
 			pre = "       _"
 		}
 	}
@@ -234,8 +234,8 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
 		for _, sf := range df.subfields {
 			b = append(b, dl...)
-			b = append(b, []byte(sf.Code)...)
-			b = append(b, []byte(sf.Text)...)
+			b = append(b, []byte(sf.Code())...)
+			b = append(b, []byte(sf.Text())...)
 		}
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
