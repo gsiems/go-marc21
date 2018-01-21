@@ -253,22 +253,22 @@ func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry)
 	var controlNumber string
 
 	for _, d := range dir {
-		if strings.HasPrefix(d.Tag, "00") {
+		if strings.HasPrefix(d.tag, "00") {
 
-			start := baseAddress + d.StartingPos
-			b := rawRec[start : start+d.FieldLength]
+			start := baseAddress + d.startingPos
+			b := rawRec[start : start+d.fieldLength]
 
 			if b[len(b)-1] == fieldTerminator {
-				if d.Tag == "001" {
+				if d.tag == "001" {
 					if controlNumber == "" {
 						controlNumber = string(b[:len(b)-1])
 					} else {
-						parseErrorTags = append(parseErrorTags, d.Tag)
+						parseErrorTags = append(parseErrorTags, d.tag)
 					}
 				}
-				cfs = append(cfs, &Controlfield{tag: d.Tag, text: string(b[:len(b)-1])})
+				cfs = append(cfs, &Controlfield{tag: d.tag, text: string(b[:len(b)-1])})
 			} else {
-				parseErrorTags = append(parseErrorTags, d.Tag)
+				parseErrorTags = append(parseErrorTags, d.tag)
 			}
 		}
 	}

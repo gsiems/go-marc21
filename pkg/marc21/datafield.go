@@ -83,21 +83,21 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
 func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (dfs []*Datafield, err error) {
 
 	for _, de := range dir {
-		if !strings.HasPrefix(de.Tag, "00") {
-			start := baseAddress + de.StartingPos
-			b := rawRec[start : start+de.FieldLength]
+		if !strings.HasPrefix(de.tag, "00") {
+			start := baseAddress + de.startingPos
+			b := rawRec[start : start+de.fieldLength]
 
-			if b[de.FieldLength-1] != fieldTerminator {
+			if b[de.fieldLength-1] != fieldTerminator {
 				return nil, errors.New("extractDatafields: Field terminator not found at end of field")
 			}
 
 			df := Datafield{
-				tag:  de.Tag,
+				tag:  de.tag,
 				ind1: string(b[0]),
 				ind2: string(b[1]),
 			}
 
-			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{delimiter}) {
+			for _, t := range bytes.Split(b[2:de.fieldLength-1], []byte{delimiter}) {
 				if len(t) > 0 {
 					df.subfields = append(df.subfields, &Subfield{code: string(t[0]), text: string(t[1:])})
 				}

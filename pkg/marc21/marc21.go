@@ -56,9 +56,9 @@ type Record struct {
 
 // directoryEntry contains a single directory entry
 type directoryEntry struct {
-	Tag         string
-	StartingPos int
-	FieldLength int
+	tag         string
+	startingPos int
+	fieldLength int
 }
 
 // Controlfield contains a controlfield entry
@@ -218,7 +218,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		cfs = append(cfs, b...)
 
-		dir = append(dir, directoryEntry{Tag: cf.Tag(), StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{tag: cf.Tag(), startingPos: startPos, fieldLength: len(b)})
 
 		startPos += len(b)
 	}
@@ -240,16 +240,16 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		dir = append(dir, directoryEntry{Tag: df.Tag(), StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{tag: df.Tag(), startingPos: startPos, fieldLength: len(b)})
 
 		startPos += len(b)
 	}
 
 	// Generate the directory
 	for _, de := range dir {
-		rawDir = append(rawDir, []byte(de.Tag)...)
-		rawDir = append(rawDir, []byte(fmt.Sprintf("%04d", de.FieldLength))...)
-		rawDir = append(rawDir, []byte(fmt.Sprintf("%05d", de.StartingPos))...)
+		rawDir = append(rawDir, []byte(de.tag)...)
+		rawDir = append(rawDir, []byte(fmt.Sprintf("%04d", de.fieldLength))...)
+		rawDir = append(rawDir, []byte(fmt.Sprintf("%05d", de.startingPos))...)
 	}
 	rawDir = append(rawDir, ft...)
 

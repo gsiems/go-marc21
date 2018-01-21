@@ -65,13 +65,13 @@ func parseDirectory(r []byte) (dir []*directoryEntry, err error) {
 	for i := leaderLen; r[i] != fieldTerminator; i += 12 {
 		var de directoryEntry
 
-		de.Tag = string(r[i : i+3])
-		de.FieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
+		de.tag = string(r[i : i+3])
+		de.fieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
 		if err != nil {
 			return nil, err
 		}
 
-		de.StartingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
+		de.startingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
 		if err != nil {
 			return nil, err
 		}
