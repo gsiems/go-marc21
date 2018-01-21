@@ -126,11 +126,11 @@ func (rec Record) ParseControlfields() (c CfData) {
 	//  38 - Modified record
 	//  39 - Cataloging source
 
-	c.ControlNumber = rec.getCF("001")
-	c.ControlNumberIdentifier = rec.getCF("003")
-	c.LatestTransDateTime = rec.getCF("005")
+	c.ControlNumber = rec.Cfield("001")
+	c.ControlNumberIdentifier = rec.Cfield("003")
+	c.LatestTransDateTime = rec.Cfield("005")
 
-	b := []byte(rec.getCF("008"))
+	b := []byte(rec.Cfield("008"))
 	c.FileDate = cfPluckVal(b, 0, 5)
 	c.DateTypePubStatus = cfShortCode(dateTypePubStatus, b, 6)
 	c.Date1 = cfPluckVal(b, 7, 4)
@@ -175,9 +175,9 @@ func (rec Record) ParseControlfields() (c CfData) {
 		}
 	}
 
-	cf006 := rec.getCFs("006")
+	cf006 := rec.Cfields([]string{"006"})
 	for _, x := range cf006 {
-		b := []byte(x)
+		b := []byte(x.Text)
 		if len(b) > 1 {
 			// NOTE: The Material Form is b[0] and ignoring it *could*
 			// disconnect the material form from the corresponding values.
@@ -193,34 +193,6 @@ func (rec Record) ParseControlfields() (c CfData) {
 
 	c.PhysicalDescription = rec.parse007fields()
 	return c
-}
-
-// getCF returns the control field for the specified non-repeating tag
-func (rec Record) getCF(tag string) string {
-	for _, cf := range rec.Controlfields {
-		if cf.Tag == tag {
-			return cf.Text
-		}
-	}
-	return ""
-}
-
-// getCFs returns the unique control field(s) for the specified repeating tag
-func (rec Record) getCFs(tag string) (t []string) {
-
-	uniq := make(map[string]bool)
-
-	for _, cf := range rec.Controlfields {
-		if cf.Tag == tag {
-			uniq[cf.Text] = true
-		}
-	}
-
-	for k := range uniq {
-		t = append(t, k)
-	}
-
-	return t
 }
 
 // MaterialType returns the code and description of the type of material
@@ -303,4 +275,37 @@ func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry)
 // Implement the Stringer interface for "Pretty-printing"
 func (cf Controlfield) String() string {
 	return fmt.Sprintf("{%s: '%s'}", cf.Tag, cf.Text)
+}
+
+// Controlfields returns the unique set of controlfields for the record
+// that match the specified tags.
+func (rec Record) Cfields(tags []string) (f []*Controlfield) {
+
+	uniq := make(map[string]bool)
+
+	for _, t := range tags {
+		for _, c := range rec.Controlfields {
+			if c.Tag == t {
+
+				ck := strings.Join([]string{c.Tag, c.Text}, ":")
+				_, ok := uniq[ck]
+				if !ok {
+					f = append(f, c)
+				}
+				uniq[ck] = true
+			}
+		}
+	}
+	return f
+}
+
+// Cfield returns the text value of the first control field for the
+// record that matches the specified (presumably non-repeating) tag.
+func (rec Record) Cfield(tag string) string {
+	for _, cf := range rec.Controlfields {
+		if cf.Tag == tag {
+			return cf.Text
+		}
+	}
+	return ""
 }

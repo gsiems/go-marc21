@@ -1288,9 +1288,9 @@ func (rec Record) parse007fields() (c []CfPhysDesc) {
 	}
 
 	// Each 007 needs to hang as a unit.
-	cf007 := rec.getCFs("007")
+	cf007 := rec.Cfields([]string{"007"})
 	for _, x := range cf007 {
-		b := []byte(x)
+		b := []byte(x.Text)
 		if len(b) > 1 {
 
 			var pd CfPhysDesc
