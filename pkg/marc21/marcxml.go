@@ -106,8 +106,8 @@ func (rec Record) AsXML() (ret string, err error) {
 
 	ret = "\t<marc:record>\n"
 	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", html.EscapeString(rec.Leader.Text))
-	for _, cf := range rec.Controlfields {
-		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.Tag, html.EscapeString(cf.Text))
+	for _, cf := range rec.controlfields {
+		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.Tag(), html.EscapeString(cf.Text()))
 	}
 	for _, df := range rec.datafields {
 		ret += fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.Tag(), df.Ind1(), df.Ind2())

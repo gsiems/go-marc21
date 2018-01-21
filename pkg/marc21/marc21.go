@@ -50,7 +50,7 @@ type Leader struct {
 // Record is for containing a MARC record
 type Record struct {
 	Leader        Leader          `xml:"leader"`
-	Controlfields []*Controlfield `xml:"controlfield"`
+	controlfields []*Controlfield `xml:"controlfield"`
 	datafields    []*Datafield    `xml:"datafield"`
 }
 
@@ -63,8 +63,8 @@ type directoryEntry struct {
 
 // Controlfield contains a controlfield entry
 type Controlfield struct {
-	Tag  string `xml:"tag,attr"`
-	Text string `xml:",chardata"`
+	tag  string `xml:"tag,attr"`
+	text string `xml:",chardata"`
 }
 
 // Datafield contains a datafield entry
@@ -159,7 +159,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 		return nil, err
 	}
 
-	rec.Controlfields, err = extractControlfields(rawRec, baseDataAddress, dir)
+	rec.controlfields, err = extractControlfields(rawRec, baseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -176,8 +176,8 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 func (rec Record) String() string {
 
 	ret := fmt.Sprintf("LDR %s\n", rec.Leader.Text)
-	for _, cf := range rec.Controlfields {
-		ret += fmt.Sprintf("%s     %s\n", cf.Tag, cf.Text)
+	for _, cf := range rec.controlfields {
+		ret += fmt.Sprintf("%s     %s\n", cf.Tag(), cf.Text())
 	}
 	for _, df := range rec.datafields {
 		pre := fmt.Sprintf("%s %s%s _", df.Tag(), df.Ind1(), df.Ind2())
@@ -208,17 +208,17 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	var startPos int
 
 	// Pack the control fields
-	for _, cf := range rec.Controlfields {
+	for _, cf := range rec.controlfields {
 
-		if cf.Text == "" {
+		if cf.Text() == "" {
 			continue
 		}
 
-		b := []byte(cf.Text)
+		b := []byte(cf.Text())
 		b = append(b, ft...)
 		cfs = append(cfs, b...)
 
-		dir = append(dir, directoryEntry{Tag: cf.Tag, StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{Tag: cf.Tag(), StartingPos: startPos, FieldLength: len(b)})
 
 		startPos += len(b)
 	}
@@ -240,7 +240,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		dir = append(dir, directoryEntry{Tag: df.tag, StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{Tag: df.Tag(), StartingPos: startPos, FieldLength: len(b)})
 
 		startPos += len(b)
 	}
