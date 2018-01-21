@@ -111,7 +111,7 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 
 // Datafields returns datafields for the record that match the specified
 // comma separated list of tags. If no tags are specified (empty string)
-// then all datafields are returned.
+// then all datafields are returned
 func (rec Record) Datafields(tags string) (f []*Datafield) {
 	if tags == "" {
 		return rec.datafields
@@ -129,7 +129,7 @@ func (rec Record) Datafields(tags string) (f []*Datafield) {
 
 // Subfields returns subfields for the datafield that match the
 // specified codes. If no codes are specified (empty string) then all
-// subfields are returned.
+// subfields are returned
 func (d Datafield) Subfields(codes string) (sf []*Subfield) {
 	if codes == "" {
 		return d.subfields
@@ -145,12 +145,12 @@ func (d Datafield) Subfields(codes string) (sf []*Subfield) {
 	return sf
 }
 
-// Tag returns the tag for the datafield.
+// Tag returns the tag for the datafield
 func (d Datafield) Tag() (tag string) {
 	return d.tag
 }
 
-// Ind1 returns the indicator 1 value for the datafield.
+// Ind1 returns the indicator 1 value for the datafield
 func (d Datafield) Ind1() (ind string) {
 	if d.ind1 == "" {
 		return " "
@@ -158,7 +158,7 @@ func (d Datafield) Ind1() (ind string) {
 	return d.ind1
 }
 
-// Ind2 returns the indicator 2 value for the datafield.
+// Ind2 returns the indicator 2 value for the datafield
 func (d Datafield) Ind2() (ind string) {
 	if d.ind2 == "" {
 		return " "
@@ -166,12 +166,12 @@ func (d Datafield) Ind2() (ind string) {
 	return d.ind2
 }
 
-// Code returns the code for the subfield.
+// Code returns the code for the subfield
 func (sf Subfield) Code() (c string) {
 	return sf.code
 }
 
-// Text returns the text for the subfield.
+// Text returns the text for the subfield
 func (sf Subfield) Text() (t string) {
 	return sf.text
 }

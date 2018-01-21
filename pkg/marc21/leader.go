@@ -374,6 +374,7 @@ func (ldr Leader) String() string {
 	return ret
 }
 
+// Text returns the text for the leader
 func (ldr Leader) Text() string {
 	return ldr.text
 }

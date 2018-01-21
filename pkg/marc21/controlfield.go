@@ -288,7 +288,7 @@ func (cf Controlfield) String() string {
 
 // Controlfields returns the unique set of controlfields for the record
 // that match the specified tags. If no tags are specified (empty string)
-// then all controlfields are returned.
+// then all controlfields are returned
 func (rec Record) Controlfields(tags string) (f []*Controlfield) {
 	if tags == "" {
 		return rec.controlfields
@@ -311,7 +311,7 @@ func (rec Record) Controlfields(tags string) (f []*Controlfield) {
 }
 
 // Controlfield returns the text value of the first control field for the
-// record that matches the specified (presumably non-repeating) tag.
+// record that matches the specified (presumably non-repeating) tag
 func (rec Record) Controlfield(tag string) string {
 	for _, cf := range rec.controlfields {
 		if cf.tag == tag {
@@ -321,10 +321,12 @@ func (rec Record) Controlfield(tag string) string {
 	return ""
 }
 
+// Tag returns the tag for the controlfield
 func (cf Controlfield) Tag() string {
 	return cf.tag
 }
 
+// Text returns the text for the controlfield
 func (cf Controlfield) Text() string {
 	return cf.text
 }
