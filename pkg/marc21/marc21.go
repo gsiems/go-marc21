@@ -44,12 +44,12 @@ type Collection struct {
 
 // Leader is for containing the text string of the MARC record Leader
 type Leader struct {
-	Text string `xml:",chardata"`
+	text string `xml:",chardata"`
 }
 
 // Record is for containing a MARC record
 type Record struct {
-	Leader        Leader          `xml:"leader"`
+	leader        Leader          `xml:"leader"`
 	controlfields []*Controlfield `xml:"controlfield"`
 	datafields    []*Datafield    `xml:"datafield"`
 }
@@ -147,7 +147,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 
 	rec = new(Record)
 
-	rec.Leader.Text = string(rawRec[:24])
+	rec.leader.text = string(rawRec[:24])
 
 	dir, err := parseDirectory(rawRec)
 	if err != nil {
@@ -175,7 +175,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 // Implement the Stringer interface for "Pretty-printing"
 func (rec Record) String() string {
 
-	ret := fmt.Sprintf("LDR %s\n", rec.Leader.Text)
+	ret := fmt.Sprintf("LDR %s\n", rec.leader.Text())
 	for _, cf := range rec.controlfields {
 		ret += fmt.Sprintf("%s     %s\n", cf.Tag(), cf.Text())
 	}
@@ -192,7 +192,7 @@ func (rec Record) String() string {
 // RecordAsMARC converts a Record into a MARC record byte array
 func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
-	if rec.Leader.Text == "" {
+	if rec.leader.text == "" {
 		err = errors.New("record Leader is undefined")
 		return marc, err
 	}
@@ -257,7 +257,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	recLen := []byte(fmt.Sprintf("%05d", 24+len(rawDir)+len(cfs)+len(dfs)+1))
 	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(rawDir)))
 
-	ldr := []byte(rec.Leader.Text)
+	ldr := []byte(rec.leader.text)
 	for i := 0; i <= 4; i++ {
 		ldr[i] = recLen[i]
 		ldr[i+12] = recBaseDataAddress[i]
