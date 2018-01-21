@@ -109,8 +109,8 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 	return dfs, nil
 }
 
-// Fields returns datafields for the record that match the specified tags
-func (rec Record) Fields(tags []string) (f []*Datafield) {
+// Dfields returns datafields for the record that match the specified tags
+func (rec Record) Dfields(tags []string) (f []*Datafield) {
 	for _, t := range tags {
 		for _, d := range rec.Datafields {
 			if d.Tag == t {
@@ -121,8 +121,8 @@ func (rec Record) Fields(tags []string) (f []*Datafield) {
 	return f
 }
 
-// Subfields returns subfields for the datafield that match the specified codes
-func (d Datafield) Subfields(codes []string) (sf []*Subfield) {
+// Sfields returns subfields for the datafield that match the specified codes
+func (d Datafield) Sfields(codes []string) (sf []*Subfield) {
 	for _, c := range codes {
 		for _, s := range d.Subfields {
 			if s.Code == c {
