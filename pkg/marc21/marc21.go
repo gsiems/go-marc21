@@ -51,7 +51,7 @@ type Leader struct {
 type Record struct {
 	Leader        Leader          `xml:"leader"`
 	Controlfields []*Controlfield `xml:"controlfield"`
-	Datafields    []*Datafield    `xml:"datafield"`
+	datafields    []*Datafield    `xml:"datafield"`
 }
 
 // directoryEntry contains a single directory entry
@@ -69,10 +69,10 @@ type Controlfield struct {
 
 // Datafield contains a datafield entry
 type Datafield struct {
-	Tag       string      `xml:"tag,attr"`
-	Ind1      string      `xml:"ind1,attr"`
-	Ind2      string      `xml:"ind2,attr"`
-	Subfields []*Subfield `xml:"subfield"`
+	tag       string      `xml:"tag,attr"`
+	ind1      string      `xml:"ind1,attr"`
+	ind2      string      `xml:"ind2,attr"`
+	subfields []*Subfield `xml:"subfield"`
 }
 
 // Subfield contains a subfield entry
@@ -164,7 +164,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 		return nil, err
 	}
 
-	rec.Datafields, err = extractDatafields(rawRec, baseDataAddress, dir)
+	rec.datafields, err = extractDatafields(rawRec, baseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -179,9 +179,9 @@ func (rec Record) String() string {
 	for _, cf := range rec.Controlfields {
 		ret += fmt.Sprintf("%s     %s\n", cf.Tag, cf.Text)
 	}
-	for _, df := range rec.Datafields {
-		pre := fmt.Sprintf("%s %s%s _", df.Tag, df.Ind1, df.Ind2)
-		for _, sf := range df.Subfields {
+	for _, df := range rec.datafields {
+		pre := fmt.Sprintf("%s %s%s _", df.Tag(), df.Ind1(), df.Ind2())
+		for _, sf := range df.subfields {
 			ret += fmt.Sprintf("%s%s%s\n", pre, sf.Code, sf.Text)
 			pre = "       _"
 		}
@@ -224,21 +224,15 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	}
 
 	// Pack the data fields/sub-fields
-	for _, df := range rec.Datafields {
+	for _, df := range rec.datafields {
 
-		ind1 := df.Ind1
-		if ind1 == "" {
-			ind1 = " "
-		}
-		ind2 := df.Ind2
-		if ind2 == "" {
-			ind2 = " "
-		}
+		ind1 := df.Ind1()
+		ind2 := df.Ind2()
 
 		b := []byte(ind1)
 		b = append(b, []byte(ind2)...)
 
-		for _, sf := range df.Subfields {
+		for _, sf := range df.subfields {
 			b = append(b, dl...)
 			b = append(b, []byte(sf.Code)...)
 			b = append(b, []byte(sf.Text)...)
@@ -246,7 +240,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		dir = append(dir, directoryEntry{Tag: df.Tag, StartingPos: startPos, FieldLength: len(b)})
+		dir = append(dir, directoryEntry{Tag: df.tag, StartingPos: startPos, FieldLength: len(b)})
 
 		startPos += len(b)
 	}

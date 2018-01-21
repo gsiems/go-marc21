@@ -92,14 +92,14 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 			}
 
 			df := Datafield{
-				Tag:  de.Tag,
-				Ind1: string(b[0]),
-				Ind2: string(b[1]),
+				tag:  de.Tag,
+				ind1: string(b[0]),
+				ind2: string(b[1]),
 			}
 
 			for _, t := range bytes.Split(b[2:de.FieldLength-1], []byte{delimiter}) {
 				if len(t) > 0 {
-					df.Subfields = append(df.Subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
+					df.subfields = append(df.subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
 				}
 			}
 			dfs = append(dfs, &df)
@@ -109,11 +109,17 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 	return dfs, nil
 }
 
-// Dfields returns datafields for the record that match the specified tags
-func (rec Record) Dfields(tags []string) (f []*Datafield) {
-	for _, t := range tags {
-		for _, d := range rec.Datafields {
-			if d.Tag == t {
+// Datafields returns datafields for the record that match the specified
+// comma separated list of tags. If no tags are specified (empty string)
+// then all datafields are returned.
+func (rec Record) Datafields(tags string) (f []*Datafield) {
+	if tags == "" {
+		return rec.datafields
+	}
+
+	for _, t := range strings.Split(tags, ",") {
+		for _, d := range rec.datafields {
+			if d.tag == t {
 				f = append(f, d)
 			}
 		}
@@ -121,14 +127,41 @@ func (rec Record) Dfields(tags []string) (f []*Datafield) {
 	return f
 }
 
-// Sfields returns subfields for the datafield that match the specified codes
-func (d Datafield) Sfields(codes []string) (sf []*Subfield) {
-	for _, c := range codes {
-		for _, s := range d.Subfields {
-			if s.Code == c {
+// Subfields returns subfields for the datafield that match the
+// specified codes. If no codes are specified (empty string) then all
+// subfields are returned.
+func (d Datafield) Subfields(codes string) (sf []*Subfield) {
+	if codes == "" {
+		return d.subfields
+	}
+
+	for _, c := range []byte(codes) {
+		for _, s := range d.subfields {
+			if s.Code == string(c) {
 				sf = append(sf, s)
 			}
 		}
 	}
 	return sf
+}
+
+// Tag returns the tag for the datafield.
+func (d Datafield) Tag() (tag string) {
+	return d.tag
+}
+
+// Ind1 returns the indicator 1 value for the datafield.
+func (d Datafield) Ind1() (ind string) {
+	if d.ind1 == "" {
+		return " "
+	}
+	return d.ind1
+}
+
+// Ind2 returns the indicator 2 value for the datafield.
+func (d Datafield) Ind2() (ind string) {
+	if d.ind2 == "" {
+		return " "
+	}
+	return d.ind2
 }
