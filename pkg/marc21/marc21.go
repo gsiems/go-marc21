@@ -197,9 +197,9 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		return marc, err
 	}
 
-	dl := termToByte(delimiter)
-	ft := termToByte(fieldTerminator)
-	rt := termToByte(recordTerminator)
+	dl := termAsByte(delimiter)
+	ft := termAsByte(fieldTerminator)
+	rt := termAsByte(recordTerminator)
 
 	var dir []directoryEntry
 	var rawDir []byte
@@ -279,7 +279,8 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	return marc, nil
 }
 
-func termToByte(i int) (b []byte) {
+// termAsByte converts a terminator/delimiter value to a byte
+func termAsByte(i int) (b []byte) {
 
 	// We apparently need a 2-byte array for setting the uint16...
 	x := make([]byte, 2)
@@ -288,28 +289,4 @@ func termToByte(i int) (b []byte) {
 	b = x[:1]
 
 	return b
-}
-
-// Field returns datafields for the record that match the specified tags
-func (rec Record) Field(tags []string) (f []*Datafield) {
-	for _, t := range tags {
-		for _, d := range rec.Datafields {
-			if d.Tag == t {
-				f = append(f, d)
-			}
-		}
-	}
-	return f
-}
-
-// Subfield returns subfields for the datafield that match the specified codes
-func (d Datafield) Subfield(codes []string) (sf []*Subfield) {
-	for _, c := range codes {
-		for _, s := range d.Subfields {
-			if s.Code == c {
-				sf = append(sf, s)
-			}
-		}
-	}
-	return sf
 }
