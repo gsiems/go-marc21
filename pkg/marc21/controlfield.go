@@ -249,7 +249,8 @@ func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry)
 	// data for either dorked-up 003/007 tag. Since the remainder of the
 	// record appears to be good we don't want to fail, but we do want
 	// to bring attention to the data issue.
-	parseError := false
+	var parseErrorTags []string
+	var controlNumber string
 
 	for _, d := range dir {
 		if strings.HasPrefix(d.Tag, "00") {
@@ -258,15 +259,23 @@ func extractControlfields(rawRec []byte, baseAddress int, dir []*directoryEntry)
 			b := rawRec[start : start+d.FieldLength]
 
 			if b[len(b)-1] == fieldTerminator {
+				if d.Tag == "001" {
+					if controlNumber == "" {
+						controlNumber = string(b[:len(b)-1])
+					} else {
+						parseErrorTags = append(parseErrorTags, d.Tag)
+					}
+				}
 				cfs = append(cfs, &Controlfield{Tag: d.Tag, Text: string(b[:len(b)-1])})
 			} else {
-				parseError = true
+				parseErrorTags = append(parseErrorTags, d.Tag)
 			}
 		}
 	}
 
-	if parseError {
-		log.Printf("Control fields extraction error: %s\n", cfs)
+	if len(parseErrorTags) > 0 {
+		badTags := strings.Join(parseErrorTags, ", ")
+		log.Printf("Control fields extraction error for ControlNumber %q (fields: %s)\n", controlNumber, badTags)
 	}
 
 	return cfs, nil
