@@ -4,7 +4,7 @@
 
 package marc21
 
-import "strconv"
+//import "strconv"
 
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
@@ -66,12 +66,12 @@ func parseDirectory(r []byte) (dir []*directoryEntry, err error) {
 		var de directoryEntry
 
 		de.tag = string(r[i : i+3])
-		de.fieldLength, err = strconv.Atoi(string(r[i+3 : i+7]))
+		de.fieldLength, err = toInt(r[i+3 : i+7]) //strconv.Atoi(string(r[i+3 : i+7]))
 		if err != nil {
 			return nil, err
 		}
 
-		de.startingPos, err = strconv.Atoi(string(r[i+7 : i+12]))
+		de.startingPos, err = toInt(r[i+7 : i+12]) // strconv.Atoi(string(r[i+7 : i+12]))
 		if err != nil {
 			return nil, err
 		}

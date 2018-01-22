@@ -44,14 +44,14 @@ type Collection struct {
 
 // Leader is for containing the text string of the MARC record Leader
 type Leader struct {
-	text string `xml:",chardata"`
+	Text string `xml:",chardata"`
 }
 
 // Record is for containing a MARC record
 type Record struct {
-	leader        Leader          `xml:"leader"`
-	controlfields []*Controlfield `xml:"controlfield"`
-	datafields    []*Datafield    `xml:"datafield"`
+	Leader        Leader          `xml:"leader"`
+	Controlfields []*Controlfield `xml:"controlfield"`
+	Datafields    []*Datafield    `xml:"datafield"`
 }
 
 // directoryEntry contains a single directory entry
@@ -63,22 +63,22 @@ type directoryEntry struct {
 
 // Controlfield contains a controlfield entry
 type Controlfield struct {
-	tag  string `xml:"tag,attr"`
-	text string `xml:",chardata"`
+	Tag  string `xml:"tag,attr"`
+	Text string `xml:",chardata"`
 }
 
 // Datafield contains a datafield entry
 type Datafield struct {
-	tag       string      `xml:"tag,attr"`
-	ind1      string      `xml:"ind1,attr"`
-	ind2      string      `xml:"ind2,attr"`
-	subfields []*Subfield `xml:"subfield"`
+	Tag       string      `xml:"tag,attr"`
+	Ind1      string      `xml:"ind1,attr"`
+	Ind2      string      `xml:"ind2,attr"`
+	Subfields []*Subfield `xml:"subfield"`
 }
 
 // Subfield contains a subfield entry
 type Subfield struct {
-	code string `xml:"code,attr"`
-	text string `xml:",chardata"`
+	Code string `xml:"code,attr"`
+	Text string `xml:",chardata"`
 }
 
 // ParseNextRecord reads the next MARC record and returns the parsed
@@ -109,7 +109,7 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 		return nil, err
 	}
 
-	recLen, err := strconv.Atoi(string(rawLen[0:5]))
+	recLen, err := toInt(rawLen[0:5]) // strconv.Atoi(string(rawLen[0:5]))
 	if err != nil {
 		return nil, err
 	}
@@ -147,24 +147,24 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 
 	rec = new(Record)
 
-	rec.leader.text = string(rawRec[:24])
+	rec.Leader.Text = string(rawRec[:24])
 
 	dir, err := parseDirectory(rawRec)
 	if err != nil {
 		return nil, err
 	}
 
-	baseDataAddress, err := strconv.Atoi(string(rawRec[12:17]))
+	baseDataAddress, err := toInt(rawRec[12:17]) //strconv.Atoi(string(rawRec[12:17]))
 	if err != nil {
 		return nil, err
 	}
 
-	rec.controlfields, err = extractControlfields(rawRec, baseDataAddress, dir)
+	rec.Controlfields, err = extractControlfields(rawRec, baseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
 
-	rec.datafields, err = extractDatafields(rawRec, baseDataAddress, dir)
+	rec.Datafields, err = extractDatafields(rawRec, baseDataAddress, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -175,14 +175,14 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 // Implement the Stringer interface for "Pretty-printing"
 func (rec Record) String() string {
 
-	ret := fmt.Sprintf("LDR %s\n", rec.leader.Text())
-	for _, cf := range rec.controlfields {
-		ret += fmt.Sprintf("%s     %s\n", cf.Tag(), cf.Text())
+	ret := fmt.Sprintf("LDR %s\n", rec.Leader.Text)
+	for _, cf := range rec.Controlfields {
+		ret += fmt.Sprintf("%s     %s\n", cf.GetTag(), cf.GetText())
 	}
-	for _, df := range rec.datafields {
-		pre := fmt.Sprintf("%s %s%s _", df.Tag(), df.Ind1(), df.Ind2())
-		for _, sf := range df.subfields {
-			ret += fmt.Sprintf("%s%s%s\n", pre, sf.Code(), sf.Text())
+	for _, df := range rec.Datafields {
+		pre := fmt.Sprintf("%s %s%s _", df.GetTag(), df.GetInd1(), df.GetInd2())
+		for _, sf := range df.Subfields {
+			ret += fmt.Sprintf("%s%s%s\n", pre, sf.GetCode(), sf.GetText())
 			pre = "       _"
 		}
 	}
@@ -192,7 +192,7 @@ func (rec Record) String() string {
 // RecordAsMARC converts a Record into a MARC record byte array
 func (rec Record) RecordAsMARC() (marc []byte, err error) {
 
-	if rec.leader.text == "" {
+	if rec.Leader.Text == "" {
 		err = errors.New("record Leader is undefined")
 		return marc, err
 	}
@@ -208,39 +208,39 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	var startPos int
 
 	// Pack the control fields
-	for _, cf := range rec.controlfields {
+	for _, cf := range rec.Controlfields {
 
-		if cf.Text() == "" {
+		if cf.GetText() == "" {
 			continue
 		}
 
-		b := []byte(cf.Text())
+		b := []byte(cf.GetText())
 		b = append(b, ft...)
 		cfs = append(cfs, b...)
 
-		dir = append(dir, directoryEntry{tag: cf.Tag(), startingPos: startPos, fieldLength: len(b)})
+		dir = append(dir, directoryEntry{tag: cf.GetTag(), startingPos: startPos, fieldLength: len(b)})
 
 		startPos += len(b)
 	}
 
 	// Pack the data fields/sub-fields
-	for _, df := range rec.datafields {
+	for _, df := range rec.Datafields {
 
-		ind1 := df.Ind1()
-		ind2 := df.Ind2()
+		ind1 := df.GetInd1()
+		ind2 := df.GetInd2()
 
 		b := []byte(ind1)
 		b = append(b, []byte(ind2)...)
 
-		for _, sf := range df.subfields {
+		for _, sf := range df.Subfields {
 			b = append(b, dl...)
-			b = append(b, []byte(sf.Code())...)
-			b = append(b, []byte(sf.Text())...)
+			b = append(b, []byte(sf.GetCode())...)
+			b = append(b, []byte(sf.GetText())...)
 		}
 		b = append(b, ft...)
 		dfs = append(dfs, b...)
 
-		dir = append(dir, directoryEntry{tag: df.Tag(), startingPos: startPos, fieldLength: len(b)})
+		dir = append(dir, directoryEntry{tag: df.GetTag(), startingPos: startPos, fieldLength: len(b)})
 
 		startPos += len(b)
 	}
@@ -257,7 +257,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	recLen := []byte(fmt.Sprintf("%05d", 24+len(rawDir)+len(cfs)+len(dfs)+1))
 	recBaseDataAddress := []byte(fmt.Sprintf("%05d", 24+len(rawDir)))
 
-	ldr := []byte(rec.leader.text)
+	ldr := []byte(rec.Leader.Text)
 	for i := 0; i <= 4; i++ {
 		ldr[i] = recLen[i]
 		ldr[i+12] = recBaseDataAddress[i]
@@ -283,4 +283,35 @@ func termAsByte(i int) (b []byte) {
 	b = x[:1]
 
 	return b
+}
+
+// toInt converts a byte array of digits to it's corresponding integer
+// value
+func toInt(b []byte) (ret int, err error) {
+	ret, err = strconv.Atoi(string(b))
+	if err != nil {
+
+		var digits = map[string]int{
+			"0": 0,
+			"1": 1,
+			"2": 2,
+			"3": 3,
+			"4": 4,
+			"5": 5,
+			"6": 6,
+			"7": 7,
+			"8": 8,
+			"9": 9,
+		}
+
+		ret = 0
+		for i := range b {
+			x, ok := digits[string(b[i])]
+			if !ok {
+				return 0, errors.New("toInt(): Not an integer")
+			}
+			ret = (10 * ret) + x
+		}
+	}
+	return ret, nil
 }

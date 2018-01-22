@@ -6,7 +6,6 @@ package marc21
 
 import (
 	"fmt"
-	"strconv"
 )
 
 /*
@@ -65,8 +64,8 @@ var recordStatus = map[string]string{
 // RecordStatus returns the one character code and label indicating
 // the "05 Record status"
 func (rec Record) RecordStatus() (code, label string) {
-	if len(rec.leader.text) > 5 {
-		code = string(rec.leader.text[5])
+	if len(rec.Leader.Text) > 5 {
+		code = string(rec.Leader.Text[5])
 		label = recordStatus[code]
 	}
 	return code, label
@@ -94,8 +93,8 @@ var recordType = map[string]string{
 // the "06 - Type of record" (type of content and material) documented
 // by the record.
 func (rec Record) RecordType() (code, label string) {
-	if len(rec.leader.text) > 6 {
-		code = string(rec.leader.text[6])
+	if len(rec.Leader.Text) > 6 {
+		code = string(rec.Leader.Text[6])
 		label = recordType[code]
 	}
 	return code, label
@@ -115,8 +114,8 @@ var bibliographicLevel = map[string]string{
 // BibliographicLevel returns the code and label indicating the
 // "07 - Bibliographic level" of the record.
 func (rec Record) BibliographicLevel() (code, label string) {
-	if len(rec.leader.text) > 7 {
-		code = string(rec.leader.text[7])
+	if len(rec.Leader.Text) > 7 {
+		code = string(rec.Leader.Text[7])
 		label = bibliographicLevel[code]
 	}
 	return code, label
@@ -131,8 +130,8 @@ var controlType = map[string]string{
 // ControlType returns the code and label indicating the
 // "08 - Type of control" of the record.
 func (rec Record) ControlType() (code, label string) {
-	if len(rec.leader.text) > 8 {
-		code = string(rec.leader.text[8])
+	if len(rec.Leader.Text) > 8 {
+		code = string(rec.Leader.Text[8])
 		label = controlType[code]
 	}
 	return code, label
@@ -147,8 +146,8 @@ var characterCodingScheme = map[string]string{
 // CharacterCodingScheme returns the code and label indicating the
 // "09 - Character coding scheme" of the record (MARC-8 or UCS/Unicode).
 func (rec Record) CharacterCodingScheme() (code, label string) {
-	if len(rec.leader.text) > 9 {
-		code = string(rec.leader.text[9])
+	if len(rec.Leader.Text) > 9 {
+		code = string(rec.Leader.Text[9])
 		label = characterCodingScheme[code]
 	}
 	return code, label
@@ -180,8 +179,8 @@ var encodingLevel = map[string]string{
 // EncodingLevel returns the code and label indicating the
 // "17 - Encoding level" of the record
 func (rec Record) EncodingLevel() (code, label string) {
-	if len(rec.leader.text) > 17 {
-		code = string(rec.leader.text[17])
+	if len(rec.Leader.Text) > 17 {
+		code = string(rec.Leader.Text[17])
 		label = encodingLevel[code]
 	}
 	return code, label
@@ -200,8 +199,8 @@ var descriptiveCatalogingForm = map[string]string{
 // CatalogingForm returns the code and label indicating the
 // "18 - Descriptive cataloging form" of the record
 func (rec Record) CatalogingForm() (code, label string) {
-	if len(rec.leader.text) > 18 {
-		code = string(rec.leader.text[18])
+	if len(rec.Leader.Text) > 18 {
+		code = string(rec.Leader.Text[18])
 		label = descriptiveCatalogingForm[code]
 	}
 	return code, label
@@ -218,8 +217,8 @@ var multipartResourceRecordLevel = map[string]string{
 // MultipartResourceRecordLevel returns the code and label indicating the
 // "19 - Multipart resource record level" of the record
 func (rec Record) MultipartResourceRecordLevel() (code, label string) {
-	if len(rec.leader.text) > 19 {
-		code = string(rec.leader.text[19])
+	if len(rec.Leader.Text) > 19 {
+		code = string(rec.Leader.Text[19])
 		label = multipartResourceRecordLevel[code]
 	}
 	return code, label
@@ -266,7 +265,7 @@ Example:
 func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l = new(ParsedLeader)
 
-	l.RecordLength, err = strconv.Atoi(string(b[0:5]))
+	l.RecordLength, err = toInt(b[0:5]) //strconv.Atoi(string(b[0:5]))
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +276,7 @@ func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l.CharacterCodingScheme = b[9]
 	l.IndicatorCount = b[10]
 	l.SubfieldCodeCount = b[11]
-	l.BaseDataAddress, err = strconv.Atoi(string(b[12:17]))
+	l.BaseDataAddress, err = toInt(b[12:17]) // strconv.Atoi(string(b[12:17]))
 	if err != nil {
 		return nil, err
 	}
@@ -295,8 +294,8 @@ func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 // Implement the Stringer interface for "Pretty-printing"
 func (ldr Leader) String() string {
 
-	b := []byte(ldr.text)
-	ret := fmt.Sprintf("LDR %s\n", ldr.text)
+	b := []byte(ldr.Text)
+	ret := fmt.Sprintf("LDR %s\n", ldr.Text)
 
 	code := string(b[0:5])
 	ret += fmt.Sprintf("    %s: ( RecordLength )\n", code)
@@ -374,7 +373,7 @@ func (ldr Leader) String() string {
 	return ret
 }
 
-// Text returns the text for the leader
-func (ldr Leader) Text() string {
-	return ldr.text
+// GetText returns the text for the leader
+func (ldr Leader) GetText() string {
+	return ldr.Text
 }

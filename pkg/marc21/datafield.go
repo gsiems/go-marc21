@@ -92,14 +92,14 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 			}
 
 			df := Datafield{
-				tag:  de.tag,
-				ind1: string(b[0]),
-				ind2: string(b[1]),
+				Tag:  de.tag,
+				Ind1: string(b[0]),
+				Ind2: string(b[1]),
 			}
 
 			for _, t := range bytes.Split(b[2:de.fieldLength-1], []byte{delimiter}) {
 				if len(t) > 0 {
-					df.subfields = append(df.subfields, &Subfield{code: string(t[0]), text: string(t[1:])})
+					df.Subfields = append(df.Subfields, &Subfield{Code: string(t[0]), Text: string(t[1:])})
 				}
 			}
 			dfs = append(dfs, &df)
@@ -109,69 +109,69 @@ func extractDatafields(rawRec []byte, baseAddress int, dir []*directoryEntry) (d
 	return dfs, nil
 }
 
-// Datafields returns datafields for the record that match the specified
-// comma separated list of tags. If no tags are specified (empty string)
-// then all datafields are returned
-func (rec Record) Datafields(tags string) (f []*Datafield) {
+// GetDatafields returns datafields for the record that match the
+// specified comma separated list of tags. If no tags are specified
+// (empty string) then all datafields are returned
+func (rec Record) GetDatafields(tags string) (dfs []*Datafield) {
 	if tags == "" {
-		return rec.datafields
+		return rec.Datafields
 	}
 
 	for _, t := range strings.Split(tags, ",") {
-		for _, d := range rec.datafields {
-			if d.tag == t {
-				f = append(f, d)
+		for _, df := range rec.Datafields {
+			if df.Tag == t {
+				dfs = append(dfs, df)
 			}
 		}
 	}
-	return f
+	return dfs
 }
 
-// Subfields returns subfields for the datafield that match the
+// GetSubfields returns subfields for the datafield that match the
 // specified codes. If no codes are specified (empty string) then all
 // subfields are returned
-func (d Datafield) Subfields(codes string) (sf []*Subfield) {
+func (df Datafield) GetSubfields(codes string) (sfs []*Subfield) {
 	if codes == "" {
-		return d.subfields
+		return df.Subfields
 	}
 
 	for _, c := range []byte(codes) {
-		for _, s := range d.subfields {
-			if s.code == string(c) {
-				sf = append(sf, s)
+		for _, sf := range df.Subfields {
+			if sf.Code == string(c) {
+				sfs = append(sfs, sf)
 			}
 		}
 	}
-	return sf
+	return sfs
 }
 
-// Tag returns the tag for the datafield
-func (d Datafield) Tag() (tag string) {
-	return d.tag
+// GetTag returns the tag for the datafield
+func (df Datafield) GetTag() string {
+	return df.Tag
 }
 
-// Ind1 returns the indicator 1 value for the datafield
-func (d Datafield) Ind1() (ind string) {
-	if d.ind1 == "" {
+// GetInd1 returns the indicator 1 value for the datafield
+func (df Datafield) GetInd1() string {
+	if df.Ind1 == "" {
 		return " "
 	}
-	return d.ind1
+	return df.Ind1
 }
 
-// Ind2 returns the indicator 2 value for the datafield
-func (d Datafield) Ind2() (ind string) {
-	if d.ind2 == "" {
+// GetInd2 returns the indicator 2 value for the datafield
+func (df Datafield) GetInd2() string {
+	if df.Ind2 == "" {
 		return " "
 	}
-	return d.ind2
+	return df.Ind2
 }
 
-// Code returns the code for the subfield
-func (sf Subfield) Code() (c string) {
-	return sf.code
+// GetCode returns the code for the subfield
+func (sf Subfield) GetCode() string {
+	return sf.Code
 }
 
-// Text returns the text for the subfield
-func (sf Subfield) Text() (t string) {
-	return sf.text
+// GetText returns the text for the subfield
+func (sf Subfield) GetText() string {
+	return sf.Text
 }

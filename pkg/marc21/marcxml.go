@@ -105,14 +105,14 @@ func (c Collection) AsXML() (ret string, err error) {
 func (rec Record) AsXML() (ret string, err error) {
 
 	ret = "\t<marc:record>\n"
-	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", html.EscapeString(rec.leader.Text()))
-	for _, cf := range rec.controlfields {
-		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.Tag(), html.EscapeString(cf.Text()))
+	ret += fmt.Sprintf("\t\t<marc:leader>%s</marc:leader>\n", html.EscapeString(rec.Leader.GetText()))
+	for _, cf := range rec.Controlfields {
+		ret += fmt.Sprintf("\t\t<marc:controlfield tag=%q>%s</marc:controlfield>\n", cf.GetTag(), html.EscapeString(cf.GetText()))
 	}
-	for _, df := range rec.datafields {
-		ret += fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.Tag(), df.Ind1(), df.Ind2())
-		for _, sf := range df.subfields {
-			ret += fmt.Sprintf("\t\t\t<marc:subfield code=%q>%s</marc:subfield>\n", sf.Code(), html.EscapeString(sf.Text()))
+	for _, df := range rec.Datafields {
+		ret += fmt.Sprintf("\t\t<marc:datafield tag=%q ind1=%q ind2=%q>\n", df.GetTag(), df.GetInd1(), df.GetInd2())
+		for _, sf := range df.Subfields {
+			ret += fmt.Sprintf("\t\t\t<marc:subfield code=%q>%s</marc:subfield>\n", sf.GetCode(), html.EscapeString(sf.GetText()))
 		}
 		ret += fmt.Sprintf("\t\t</marc:datafield>\n")
 	}

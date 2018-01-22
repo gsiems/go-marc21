@@ -90,7 +90,7 @@ func TestMARC(t *testing.T) {
 			t.Errorf("Record.Print() failed")
 		}
 
-		out = fmt.Sprint(rec.leader)
+		out = fmt.Sprint(rec.Leader)
 		if out == "" {
 			t.Errorf("Leader.Print() failed")
 		}
