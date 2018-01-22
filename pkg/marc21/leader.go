@@ -265,7 +265,7 @@ Example:
 func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l = new(ParsedLeader)
 
-	l.RecordLength, err = toInt(b[0:5]) //strconv.Atoi(string(b[0:5]))
+	l.RecordLength, err = toInt(b[0:5])
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func ParseLeader(b []byte) (l *ParsedLeader, err error) {
 	l.CharacterCodingScheme = b[9]
 	l.IndicatorCount = b[10]
 	l.SubfieldCodeCount = b[11]
-	l.BaseDataAddress, err = toInt(b[12:17]) // strconv.Atoi(string(b[12:17]))
+	l.BaseDataAddress, err = toInt(b[12:17])
 	if err != nil {
 		return nil, err
 	}

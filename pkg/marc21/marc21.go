@@ -109,7 +109,7 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 		return nil, err
 	}
 
-	recLen, err := toInt(rawLen[0:5]) // strconv.Atoi(string(rawLen[0:5]))
+	recLen, err := toInt(rawLen[0:5])
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func ParseRecord(rawRec []byte) (rec *Record, err error) {
 		return nil, err
 	}
 
-	baseDataAddress, err := toInt(rawRec[12:17]) //strconv.Atoi(string(rawRec[12:17]))
+	baseDataAddress, err := toInt(rawRec[12:17])
 	if err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func termAsByte(i int) (b []byte) {
 	return b
 }
 
-// toInt converts a byte array of digits to it's corresponding integer
+// toInt converts a byte array of digits to its corresponding integer
 // value
 func toInt(b []byte) (ret int, err error) {
 	ret, err = strconv.Atoi(string(b))
