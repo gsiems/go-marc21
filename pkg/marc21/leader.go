@@ -4,10 +4,6 @@
 
 package marc21
 
-import (
-	"fmt"
-)
-
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
 
@@ -24,55 +20,145 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     coded values and are identified by relative character position. The
     Leader is fixed in length at 24 character positions and is the
     first field of a MARC record.
+
+Also:
+    http://www.loc.gov/marc/holdings/hdleader.html
+    http://www.loc.gov/marc/authority/adleader.html
+    http://www.loc.gov/marc/classification/cdleader.html
+    http://www.loc.gov/marc/community/cileader.html
+
+While the general leader layout is the same for the different MARC formats
+there are differences.
+
+MARC 21 Bibliography
+    00-04 - Record length
+    05 - Record status
+    06 - Type of record
+    07 - Bibliographic level
+    08 - Type of control
+    09 - Character coding scheme
+    10 - Indicator count
+    11 - Subfield code count
+    12-16 - Base address of data
+    17 - Encoding level
+    18 - Descriptive cataloging form
+    19 - Multipart resource record level
+    20 - Length of the length-of-field portion
+    21 - Length of the starting-character-position portion
+    22 - Length of the implementation-defined portion
+    23 - Undefined
+
+MARC 21 Holdings
+    00-04 - Record length
+    05 - Record status
+    06 - Type of record
+    07-08 - Undefined character positions
+    09 - Character coding scheme
+    10 - Indicator count
+    11 - Subfield code length
+    12-16 - Base address of data
+    17 - Encoding level
+    18 - Item information in record
+    19 - Undefined character position
+    20 - Length of the length-of-field portion
+    21 - Length of the starting-character-position portion
+    22 - Length of the implementation-defined portion
+    23 - Undefined
+
+MARC 21 Authority
+    00-04 - Record length
+    05 - Record status
+    06 - Type of record
+    07-08 - Undefined character positions
+    09 - Character coding scheme
+    10 - Indicator count
+    11 - Subfield code length
+    12-16 - Base address of data
+    17 - Encoding level
+    18 - Punctuation policy
+    19 - Undefined
+    20 - Length of the length-of-field portion
+    21 - Length of the starting-character-position portion
+    22 - Length of the implementation-defined portion
+    23 - Undefined
+
+MARC 21 Classification
+    00-04 - Record length
+    05 - Record status
+    06 - Type of record
+    07-08 - Undefined character positions
+    09 - Character coding scheme
+    10 - Indicator count
+    11 - Subfield code length
+    12-16 - Base address of data
+    17 - Encoding level
+    18-19 - Undefined character positions
+    20 - Length of the length-of-field portion
+    21 - Length of the starting-character-position portion
+    22 - Length of the implementation-defined portion
+    23 - Undefined
+
+MARC 21 Community Information
+    00-04 - Record length
+    05 - Record status
+    06 - Type of record
+    07 - Kind of data
+    08 - Undefined character position
+    09 - Character coding scheme
+    10 - Indicator count
+    11 - Subfield code length
+    12-16 - Base address of data
+    17-19 - Undefined character positions
+    20 - Length of the length-of-field portion
+    21 - Length of the starting-character-position portion
+    22 - Length of the implementation-defined portion
+    23 - Undefined
+
 */
 
-// ParsedLeader contains the results of a parsed MARC leader (return
-// value of ParseLeader)
-type ParsedLeader struct {
-	RecordLength           int
-	RecordStatus           byte
-	RecordType             byte
-	BibliographicLevel     byte
-	ControlType            byte
-	CharacterCodingScheme  byte
-	IndicatorCount         byte
-	SubfieldCodeCount      byte
-	BaseDataAddress        int
-	EncodingLevel          byte
-	CatalogingForm         byte
-	MultipartLevel         byte
-	LenOfLengthOfField     byte
-	LenOfStartCharPosition byte
-	LenOfImplementDefined  byte
-	Undefined              byte
-}
+/*
+http://www.loc.gov/marc/bibliographic/ecbdlist.html
+http://www.loc.gov/marc/holdings/echdlist.html
+http://www.loc.gov/marc/authority/ecadlist.html
+http://www.loc.gov/marc/classification/eccdlist.html
+http://www.loc.gov/marc/community/eccilist.html
+*/
 
-// http://www.loc.gov/marc/bibliographic/bdleader.html
-//
-//  Character Positions
-//  00-04 - Record length
+const (
+	FmtUnknown = iota
+	Bibliography
+	Holdings
+	Authority
+	Classification
+	Community
+)
 
-//  05 - Record status
-var recordStatus = map[string]string{
-	"a": "Increase in encoding level",
-	"c": "Corrected or revised",
-	"d": "Deleted",
-	"n": "New",
-	"p": "Increase in encoding level from prepublication",
-}
+// RecordFormat indicates the high level nature of the record and is
+// used to differentiate between Bibliography, Holdings, Authority,
+// Classification, and Community record formats.
+func (rec Record) RecordFormat() int {
 
-// RecordStatus returns the one character code and label indicating
-// the "05 Record status"
-func (rec Record) RecordStatus() (code, label string) {
-	if len(rec.Leader.Text) > 5 {
-		code = string(rec.Leader.Text[5])
-		label = recordStatus[code]
+	if len(rec.Leader.Text) > 6 {
+		code := string(rec.Leader.Text[6])
+		switch code {
+		case "q":
+			return Community
+		case "z":
+			return Authority
+		case "w":
+			return Classification
+		case "u", "v", "x", "y":
+			return Holdings
+		case "a", "c", "d", "e", "f", "g", "i", "j", "k", "m", "o", "p", "r", "t":
+			return Bibliography
+		}
 	}
-	return code, label
+	return FmtUnknown
 }
 
 //  06 - Type of record
 var recordType = map[string]string{
+	// Bibliography
 	"a": "Language material",
 	"c": "Notated music",
 	"d": "Manuscript notated music",
@@ -87,52 +173,26 @@ var recordType = map[string]string{
 	"p": "Mixed materials",
 	"r": "Three-dimensional artifact or naturally occurring object",
 	"t": "Manuscript language material",
+	// Holding
+	"u": "Unknown",
+	"v": "Multipart item holdings",
+	"x": "Single-part item holdings",
+	"y": "Serial item holdings",
+	// Classification
+	"w": "Classification data",
+	// Authority
+	"z": "Authority data",
+	// Community
+	"q": "Community information",
 }
 
 // RecordType returns the one character code and label indicating
-// the "06 - Type of record" (type of content and material) documented
-// by the record.
+// the "06 - Type of record" for the record. Use RecordFormat
+// to determine the record format (bibliographic, holdings, etc.)
 func (rec Record) RecordType() (code, label string) {
 	if len(rec.Leader.Text) > 6 {
 		code = string(rec.Leader.Text[6])
 		label = recordType[code]
-	}
-	return code, label
-}
-
-//  07 - Bibliographic level
-var bibliographicLevel = map[string]string{
-	"a": "Monographic component part",
-	"b": "Serial component part",
-	"c": "Collection",
-	"d": "Subunit",
-	"i": "Integrating resource",
-	"m": "Monograph/Item",
-	"s": "Serial",
-}
-
-// BibliographicLevel returns the code and label indicating the
-// "07 - Bibliographic level" of the record.
-func (rec Record) BibliographicLevel() (code, label string) {
-	if len(rec.Leader.Text) > 7 {
-		code = string(rec.Leader.Text[7])
-		label = bibliographicLevel[code]
-	}
-	return code, label
-}
-
-//  08 - Type of control
-var controlType = map[string]string{
-	" ": "No specified type",
-	"a": "Archival",
-}
-
-// ControlType returns the code and label indicating the
-// "08 - Type of control" of the record.
-func (rec Record) ControlType() (code, label string) {
-	if len(rec.Leader.Text) > 8 {
-		code = string(rec.Leader.Text[8])
-		label = controlType[code]
 	}
 	return code, label
 }
@@ -151,226 +211,6 @@ func (rec Record) CharacterCodingScheme() (code, label string) {
 		label = characterCodingScheme[code]
 	}
 	return code, label
-}
-
-//  10 - Indicator count
-//      2 - Number of character positions used for indicators
-//
-//  11 - Subfield code count
-//      2 - Number of character positions used for a subfield code
-//
-//  12-16 - Base address of data
-//      [number] - Length of Leader and Directory
-//
-//  17 - Encoding level
-var encodingLevel = map[string]string{
-	" ": "Full level",
-	"1": "Full level, material not examined",
-	"2": "Less-than-full level, material not examined",
-	"3": "Abbreviated level",
-	"4": "Core level",
-	"5": "Partial (preliminary) level",
-	"7": "Minimal level",
-	"8": "Prepublication level",
-	"u": "Unknown",
-	"z": "Not applicable",
-}
-
-// EncodingLevel returns the code and label indicating the
-// "17 - Encoding level" of the record
-func (rec Record) EncodingLevel() (code, label string) {
-	if len(rec.Leader.Text) > 17 {
-		code = string(rec.Leader.Text[17])
-		label = encodingLevel[code]
-	}
-	return code, label
-}
-
-//  18 - Descriptive cataloging form
-var descriptiveCatalogingForm = map[string]string{
-	" ": "Non-ISBD",
-	"a": "AACR 2",
-	"c": "ISBD punctuation omitted",
-	"i": "ISBD punctuation included",
-	"n": "Non-ISBD punctuation omitted",
-	"u": "Unknown",
-}
-
-// CatalogingForm returns the code and label indicating the
-// "18 - Descriptive cataloging form" of the record
-func (rec Record) CatalogingForm() (code, label string) {
-	if len(rec.Leader.Text) > 18 {
-		code = string(rec.Leader.Text[18])
-		label = descriptiveCatalogingForm[code]
-	}
-	return code, label
-}
-
-//  19 - Multipart resource record level
-var multipartResourceRecordLevel = map[string]string{
-	" ": "Not specified or not applicable",
-	"a": "Set",
-	"b": "Part with independent title",
-	"c": "Part with dependent title",
-}
-
-// MultipartResourceRecordLevel returns the code and label indicating the
-// "19 - Multipart resource record level" of the record
-func (rec Record) MultipartResourceRecordLevel() (code, label string) {
-	if len(rec.Leader.Text) > 19 {
-		code = string(rec.Leader.Text[19])
-		label = multipartResourceRecordLevel[code]
-	}
-	return code, label
-}
-
-//  20 - Length of the length-of-field portion
-//      4 - Number of characters in the length-of-field portion of a
-//          Directory entry
-//
-//  21 - Length of the starting-character-position portion
-//      5 - Number of characters in the starting-character-position
-//          portion of a Directory entry
-//
-//  22 - Length of the implementation-defined portion
-//      0 - Number of characters in the implementation-defined portion
-//          of a Directory entry
-//
-//  23 - Undefined
-//      0 - Undefined
-
-/*
-Example:
-
-    01166cam  2200313   450000100
-    01166   | RecordLength           int   |
-    c       | RecordStatus           byte  | c - Corrected or revised
-    a       | RecordType             byte  | a - Language material
-    m       | BibliographicLevel     byte  | a - Monographic component part
-            | ControlType            byte  | # - No specified type
-            | CharacterCodingScheme  byte  | # - MARC-8
-    2       | IndicatorCount         byte  | 2 - Number of character positions used for indicators
-    2       | SubfieldCodeCount      byte  | 2 - Number of character positions used for a subfield code
-    00313   | BaseDataAddress        int   |
-            | EncodingLevel          byte  | # - Full level
-            | CatalogingForm         byte  | # - Non-ISBD
-            | MultipartLevel         byte  | # - Not specified or not applicable
-    4       | LenOfLengthOfField     byte  | 4 - Number of characters in the length-of-field portion of a Directory entry
-    5       | LenOfStartCharPosition byte  | 5 - Number of characters in the starting-character-position portion of a Directory entry
-    0       | LenOfImplementDefined  byte  | 0 - Number of characters in the implementation-defined portion of a Directory entry
-    0       | Undefined              byte  | 0 - Undefined
-*/
-
-// ParseLeader extracts the leader information from the raw MARC record bytes
-func ParseLeader(b []byte) (l *ParsedLeader, err error) {
-	l = new(ParsedLeader)
-
-	l.RecordLength, err = toInt(b[0:5])
-	if err != nil {
-		return nil, err
-	}
-	l.RecordStatus = b[5]
-	l.RecordType = b[6]
-	l.BibliographicLevel = b[7]
-	l.ControlType = b[8]
-	l.CharacterCodingScheme = b[9]
-	l.IndicatorCount = b[10]
-	l.SubfieldCodeCount = b[11]
-	l.BaseDataAddress, err = toInt(b[12:17])
-	if err != nil {
-		return nil, err
-	}
-	l.EncodingLevel = b[17]
-	l.CatalogingForm = b[18]
-	l.MultipartLevel = b[19]
-	l.LenOfLengthOfField = b[20]
-	l.LenOfStartCharPosition = b[21]
-	l.LenOfImplementDefined = b[22]
-	l.Undefined = b[23]
-
-	return l, nil
-}
-
-// Implement the Stringer interface for "Pretty-printing"
-func (ldr Leader) String() string {
-
-	b := []byte(ldr.Text)
-	ret := fmt.Sprintf("LDR %s\n", ldr.Text)
-
-	code := string(b[0:5])
-	ret += fmt.Sprintf("    %s: ( RecordLength )\n", code)
-
-	code = string(b[5])
-	label := recordStatus[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( RecordStatus = %q )\n", code, label)
-
-	code = string(b[6])
-	label = recordType[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( RecordType = %q )\n", code, label)
-
-	code = string(b[7])
-	label = bibliographicLevel[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( BibliographicLevel = %q )\n", code, label)
-
-	code = string(b[8])
-	label = controlType[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( ControlType = %q )\n", code, label)
-
-	code = string(b[9])
-	label = characterCodingScheme[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( CharacterCodingScheme = %q )\n", code, label)
-
-	code = string(b[10])
-	ret += fmt.Sprintf("        %s: ( IndicatorCount )\n", code)
-
-	code = string(b[11])
-	ret += fmt.Sprintf("        %s: ( SubfieldCodeCount )\n", code)
-
-	code = string(b[12:17])
-	ret += fmt.Sprintf("    %s: ( BaseAddressOfData )\n", code)
-
-	code = string(b[17])
-	label = encodingLevel[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( EncodingLevel = %q )\n", code, label)
-
-	code = string(b[18])
-	label = descriptiveCatalogingForm[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( DescriptiveCatalogingForm = %q )\n", code, label)
-
-	code = string(b[19])
-	label = multipartResourceRecordLevel[code]
-	if code == " " {
-		code = "#"
-	}
-	ret += fmt.Sprintf("        %s: ( MultipartResourceRecordLevel = %q )\n", code, label)
-
-	ret += fmt.Sprintln("        4: ( LengthOfLengthOfField )")
-	ret += fmt.Sprintln("        5: ( LengthOfStartingCharacterPosition )")
-	ret += fmt.Sprintln("        0: ( LengthOfImplementationDefined )")
-	ret += fmt.Sprintln("        0: ( Undefined )")
-
-	return ret
 }
 
 // GetText returns the text for the leader

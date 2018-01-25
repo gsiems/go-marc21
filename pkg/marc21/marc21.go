@@ -36,7 +36,7 @@ const (
 	maxRecordSize    = 99999
 )
 
-// Collection is fo containing zero or more MARC records
+// Collection is for containing zero or more MARC records
 type Collection struct {
 	Name    xml.Name  `xml:"collection"`
 	Records []*Record `xml:"record"`

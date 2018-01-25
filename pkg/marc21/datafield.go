@@ -77,6 +77,13 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     defined for purposes of identification, not arrangement. The order
     of subfields is generally specified by standards for the data
     content, such as cataloging rules.
+
+Also:
+    http://www.loc.gov/marc/holdings/hdintro.html
+    http://www.loc.gov/marc/authority/adintro.html
+    http://www.loc.gov/marc/classification/cdintro.html
+    http://www.loc.gov/marc/community/ciintro.html
+
 */
 
 // extractDatafields extracts the data fields/sub-fields from the raw MARC record bytes

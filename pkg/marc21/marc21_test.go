@@ -46,44 +46,44 @@ func TestMARC(t *testing.T) {
 			continue
 		}
 
-		code, _ := rec.RecordStatus()
-		if code == "" {
-			t.Errorf("RecordStatus() failed")
-		}
-		code, _ = rec.RecordType()
-		if code == "" {
-			t.Errorf("RecordType() failed")
-		}
-		code, _ = rec.BibliographicLevel()
-		if code == "" {
-			t.Errorf("BibliographicLevel() failed")
-		}
-		code, _ = rec.ControlType()
-		if code == "" {
-			t.Errorf("ControlType() failed")
-		}
-		code, _ = rec.CharacterCodingScheme()
-		if code == "" {
-			t.Errorf("CharacterCodingScheme() failed")
-		}
-		code, _ = rec.EncodingLevel()
-		if code == "" {
-			t.Errorf("EncodingLevel() failed")
-		}
-		code, _ = rec.CatalogingForm()
-		if code == "" {
-			t.Errorf("CatalogingForm() failed")
-		}
-		code, _ = rec.MultipartResourceRecordLevel()
-		if code == "" {
-			t.Errorf("MultipartResourceRecordLevel() failed")
-		}
-
-		cfd := rec.ParseControlfields()
-		if false {
-			fmt.Printf("%q\n", cfd)
-			//t.Errorf("Record.parseControlfields() failed")
-		}
+		//		code, _ := rec.RecordStatus()
+		//		if code == "" {
+		//			t.Errorf("RecordStatus() failed")
+		//		}
+		//		code, _ = rec.RecordType()
+		//		if code == "" {
+		//			t.Errorf("RecordType() failed")
+		//		}
+		//		code, _ = rec.BibliographicLevel()
+		//		if code == "" {
+		//			t.Errorf("BibliographicLevel() failed")
+		//		}
+		//		code, _ = rec.ControlType()
+		//		if code == "" {
+		//			t.Errorf("ControlType() failed")
+		//		}
+		//		code, _ = rec.CharacterCodingScheme()
+		//		if code == "" {
+		//			t.Errorf("CharacterCodingScheme() failed")
+		//		}
+		//		code, _ = rec.EncodingLevel()
+		//		if code == "" {
+		//			t.Errorf("EncodingLevel() failed")
+		//		}
+		//		code, _ = rec.CatalogingForm()
+		//		if code == "" {
+		//			t.Errorf("CatalogingForm() failed")
+		//		}
+		//		code, _ = rec.MultipartResourceRecordLevel()
+		//		if code == "" {
+		//			t.Errorf("MultipartResourceRecordLevel() failed")
+		//		}
+		//
+		//		cfd := rec.ParseControlfields()
+		//		if false {
+		//			fmt.Printf("%q\n", cfd)
+		//			//t.Errorf("Record.parseControlfields() failed")
+		//		}
 
 		out := fmt.Sprint(rec)
 		if out == "" {

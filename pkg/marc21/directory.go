@@ -31,6 +31,13 @@ http://www.loc.gov/marc/bibliographic/bdintro.html
     distinguished only by the location of the respective fields within
     the record. The Directory ends with a field terminator character
     (ASCII 1E hex).
+
+Also:
+    http://www.loc.gov/marc/holdings/hdintro.html
+    http://www.loc.gov/marc/authority/adintro.html
+    http://www.loc.gov/marc/classification/cdintro.html
+    http://www.loc.gov/marc/community/ciintro.html
+
 */
 
 /*
