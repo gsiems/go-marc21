@@ -8,7 +8,6 @@
 package marc21
 
 import (
-	"encoding/binary"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -29,9 +28,9 @@ https://www.loc.gov/marc/specifications/specrecstruc.html
 */
 
 const (
-	delimiter        = 0x1f
-	fieldTerminator  = 0x1e
-	recordTerminator = 0x1d
+	delimiter        = byte(0x1f)
+	fieldTerminator  = byte(0x1e)
+	recordTerminator = byte(0x1d)
 	leaderLen        = 24
 	maxRecordSize    = 99999
 )
@@ -197,10 +196,6 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		return marc, err
 	}
 
-	dl := termAsByte(delimiter)
-	ft := termAsByte(fieldTerminator)
-	rt := termAsByte(recordTerminator)
-
 	var dir []directoryEntry
 	var rawDir []byte
 	var cfs []byte
@@ -215,7 +210,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		}
 
 		b := []byte(cf.GetText())
-		b = append(b, ft...)
+		b = append(b, fieldTerminator)
 		cfs = append(cfs, b...)
 
 		dir = append(dir, directoryEntry{tag: cf.GetTag(), startingPos: startPos, fieldLength: len(b)})
@@ -233,11 +228,11 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		b = append(b, []byte(ind2)...)
 
 		for _, sf := range df.Subfields {
-			b = append(b, dl...)
+			b = append(b, delimiter)
 			b = append(b, []byte(sf.GetCode())...)
 			b = append(b, []byte(sf.GetText())...)
 		}
-		b = append(b, ft...)
+		b = append(b, fieldTerminator)
 		dfs = append(dfs, b...)
 
 		dir = append(dir, directoryEntry{tag: df.GetTag(), startingPos: startPos, fieldLength: len(b)})
@@ -251,7 +246,7 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 		rawDir = append(rawDir, []byte(fmt.Sprintf("%04d", de.fieldLength))...)
 		rawDir = append(rawDir, []byte(fmt.Sprintf("%05d", de.startingPos))...)
 	}
-	rawDir = append(rawDir, ft...)
+	rawDir = append(rawDir, fieldTerminator)
 
 	// Build the leader
 	recLen := []byte(fmt.Sprintf("%05d", 24+len(rawDir)+len(cfs)+len(dfs)+1))
@@ -268,21 +263,9 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	marc = append(marc, rawDir...)
 	marc = append(marc, cfs...)
 	marc = append(marc, dfs...)
-	marc = append(marc, rt...)
+	marc = append(marc, recordTerminator)
 
 	return marc, nil
-}
-
-// termAsByte converts a terminator/delimiter value to a byte
-func termAsByte(i int) (b []byte) {
-
-	// We apparently need a 2-byte array for setting the uint16...
-	x := make([]byte, 2)
-	binary.LittleEndian.PutUint16(x, uint16(i))
-	// ... but we don't want the trailing null byte in actual use
-	b = x[:1]
-
-	return b
 }
 
 // toInt converts a byte array of digits to its corresponding integer
