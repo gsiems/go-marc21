@@ -1,4 +1,4 @@
-// Copyright 2017 Gregory Siems. All rights reserved.
+// Copyright 2017-2018 Gregory Siems. All rights reserved.
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 )
 
 /*
@@ -266,35 +265,4 @@ func (rec Record) RecordAsMARC() (marc []byte, err error) {
 	marc = append(marc, recordTerminator)
 
 	return marc, nil
-}
-
-// toInt converts a byte array of digits to its corresponding integer
-// value
-func toInt(b []byte) (ret int, err error) {
-	ret, err = strconv.Atoi(string(b))
-	if err != nil {
-
-		var digits = map[string]int{
-			"0": 0,
-			"1": 1,
-			"2": 2,
-			"3": 3,
-			"4": 4,
-			"5": 5,
-			"6": 6,
-			"7": 7,
-			"8": 8,
-			"9": 9,
-		}
-
-		ret = 0
-		for i := range b {
-			x, ok := digits[string(b[i])]
-			if !ok {
-				return 0, errors.New("toInt(): Not an integer")
-			}
-			ret = (10 * ret) + x
-		}
-	}
-	return ret, nil
 }
