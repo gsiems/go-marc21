@@ -162,6 +162,7 @@ func (rec Record) RecordFormat() int {
 }
 
 //  05 - Record status
+// Valid values for Bibliography records
 var recordStatus = map[string]string{
 	"a": "Increase in encoding level",                     // Bib, Auth,       Class,
 	"c": "Corrected or revised",                           // Bib, Auth, Hold, Class, CI
@@ -170,10 +171,34 @@ var recordStatus = map[string]string{
 	"p": "Increase in encoding level from prepublication", // Bib
 }
 
+// Valid values for Authority and Classification records
+var recordStatusA = map[string]string{
+	"a": "Increase in encoding level", // Bib, Auth,       Class,
+	"c": "Corrected or revised",       // Bib, Auth, Hold, Class, CI
+	"d": "Deleted",                    // Bib, Auth, Hold, Class, CI
+	"n": "New",                        // Bib, Auth, Hold, Class, CI
+}
+
+// Valid values for Holdings and Community records
+var recordStatusH = map[string]string{
+	"c": "Corrected or revised", // Bib, Auth, Hold, Class, CI
+	"d": "Deleted",              // Bib, Auth, Hold, Class, CI
+	"n": "New",                  // Bib, Auth, Hold, Class, CI
+}
+
 // RecordStatus returns the one character code and label indicating
 // the "05 Record status"
 func (rec Record) RecordStatus() (code, label string) {
-	return shortCodeLookup(recordStatus, rec.Leader.Text, 5)
+
+	switch rec.RecordFormat() {
+	case Bibliography:
+		code, label = shortCodeLookup(recordStatus, rec.Leader.Text, 5)
+	case Holdings, Community:
+		code, label = shortCodeLookup(recordStatusH, rec.Leader.Text, 5)
+	case Authority, Classification:
+		code, label = shortCodeLookup(recordStatusA, rec.Leader.Text, 5)
+	}
+	return code, label
 }
 
 //  06 - Type of record
@@ -224,6 +249,105 @@ var characterCodingScheme = map[string]string{
 func (rec Record) CharacterCodingScheme() (code, label string) {
 	return shortCodeLookup(characterCodingScheme, rec.Leader.Text, 9)
 }
+
+////////////////////////////////////////////////////////////////////////
+// Functions specific to Bibliography formats
+
+//  07 - "Bibliographic level" for Bibliography records.
+var bibliographicLevel = map[string]string{
+	"a": "Monographic component part",
+	"b": "Serial component part",
+	"c": "Collection",
+	"d": "Subunit",
+	"i": "Integrating resource",
+	"m": "Monograph/Item",
+	"s": "Serial",
+}
+
+// BibliographicLevel returns the code and label indicating the
+// "07 - Bibliographic level" of the Bibliography record.
+func (rec Record) BibliographicLevel() (code, label string) {
+	if rec.RecordFormat() == Bibliography {
+		code, label = shortCodeLookup(bibliographicLevel, rec.Leader.Text, 7)
+	}
+	return code, label
+}
+
+//  08 - "Type of control" for Bibliography records.
+var controlType = map[string]string{
+	" ": "No specified type",
+	"a": "Archival",
+}
+
+// ControlType returns the code and label indicating the
+// "08 - Type of control" of the Bibliography record.
+func (rec Record) ControlType() (code, label string) {
+	if rec.RecordFormat() == Bibliography {
+		code, label = shortCodeLookup(controlType, rec.Leader.Text, 8)
+	}
+	return code, label
+}
+
+//  17 - "Encoding level" for Bibliography records.
+var encodingLevel = map[string]string{
+	" ": "Full level",
+	"1": "Full level, material not examined",
+	"2": "Less-than-full level, material not examined",
+	"3": "Abbreviated level",
+	"4": "Core level",
+	"5": "Partial (preliminary) level",
+	"7": "Minimal level",
+	"8": "Prepublication level",
+	"u": "Unknown",
+	"z": "Not applicable",
+}
+
+// EncodingLevel returns the code and label indicating the
+// "17 - Encoding level" of the Bibliography record.
+func (rec Record) EncodingLevel() (code, label string) {
+	if rec.RecordFormat() == Bibliography {
+		code, label = shortCodeLookup(encodingLevel, rec.Leader.Text, 17)
+	}
+	return code, label
+}
+
+//  18 - "Descriptive cataloging form" for Bibliography records.
+var descriptiveCatalogingForm = map[string]string{
+	" ": "Non-ISBD",
+	"a": "AACR 2",
+	"c": "ISBD punctuation omitted",
+	"i": "ISBD punctuation included",
+	"n": "Non-ISBD punctuation omitted",
+	"u": "Unknown",
+}
+
+// CatalogingForm returns the code and label indicating the
+// "18 - Descriptive cataloging form" of the Bibliography record.
+func (rec Record) CatalogingForm() (code, label string) {
+	if rec.RecordFormat() == Bibliography {
+		code, label = shortCodeLookup(descriptiveCatalogingForm, rec.Leader.Text, 18)
+	}
+	return code, label
+}
+
+//  19 - "Multipart resource record level" for Bibliography records.
+var multipartResourceRecordLevel = map[string]string{
+	" ": "Not specified or not applicable",
+	"a": "Set",
+	"b": "Part with independent title",
+	"c": "Part with dependent title",
+}
+
+// MultipartResourceRecordLevel returns the code and label indicating the
+// "19 - Multipart resource record level" of the Bibliography record.
+func (rec Record) MultipartResourceRecordLevel() (code, label string) {
+	if rec.RecordFormat() == Bibliography {
+		code, label = shortCodeLookup(multipartResourceRecordLevel, rec.Leader.Text, 19)
+	}
+	return code, label
+}
+
+////////////////////////////////////////////////////////////////////////
 
 // GetText returns the text for the leader
 func (ldr Leader) GetText() string {
