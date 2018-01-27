@@ -447,11 +447,13 @@ func (rec Record) AuthorityPunctuationPolicy() (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Functions specific to Classification formats
 
+// None
+
 ////////////////////////////////////////////////////////////////////////
 // Functions specific to Community formats
 
 // 07 - Kind of data
-var communityDataKind = map[string]string{
+var communityKindOfData = map[string]string{
 	"n": "Individual",
 	"o": "Organization",
 	"p": "Program or service",
@@ -459,11 +461,11 @@ var communityDataKind = map[string]string{
 	"z": "Other",
 }
 
-// CommunityDataKind returns the code and label indicating the
+// CommunityKindOfData returns the code and label indicating the
 // "07 - Kind of data" of the Community record.
-func (rec Record) CommunityDataKind() (code, label string) {
+func (rec Record) CommunityKindOfData() (code, label string) {
 	if rec.RecordFormat() == Community {
-		code, label = shortCodeLookup(communityDataKind, rec.Leader.Text, 7)
+		code, label = shortCodeLookup(communityKindOfData, rec.Leader.Text, 7)
 	}
 	return code, label
 }
