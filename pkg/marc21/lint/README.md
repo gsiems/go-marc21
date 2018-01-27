@@ -28,3 +28,9 @@ with this? is there a standard convention in the face of repeated
 non-repeating elements?). Can some obsolete fields be migrated to the
 appropriate replacement fields?
 
+How easily can (some of) the rules be generated from the following:
+ * http://www.loc.gov/marc/bibliographic/ecbdlist.html
+ * http://www.loc.gov/marc/holdings/echdlist.html
+ * http://www.loc.gov/marc/authority/ecadlist.html
+ * http://www.loc.gov/marc/classification/eccdlist.html
+ * http://www.loc.gov/marc/community/eccilist.html
