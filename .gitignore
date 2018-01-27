@@ -1,6 +1,7 @@
 git_ignore
 *.out
 coverage.html
+cmd/split_out
 marcdump
 marcsplit
 marc2xml
