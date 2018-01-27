@@ -162,28 +162,46 @@ func (rec Record) RecordFormat() int {
 }
 
 //  05 - Record status
-// Valid values for Bibliography records
+// Valid record status values for Bibliography records
 var recordStatus = map[string]string{
-	"a": "Increase in encoding level",                     // Bib, Auth,       Class,
-	"c": "Corrected or revised",                           // Bib, Auth, Hold, Class, CI
-	"d": "Deleted",                                        // Bib, Auth, Hold, Class, CI
-	"n": "New",                                            // Bib, Auth, Hold, Class, CI
-	"p": "Increase in encoding level from prepublication", // Bib
+	"a": "Increase in encoding level",
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
+	"p": "Increase in encoding level from prepublication",
 }
 
-// Valid values for Authority and Classification records
-var recordStatusA = map[string]string{
-	"a": "Increase in encoding level", // Bib, Auth,       Class,
-	"c": "Corrected or revised",       // Bib, Auth, Hold, Class, CI
-	"d": "Deleted",                    // Bib, Auth, Hold, Class, CI
-	"n": "New",                        // Bib, Auth, Hold, Class, CI
+// Valid record status values for Authority records
+var authorityRecordStatus = map[string]string{
+	"a": "Increase in encoding level",
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
+	"o": "Obsolete",
+	"s": "Deleted; heading split into two or more headings",
+	"x": "Deleted; heading replaced by another heading",
 }
 
-// Valid values for Holdings and Community records
-var recordStatusH = map[string]string{
-	"c": "Corrected or revised", // Bib, Auth, Hold, Class, CI
-	"d": "Deleted",              // Bib, Auth, Hold, Class, CI
-	"n": "New",                  // Bib, Auth, Hold, Class, CI
+// Valid record status values for Classification records
+var classificationRecordStatus = map[string]string{
+	"a": "Increase in encoding level",
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
+}
+
+// Valid record status values for Holdings records
+var holdingsRecordStatus = map[string]string{
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
+}
+
+// Valid record status values for Community records
+var communityRecordStatus = map[string]string{
+	"c": "Corrected or revised",
+	"d": "Deleted",
+	"n": "New",
 }
 
 // RecordStatus returns the one character code and label indicating
@@ -193,10 +211,14 @@ func (rec Record) RecordStatus() (code, label string) {
 	switch rec.RecordFormat() {
 	case Bibliography:
 		code, label = shortCodeLookup(recordStatus, rec.Leader.Text, 5)
-	case Holdings, Community:
-		code, label = shortCodeLookup(recordStatusH, rec.Leader.Text, 5)
-	case Authority, Classification:
-		code, label = shortCodeLookup(recordStatusA, rec.Leader.Text, 5)
+	case Holdings:
+		code, label = shortCodeLookup(holdingsRecordStatus, rec.Leader.Text, 5)
+	case Authority:
+		code, label = shortCodeLookup(authorityRecordStatus, rec.Leader.Text, 5)
+	case Classification:
+		code, label = shortCodeLookup(classificationRecordStatus, rec.Leader.Text, 5)
+	case Community:
+		code, label = shortCodeLookup(communityRecordStatus, rec.Leader.Text, 5)
 	}
 	return code, label
 }
@@ -250,8 +272,68 @@ func (rec Record) CharacterCodingScheme() (code, label string) {
 	return shortCodeLookup(characterCodingScheme, rec.Leader.Text, 9)
 }
 
+// 17 - Encoding level
+// "17 - Encoding level" for Bibliography records.
+var encodingLevel = map[string]string{
+	" ": "Full level",
+	"1": "Full level, material not examined",
+	"2": "Less-than-full level, material not examined",
+	"3": "Abbreviated level",
+	"4": "Core level",
+	"5": "Partial (preliminary) level",
+	"7": "Minimal level",
+	"8": "Prepublication level",
+	"u": "Unknown",
+	"z": "Not applicable",
+}
+
+// "17 - Encoding level" for Holdings records.
+var holdingsEncodingLevel = map[string]string{
+	"1": "Holdings level 1",
+	"2": "Holdings level 2",
+	"3": "Holdings level 3",
+	"4": "Holdings level 4",
+	"5": "Holdings level 4 with piece designation",
+	"m": "Mixed level",
+	"u": "Unknown",
+	"z": "Other level",
+}
+
+// "17 - Encoding level" for Authority records.
+var authorityEncodingLevel = map[string]string{
+	"n": "Complete authority record",
+	"o": "Incomplete authority record",
+}
+
+// "17 - Encoding level" for Classification records.
+var classificationEncodingLevel = map[string]string{
+	"n": "Complete classification record",
+	"o": "Incomplete classification record",
+}
+
+// EncodingLevel returns the code and label indicating the
+// "17 - Encoding level" of the (all except Community) record.
+func (rec Record) EncodingLevel() (code, label string) {
+
+	switch rec.RecordFormat() {
+	case Bibliography:
+		code, label = shortCodeLookup(encodingLevel, rec.Leader.Text, 5)
+	case Holdings:
+		code, label = shortCodeLookup(holdingsEncodingLevel, rec.Leader.Text, 5)
+	case Authority:
+		code, label = shortCodeLookup(authorityEncodingLevel, rec.Leader.Text, 5)
+	case Classification:
+		code, label = shortCodeLookup(classificationEncodingLevel, rec.Leader.Text, 5)
+	}
+	return code, label
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Functions specific to Bibliography formats
+//      Since bibliography records are assumed to be the most commonly
+//      used these functions do not prefix themselves with the record
+//      format like the Holdings, Authority, Classification, Community
+//      specific code lookup functions do.
 
 //  07 - "Bibliographic level" for Bibliography records.
 var bibliographicLevel = map[string]string{
@@ -288,29 +370,6 @@ func (rec Record) ControlType() (code, label string) {
 	return code, label
 }
 
-//  17 - "Encoding level" for Bibliography records.
-var encodingLevel = map[string]string{
-	" ": "Full level",
-	"1": "Full level, material not examined",
-	"2": "Less-than-full level, material not examined",
-	"3": "Abbreviated level",
-	"4": "Core level",
-	"5": "Partial (preliminary) level",
-	"7": "Minimal level",
-	"8": "Prepublication level",
-	"u": "Unknown",
-	"z": "Not applicable",
-}
-
-// EncodingLevel returns the code and label indicating the
-// "17 - Encoding level" of the Bibliography record.
-func (rec Record) EncodingLevel() (code, label string) {
-	if rec.RecordFormat() == Bibliography {
-		code, label = shortCodeLookup(encodingLevel, rec.Leader.Text, 17)
-	}
-	return code, label
-}
-
 //  18 - "Descriptive cataloging form" for Bibliography records.
 var descriptiveCatalogingForm = map[string]string{
 	" ": "Non-ISBD",
@@ -343,6 +402,68 @@ var multipartResourceRecordLevel = map[string]string{
 func (rec Record) MultipartResourceRecordLevel() (code, label string) {
 	if rec.RecordFormat() == Bibliography {
 		code, label = shortCodeLookup(multipartResourceRecordLevel, rec.Leader.Text, 19)
+	}
+	return code, label
+}
+
+////////////////////////////////////////////////////////////////////////
+// Functions specific to Holdings formats
+
+// 18 - Item information in record
+var holdingItemInformation = map[string]string{
+	"i": "Item information",
+	"n": "No item information",
+}
+
+// HoldingItemInformation returns the code and label indicating the
+// "18 - Item information in record" of the Holdings record.
+func (rec Record) HoldingItemInformation() (code, label string) {
+	if rec.RecordFormat() == Holdings {
+		code, label = shortCodeLookup(holdingItemInformation, rec.Leader.Text, 18)
+	}
+	return code, label
+}
+
+////////////////////////////////////////////////////////////////////////
+// Functions specific to Authority formats
+
+// 18 - Punctuation policy
+var authorityPunctuationPolicy = map[string]string{
+	" ": "No information provided",
+	"c": "Punctuation omitted",
+	"i": "Punctuation included",
+	"u": "Unknown",
+}
+
+// AuthorityPunctuationPolicy returns the code and label indicating the
+// "18 - Punctuation policy" of the Authority record.
+func (rec Record) AuthorityPunctuationPolicy() (code, label string) {
+	if rec.RecordFormat() == Holdings {
+		code, label = shortCodeLookup(authorityPunctuationPolicy, rec.Leader.Text, 18)
+	}
+	return code, label
+}
+
+////////////////////////////////////////////////////////////////////////
+// Functions specific to Classification formats
+
+////////////////////////////////////////////////////////////////////////
+// Functions specific to Community formats
+
+// 07 - Kind of data
+var communityDataKind = map[string]string{
+	"n": "Individual",
+	"o": "Organization",
+	"p": "Program or service",
+	"q": "Event",
+	"z": "Other",
+}
+
+// CommunityDataKind returns the code and label indicating the
+// "07 - Kind of data" of the Community record.
+func (rec Record) CommunityDataKind() (code, label string) {
+	if rec.RecordFormat() == Community {
+		code, label = shortCodeLookup(communityDataKind, rec.Leader.Text, 7)
 	}
 	return code, label
 }
