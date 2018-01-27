@@ -1,4 +1,4 @@
-// Copyright 2017 Gregory Siems. All rights reserved.
+// Copyright 2017-2018 Gregory Siems. All rights reserved.
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
@@ -125,11 +125,17 @@ http://www.loc.gov/marc/community/eccilist.html
 */
 
 const (
+	// FmtUnknown indicates that the record format is not known or not specified
 	FmtUnknown = iota
+	// Bibliography indicates that the record is a Bibliography (or bib-holding) record
 	Bibliography
+	// Holdings indicates that the record is a Holdings record
 	Holdings
+	// Authority indicates that the record is an Authority record
 	Authority
+	// Classification indicates that the record is a Classification record
 	Classification
+	// Community indicates that the record is a Community Information record
 	Community
 )
 
@@ -138,22 +144,36 @@ const (
 // Classification, and Community record formats.
 func (rec Record) RecordFormat() int {
 
-	if len(rec.Leader.Text) > 6 {
-		code := string(rec.Leader.Text[6])
-		switch code {
-		case "q":
-			return Community
-		case "z":
-			return Authority
-		case "w":
-			return Classification
-		case "u", "v", "x", "y":
-			return Holdings
-		case "a", "c", "d", "e", "f", "g", "i", "j", "k", "m", "o", "p", "r", "t":
-			return Bibliography
-		}
+	code, _ := rec.RecordType()
+
+	switch code {
+	case "q":
+		return Community
+	case "z":
+		return Authority
+	case "w":
+		return Classification
+	case "u", "v", "x", "y":
+		return Holdings
+	case "a", "c", "d", "e", "f", "g", "i", "j", "k", "m", "o", "p", "r", "t":
+		return Bibliography
 	}
 	return FmtUnknown
+}
+
+//  05 - Record status
+var recordStatus = map[string]string{
+	"a": "Increase in encoding level",                     // Bib, Auth,       Class,
+	"c": "Corrected or revised",                           // Bib, Auth, Hold, Class, CI
+	"d": "Deleted",                                        // Bib, Auth, Hold, Class, CI
+	"n": "New",                                            // Bib, Auth, Hold, Class, CI
+	"p": "Increase in encoding level from prepublication", // Bib
+}
+
+// RecordStatus returns the one character code and label indicating
+// the "05 Record status"
+func (rec Record) RecordStatus() (code, label string) {
+	return shortCodeLookup(recordStatus, rec.Leader.Text, 5)
 }
 
 //  06 - Type of record
@@ -190,11 +210,7 @@ var recordType = map[string]string{
 // the "06 - Type of record" for the record. Use RecordFormat
 // to determine the record format (bibliographic, holdings, etc.)
 func (rec Record) RecordType() (code, label string) {
-	if len(rec.Leader.Text) > 6 {
-		code = string(rec.Leader.Text[6])
-		label = recordType[code]
-	}
-	return code, label
+	return shortCodeLookup(recordType, rec.Leader.Text, 6)
 }
 
 //  09 - Character coding scheme
@@ -206,11 +222,7 @@ var characterCodingScheme = map[string]string{
 // CharacterCodingScheme returns the code and label indicating the
 // "09 - Character coding scheme" of the record (MARC-8 or UCS/Unicode).
 func (rec Record) CharacterCodingScheme() (code, label string) {
-	if len(rec.Leader.Text) > 9 {
-		code = string(rec.Leader.Text[9])
-		label = characterCodingScheme[code]
-	}
-	return code, label
+	return shortCodeLookup(characterCodingScheme, rec.Leader.Text, 9)
 }
 
 // GetText returns the text for the leader
