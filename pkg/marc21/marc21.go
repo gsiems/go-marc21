@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-// Package marc21 reads/parses MARC21 and MARCXML data.
+// Package marc21 reads MARC21 and MARCXML data.
 //
 // Enables converting between MARC21 and MARCXML data.
 package marc21
@@ -81,7 +81,7 @@ type Subfield struct {
 }
 
 // ParseNextRecord reads the next MARC record and returns the parsed
-// record stucture
+// record structure
 func ParseNextRecord(r io.Reader) (rec *Record, err error) {
 
 	rawRec, err := NextRecord(r)
@@ -141,7 +141,7 @@ func NextRecord(r io.Reader) (rawRec []byte, err error) {
 }
 
 // ParseRecord takes the bytes for a MARC record and returns the parsed
-// record stucture
+// record structure
 func ParseRecord(rawRec []byte) (rec *Record, err error) {
 
 	rec = new(Record)
