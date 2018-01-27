@@ -46,14 +46,18 @@ func TestMARC(t *testing.T) {
 			continue
 		}
 
-		//		code, _ := rec.RecordStatus()
-		//		if code == "" {
-		//			t.Errorf("RecordStatus() failed")
-		//		}
-		//		code, _ = rec.RecordType()
-		//		if code == "" {
-		//			t.Errorf("RecordType() failed")
-		//		}
+		rf := rec.RecordFormat()
+		if rf == FmtUnknown {
+			t.Errorf("RecordFormat() failed")
+		}
+		code, _ := rec.RecordStatus()
+		if code == "" {
+			t.Errorf("RecordStatus() failed")
+		}
+		code, _ = rec.RecordType()
+		if code == "" {
+			t.Errorf("RecordType() failed")
+		}
 		//		code, _ = rec.BibliographicLevel()
 		//		if code == "" {
 		//			t.Errorf("BibliographicLevel() failed")
@@ -62,10 +66,10 @@ func TestMARC(t *testing.T) {
 		//		if code == "" {
 		//			t.Errorf("ControlType() failed")
 		//		}
-		//		code, _ = rec.CharacterCodingScheme()
-		//		if code == "" {
-		//			t.Errorf("CharacterCodingScheme() failed")
-		//		}
+		code, _ = rec.CharacterCodingScheme()
+		if code == "" {
+			t.Errorf("CharacterCodingScheme() failed")
+		}
 		//		code, _ = rec.EncodingLevel()
 		//		if code == "" {
 		//			t.Errorf("EncodingLevel() failed")
