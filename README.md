@@ -1,15 +1,25 @@
 # go-marc21
 
+[![GoDoc](https://godoc.org/github.com/gsiems/go-marc21/pkg/marc21?status.svg)](https://godoc.org/github.com/gsiems/go-marc21/pkg/marc21)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gsiems/go-marc21)](https://goreportcard.com/report/github.com/gsiems/go-marc21)
+
+## Currently does:
+
  * Read MARC21 and MARCXML data.
 
  * Convert between MARC21 and MARCXML data.
 
  * Write "Pretty-print" text (compatible with perl MARC::Record->as_formatted() output)
 
- * Parse leaders and control fields
-
-## TODO:
+## Things that would be nice TODO:
 
  * Convert MARC-8 encoding to UTF-8
 
  * Functions for "human-friendly" extraction of titles, authors, etc.
+
+ * Parse leaders and control fields
+
+ * Perform error checking on MARC records
+
+ * Read/write MARCMaker files https://www.loc.gov/marc/makrbrkr.html
+
