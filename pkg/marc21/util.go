@@ -11,27 +11,41 @@ import (
 
 // Utility and helper functions
 
-// shortCode extracts a single-character from a string
-func shortCode(s string, i int) (code string) {
-
-	if len(s) > i {
-		code = string(s[i])
-	}
-
-	return code
-}
-
 // shortCodeLookup performs lookups on single-character reference tables (maps)
 // and returns the code and, if found, the descriptive label for the code.
 func shortCodeLookup(codeList map[string]string, s string, i int) (code, label string) {
 
-	code = shortCode(s, i)
+	code = pluckByte(s, i)
 
 	if code != "" {
 		label = codeList[code]
 	}
 
 	return code, label
+}
+
+// pluckByte extracts a single-byte from a string and returns
+// the string result.
+func pluckByte(b string, i int) (s string) {
+
+	if len(b) > i {
+		s = string(b[i])
+	}
+
+	return s
+}
+
+// pluckBytes extracts one or more bytes from a string and returns
+// the string result.
+func pluckBytes(b string, i, w int) (s string) {
+
+	if w == 0 {
+		return pluckByte(b, i)
+	}
+	if len(b) > i+w {
+		s = b[i : i+w]
+	}
+	return s
 }
 
 // toInt converts a byte array of digits to its corresponding integer

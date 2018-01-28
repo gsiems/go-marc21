@@ -164,7 +164,7 @@ func (rec Record) RecordFormat() int {
 // used to differentiate between Bibliography, Holdings, Authority,
 // Classification, and Community record formats.
 func (ldr Leader) RecordFormat() int {
-	code := shortCode(ldr.Text, 6)
+	code := pluckByte(ldr.Text, 6)
 	switch code {
 	case "q":
 		return Community
@@ -314,7 +314,7 @@ var bibliographyMaterialType = map[string]string{
 // {"Books",  "Computer Files", "Maps", "Music", "Continuing Resources",
 // "Visual Materials" or "Mixed Materials"}
 func (rec Record) BibliographyMaterialType() (code, label string) {
-	rectype := shortCode(rec.Leader.Text, 6)
+	rectype := pluckByte(rec.Leader.Text, 6)
 
 	// the simple record type to material type mappings
 	var rtmap = map[string]string{
@@ -335,7 +335,7 @@ func (rec Record) BibliographyMaterialType() (code, label string) {
 	code, ok := rtmap[rectype]
 	if !ok {
 		// no simple match
-		biblevel := shortCode(rec.Leader.Text, 7)
+		biblevel := pluckByte(rec.Leader.Text, 7)
 		switch biblevel {
 		case "a", "c", "d", "m":
 			if rectype == "a" || rectype == "t" {
@@ -647,7 +647,7 @@ func (ldr Leader) String() string {
 
 	ret := fmt.Sprintf("MARC 21 %s\n", marcFormatName[recFormat])
 	ret += fmt.Sprintf("LDR %s\n", ldr.Text)
-	ret += fmt.Sprintf("  00-04 -  %s: ( Record length )\n", ldr.Text[0:5])
+	ret += fmt.Sprintf("  00-04 -  %s: ( Record length )\n", pluckBytes(ldr.Text, 0, 5))
 
 	switch recFormat {
 	case Bibliography:
@@ -667,9 +667,9 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(bibliographyFieldData["CharacterCodingScheme"], ldr.Text, 9)
 		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
-		ret += fmt.Sprintf("  11 -     %s: ( Subfield code count )\n", string(ldr.Text[11]))
-		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", pluckByte(ldr.Text, 10))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code count )\n", pluckByte(ldr.Text, 11))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", pluckBytes(ldr.Text, 12, 5))
 
 		code, label = ldrlk(bibliographyFieldData["EncodingLevel"], ldr.Text, 17)
 		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
@@ -688,14 +688,14 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(holdingsFieldData["TypeOfRecord"], ldr.Text, 6)
 		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", pluckBytes(ldr.Text, 7, 2))
 
 		code, label = ldrlk(holdingsFieldData["CharacterCodingScheme"], ldr.Text, 9)
 		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
-		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
-		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", pluckByte(ldr.Text, 10))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", pluckByte(ldr.Text, 11))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", pluckBytes(ldr.Text, 12, 5))
 
 		code, label = ldrlk(holdingsFieldData["EncodingLevel"], ldr.Text, 17)
 		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
@@ -703,7 +703,7 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(holdingsFieldData["ItemInformationInRecord"], ldr.Text, 18)
 		ret += fmt.Sprintf("  18 -     %s: ( Item information in record = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", string(ldr.Text[19]))
+		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", pluckByte(ldr.Text, 19))
 
 	case Authority:
 
@@ -713,14 +713,14 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(authorityFieldData["TypeOfRecord"], ldr.Text, 6)
 		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", pluckBytes(ldr.Text, 7, 2))
 
 		code, label = ldrlk(authorityFieldData["CharacterCodingScheme"], ldr.Text, 9)
 		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
-		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
-		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", pluckByte(ldr.Text, 10))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", pluckByte(ldr.Text, 11))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", pluckBytes(ldr.Text, 12, 5))
 
 		code, label = ldrlk(authorityFieldData["EncodingLevel"], ldr.Text, 17)
 		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
@@ -728,7 +728,7 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(authorityFieldData["PunctuationPolicy"], ldr.Text, 18)
 		ret += fmt.Sprintf("  18 -     %s: ( Punctuation policy = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", string(ldr.Text[19]))
+		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", pluckByte(ldr.Text, 19))
 
 	case Classification:
 
@@ -738,19 +738,19 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(classificationFieldData["TypeOfRecord"], ldr.Text, 6)
 		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", pluckBytes(ldr.Text, 7, 2))
 
 		code, label = ldrlk(classificationFieldData["CharacterCodingScheme"], ldr.Text, 9)
 		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
-		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
-		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", pluckByte(ldr.Text, 10))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", pluckByte(ldr.Text, 11))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", pluckBytes(ldr.Text, 12, 5))
 
 		code, label = ldrlk(classificationFieldData["EncodingLevel"], ldr.Text, 17)
 		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  18-19 -  %s: ( Undefined character positions )\n", ldr.Text[18:20])
+		ret += fmt.Sprintf("  18-19 -  %s: ( Undefined character positions )\n", pluckBytes(ldr.Text, 18, 2))
 
 	case Community:
 		code, label := ldrlk(communityFieldData["RecordStatus"], ldr.Text, 5)
@@ -762,23 +762,23 @@ func (ldr Leader) String() string {
 		code, label = ldrlk(communityFieldData["KindOfData"], ldr.Text, 7)
 		ret += fmt.Sprintf("  07 -     %s: ( Kind of data = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  08 -     %s: ( Undefined character position )\n", string(ldr.Text[8]))
+		ret += fmt.Sprintf("  08 -     %s: ( Undefined character position )\n", pluckByte(ldr.Text, 8))
 
 		code, label = ldrlk(communityFieldData["CharacterCodingScheme"], ldr.Text, 9)
 		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
 
-		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
-		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
-		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", pluckByte(ldr.Text, 10))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", pluckByte(ldr.Text, 11))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", pluckBytes(ldr.Text, 12, 5))
 
-		ret += fmt.Sprintf("  17-19 -  %s: ( Undefined character positions )\n", ldr.Text[17:20])
+		ret += fmt.Sprintf("  17-19 -  %s: ( Undefined character positions )\n", pluckBytes(ldr.Text, 17, 3))
 
 	}
 
-	ret += fmt.Sprintf("  20 -     %s: ( Length of the length-of-field portion )\n", string(ldr.Text[20]))
-	ret += fmt.Sprintf("  21 -     %s: ( Length of the starting-character-position portion )\n", string(ldr.Text[21]))
-	ret += fmt.Sprintf("  22 -     %s: ( Length of the implementation-defined portion )\n", string(ldr.Text[22]))
-	ret += fmt.Sprintf("  23 -     %s: ( Undefined )\n", string(ldr.Text[23]))
+	ret += fmt.Sprintf("  20 -     %s: ( Length of the length-of-field portion )\n", pluckByte(ldr.Text, 20))
+	ret += fmt.Sprintf("  21 -     %s: ( Length of the starting-character-position portion )\n", pluckByte(ldr.Text, 21))
+	ret += fmt.Sprintf("  22 -     %s: ( Length of the implementation-defined portion )\n", pluckByte(ldr.Text, 22))
+	ret += fmt.Sprintf("  23 -     %s: ( Undefined )\n", pluckByte(ldr.Text, 23))
 
 	return ret
 }
