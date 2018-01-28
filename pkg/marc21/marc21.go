@@ -19,7 +19,7 @@ import (
        * leader.CharacterCodingScheme == "a" is UCS/Unicode
        * https://www.loc.gov/marc/specifications/speccharucs.html
        * https://www.loc.gov/marc/specifications/codetables.xml
-
+       * https://lcweb2.loc.gov/diglib/codetables/eacc2uni.txt
 */
 
 /*
