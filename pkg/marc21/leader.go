@@ -162,27 +162,27 @@ func (rec Record) RecordFormat() int {
 	return FmtUnknown
 }
 
-// availableFields is the base for the available fields mappings for the
+// validFields is the base for the valid fields mappings for the
 // different MARC record formats
-type availableFields map[string]int
+type validFields map[string]int
 
-// AvailableLeaderFields returns a list of the different lookup fields
-// that are available for the MARC record (based on record format)
-func (rec Record) AvailableLeaderFields() (f []string) {
+// ValidLeaderFields returns a list of the different lookup fields
+// that are valid for the MARC record (based on record format)
+func (rec Record) ValidLeaderFields() (f []string) {
 
-	var a availableFields
+	var a validFields
 
 	switch rec.RecordFormat() {
 	case Bibliography:
-		a = availableBibliographyFields
+		a = validBibliographyFields
 	case Holdings:
-		a = availableHoldingsFields
+		a = validHoldingsFields
 	case Authority:
-		a = availableAuthorityFields
+		a = validAuthorityFields
 	case Classification:
-		a = availableClassificationFields
+		a = validClassificationFields
 	case Community:
-		a = availableCommunityFields
+		a = validCommunityFields
 	}
 
 	if a != nil {
@@ -281,7 +281,60 @@ func (rec Record) CharacterCodingScheme() (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Lookup data for Bibliography records
 
-var availableBibliographyFields = availableFields{
+var bibliographyMaterialType = map[string]string{
+	"BK": "Books",
+	"CF": "Computer Files",
+	"MP": "Maps",
+	"MU": "Music",
+	"CR": "Continuing Resources",
+	"VM": "Visual Materials",
+	"MX": "Mixed Materials",
+}
+
+// BibliographyMaterialType returns the code and description of the type
+// of material documented by Bibliography the record.
+// {"Books",  "Computer Files", "Maps", "Music", "Continuing Resources",
+// "Visual Materials" or "Mixed Materials"}
+func (rec Record) BibliographyMaterialType() (code, label string) {
+	rectype := shortCode(rec.Leader.Text, 6)
+
+	// the simple record type to material type mappings
+	var rtmap = map[string]string{
+		"c": "MU",
+		"d": "MU",
+		"i": "MU",
+		"j": "MU",
+		"e": "MP",
+		"f": "MP",
+		"g": "VM",
+		"k": "VM",
+		"o": "VM",
+		"r": "VM",
+		"m": "CF",
+		"p": "MX",
+	}
+
+	code, ok := rtmap[rectype]
+	if !ok {
+		// no simple match
+		biblevel := shortCode(rec.Leader.Text, 7)
+		switch biblevel {
+		case "a", "c", "d", "m":
+			if rectype == "a" || rectype == "t" {
+				code = "BK"
+			}
+		case "b", "i", "s":
+			if rectype == "a" {
+				code = "CR"
+			}
+		}
+	}
+
+	label = bibliographyMaterialType[code]
+	return code, label
+}
+
+var validBibliographyFields = validFields{
 	"RecordStatus":                 5,
 	"TypeOfRecord":                 6,
 	"BibliographicLevel":           7,
@@ -367,7 +420,7 @@ var bibliographyMultipartResourceRecordLevel = map[string]string{
 
 func (rec Record) lookupBibliographyField(s string) (code, label string) {
 	if rec.RecordFormat() == Bibliography {
-		i, ok := availableBibliographyFields[s]
+		i, ok := validBibliographyFields[s]
 		if ok {
 			code, label = shortCodeLookup(bibliographyFieldData[s], rec.Leader.Text, i)
 		}
@@ -378,7 +431,7 @@ func (rec Record) lookupBibliographyField(s string) (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Lookup data for Holdings records
 
-var availableHoldingsFields = availableFields{
+var validHoldingsFields = validFields{
 	"RecordStatus":            5,
 	"TypeOfRecord":            6,
 	"CharacterCodingScheme":   9,
@@ -421,7 +474,7 @@ var holdingItemInformationInRecord = map[string]string{
 
 func (rec Record) lookupHoldingsField(s string) (code, label string) {
 	if rec.RecordFormat() == Holdings {
-		i, ok := availableHoldingsFields[s]
+		i, ok := validHoldingsFields[s]
 		if ok {
 			code, label = shortCodeLookup(holdingsFieldData[s], rec.Leader.Text, i)
 		}
@@ -432,7 +485,7 @@ func (rec Record) lookupHoldingsField(s string) (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Lookup data for Authority records
 
-var availableAuthorityFields = availableFields{
+var validAuthorityFields = validFields{
 	"RecordStatus":          5,
 	"TypeOfRecord":          6,
 	"CharacterCodingScheme": 9,
@@ -472,7 +525,7 @@ var authorityPunctuationPolicy = map[string]string{
 
 func (rec Record) lookupAuthorityField(s string) (code, label string) {
 	if rec.RecordFormat() == Authority {
-		i, ok := availableAuthorityFields[s]
+		i, ok := validAuthorityFields[s]
 		if ok {
 			code, label = shortCodeLookup(authorityFieldData[s], rec.Leader.Text, i)
 		}
@@ -483,7 +536,7 @@ func (rec Record) lookupAuthorityField(s string) (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Lookup data for Classification records
 
-var availableClassificationFields = availableFields{
+var validClassificationFields = validFields{
 	"RecordStatus":          5,
 	"TypeOfRecord":          6,
 	"CharacterCodingScheme": 9,
@@ -512,7 +565,7 @@ var classificationEncodingLevel = map[string]string{
 
 func (rec Record) lookupClassificationField(s string) (code, label string) {
 	if rec.RecordFormat() == Classification {
-		i, ok := availableClassificationFields[s]
+		i, ok := validClassificationFields[s]
 		if ok {
 			code, label = shortCodeLookup(classificationFieldData[s], rec.Leader.Text, i)
 		}
@@ -523,7 +576,7 @@ func (rec Record) lookupClassificationField(s string) (code, label string) {
 ////////////////////////////////////////////////////////////////////////
 // Lookup data for Community records
 
-var availableCommunityFields = availableFields{
+var validCommunityFields = validFields{
 	"RecordStatus":          5,
 	"TypeOfRecord":          6,
 	"KindOfData":            7,
@@ -554,7 +607,7 @@ var communityKindOfData = map[string]string{
 
 func (rec Record) lookupCommunityField(s string) (code, label string) {
 	if rec.RecordFormat() == Community {
-		i, ok := availableCommunityFields[s]
+		i, ok := validCommunityFields[s]
 		if ok {
 			code, label = shortCodeLookup(communityFieldData[s], rec.Leader.Text, i)
 		}
