@@ -4,6 +4,8 @@
 
 package marc21
 
+import "fmt"
+
 /*
 https://www.loc.gov/marc/specifications/specrecstruc.html
 
@@ -142,11 +144,27 @@ const (
 	Community
 )
 
+var marcFormatName = map[int]string{
+	FmtUnknown:     "Unknown",
+	Bibliography:   "Bibliography",
+	Holdings:       "Holdings",
+	Authority:      "Authority",
+	Classification: "Classification",
+	Community:      "Community Information",
+}
+
 // RecordFormat indicates the high level nature of the record and is
 // used to differentiate between Bibliography, Holdings, Authority,
 // Classification, and Community record formats.
 func (rec Record) RecordFormat() int {
-	code, _ := rec.RecordType()
+	return rec.Leader.RecordFormat()
+}
+
+// RecordFormat indicates the high level nature of the record and is
+// used to differentiate between Bibliography, Holdings, Authority,
+// Classification, and Community record formats.
+func (ldr Leader) RecordFormat() int {
+	code := shortCode(ldr.Text, 6)
 	switch code {
 	case "q":
 		return Community
@@ -620,4 +638,158 @@ func (rec Record) lookupCommunityField(s string) (code, label string) {
 // GetText returns the text for the leader
 func (ldr Leader) GetText() string {
 	return ldr.Text
+}
+
+// Implement the Stringer interface for "Pretty-printing"
+func (ldr Leader) String() string {
+
+	recFormat := ldr.RecordFormat()
+
+	ret := fmt.Sprintf("MARC 21 %s\n", marcFormatName[recFormat])
+	ret += fmt.Sprintf("LDR %s\n", ldr.Text)
+	ret += fmt.Sprintf("  00-04 -  %s: ( Record length )\n", ldr.Text[0:5])
+
+	switch recFormat {
+	case Bibliography:
+
+		code, label := ldrlk(bibliographyFieldData["RecordStatus"], ldr.Text, 5)
+		ret += fmt.Sprintf("  05 -     %s: ( Record status = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["TypeOfRecord"], ldr.Text, 6)
+		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["BibliographicLevel"], ldr.Text, 7)
+		ret += fmt.Sprintf("  07 -     %s: ( Bibliographic level = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["TypeOfControl"], ldr.Text, 8)
+		ret += fmt.Sprintf("  08 -     %s: ( Type of control = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["CharacterCodingScheme"], ldr.Text, 9)
+		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code count )\n", string(ldr.Text[11]))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+
+		code, label = ldrlk(bibliographyFieldData["EncodingLevel"], ldr.Text, 17)
+		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["DescriptiveCatalogingForm"], ldr.Text, 18)
+		ret += fmt.Sprintf("  18 -     %s: ( Descriptive cataloging form = %q )\n", code, label)
+
+		code, label = ldrlk(bibliographyFieldData["MultipartResourceRecordLevel"], ldr.Text, 19)
+		ret += fmt.Sprintf("  19 -     %s: ( Multipart resource record level = %q )\n", code, label)
+
+	case Holdings:
+
+		code, label := ldrlk(holdingsFieldData["RecordStatus"], ldr.Text, 5)
+		ret += fmt.Sprintf("  05 -     %s: ( Record status = %q )\n", code, label)
+
+		code, label = ldrlk(holdingsFieldData["TypeOfRecord"], ldr.Text, 6)
+		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+
+		code, label = ldrlk(holdingsFieldData["CharacterCodingScheme"], ldr.Text, 9)
+		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+
+		code, label = ldrlk(holdingsFieldData["EncodingLevel"], ldr.Text, 17)
+		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
+
+		code, label = ldrlk(holdingsFieldData["ItemInformationInRecord"], ldr.Text, 18)
+		ret += fmt.Sprintf("  18 -     %s: ( Item information in record = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", string(ldr.Text[19]))
+
+	case Authority:
+
+		code, label := ldrlk(authorityFieldData["RecordStatus"], ldr.Text, 5)
+		ret += fmt.Sprintf("  05 -     %s: ( Record status = %q )\n", code, label)
+
+		code, label = ldrlk(authorityFieldData["TypeOfRecord"], ldr.Text, 6)
+		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+
+		code, label = ldrlk(authorityFieldData["CharacterCodingScheme"], ldr.Text, 9)
+		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+
+		code, label = ldrlk(authorityFieldData["EncodingLevel"], ldr.Text, 17)
+		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
+
+		code, label = ldrlk(authorityFieldData["PunctuationPolicy"], ldr.Text, 18)
+		ret += fmt.Sprintf("  18 -     %s: ( Punctuation policy = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  19 -     %s: ( Undefined character position )\n", string(ldr.Text[19]))
+
+	case Classification:
+
+		code, label := ldrlk(classificationFieldData["RecordStatus"], ldr.Text, 5)
+		ret += fmt.Sprintf("  05 -     %s: ( Record status = %q )\n", code, label)
+
+		code, label = ldrlk(classificationFieldData["TypeOfRecord"], ldr.Text, 6)
+		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  07-08 -  %s: ( Undefined character positions )\n", ldr.Text[7:9])
+
+		code, label = ldrlk(classificationFieldData["CharacterCodingScheme"], ldr.Text, 9)
+		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+
+		code, label = ldrlk(classificationFieldData["EncodingLevel"], ldr.Text, 17)
+		ret += fmt.Sprintf("  17 -     %s: ( Encoding level = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  18-19 -  %s: ( Undefined character positions )\n", ldr.Text[18:20])
+
+	case Community:
+		code, label := ldrlk(communityFieldData["RecordStatus"], ldr.Text, 5)
+		ret += fmt.Sprintf("  05 -     %s: ( Record status = %q )\n", code, label)
+
+		code, label = ldrlk(communityFieldData["TypeOfRecord"], ldr.Text, 6)
+		ret += fmt.Sprintf("  06 -     %s: ( Type of Record = %q )\n", code, label)
+
+		code, label = ldrlk(communityFieldData["KindOfData"], ldr.Text, 7)
+		ret += fmt.Sprintf("  07 -     %s: ( Kind of data = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  08 -     %s: ( Undefined character position )\n", string(ldr.Text[8]))
+
+		code, label = ldrlk(communityFieldData["CharacterCodingScheme"], ldr.Text, 9)
+		ret += fmt.Sprintf("  09 -     %s: ( Character coding scheme = %q )\n", code, label)
+
+		ret += fmt.Sprintf("  10 -     %s: ( Indicator count )\n", string(ldr.Text[10]))
+		ret += fmt.Sprintf("  11 -     %s: ( Subfield code length )\n", string(ldr.Text[11]))
+		ret += fmt.Sprintf("  12-16 -  %s: ( Base address of data )\n", ldr.Text[12:17])
+
+		ret += fmt.Sprintf("  17-19 -  %s: ( Undefined character positions )\n", ldr.Text[17:20])
+
+	}
+
+	ret += fmt.Sprintf("  20 -     %s: ( Length of the length-of-field portion )\n", string(ldr.Text[20]))
+	ret += fmt.Sprintf("  21 -     %s: ( Length of the starting-character-position portion )\n", string(ldr.Text[21]))
+	ret += fmt.Sprintf("  22 -     %s: ( Length of the implementation-defined portion )\n", string(ldr.Text[22]))
+	ret += fmt.Sprintf("  23 -     %s: ( Undefined )\n", string(ldr.Text[23]))
+
+	return ret
+}
+
+// ldrlk is a helper function for the leader stringer interface
+func ldrlk(codeList map[string]string, s string, i int) (code, label string) {
+
+	code, label = shortCodeLookup(codeList, s, i)
+	if code == " " {
+		code = "#"
+	}
+
+	return code, label
 }
