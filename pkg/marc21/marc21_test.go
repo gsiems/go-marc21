@@ -61,15 +61,21 @@ func TestMARC(t *testing.T) {
 			if code == "" {
 				t.Errorf("RecordType() failed")
 			}
-			code, _ = rec.CharacterCodingScheme()
+			code, label := rec.CharacterCodingScheme()
 			if code == "" {
 				t.Errorf("CharacterCodingScheme() failed")
 			}
 
-			s := rec.AvailableLeaderFields()
-			if len(s) == 0 {
-				t.Errorf("AvailableLeaderFields() failed")
+			nc, nl := rec.LookupLeaderField("CharacterCodingScheme")
+			if code != nc || label != nl {
+				t.Errorf("LookupLeaderField(CharacterCodingScheme) failed")
 			}
+
+			s := rec.ValidLeaderFields()
+			if len(s) == 0 {
+				t.Errorf("ValidLeaderFields() failed")
+			}
+
 		}
 		/*
 			if rf != Bibliography {
@@ -173,6 +179,29 @@ func TestRecordAsMARC(t *testing.T) {
 		_, err := rec.RecordAsMARC()
 		if err != nil {
 			t.Errorf("RecordAsMARC() failed: %q", err)
+		}
+	}
+}
+
+func TestLeaderPrint(t *testing.T) {
+
+	marcFile := os.Getenv("TEST_MARC_FILE")
+
+	fi, err := os.Open(marcFile)
+	if err != nil {
+		t.Errorf("os.Open() failed: %q", err)
+	}
+	defer fi.Close()
+
+	rec, err := ParseNextRecord(fi)
+	if err != nil {
+		t.Errorf("ParseNextRecord() failed: %q", err)
+	} else {
+		out := fmt.Sprint(rec.Leader)
+		// TODO: this really needs to test against a specific MARC record
+		// and compare the output to the specific expected value.
+		if out == "" {
+			t.Errorf("Sprint(rec.Leader) failed")
 		}
 	}
 }
