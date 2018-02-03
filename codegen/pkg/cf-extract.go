@@ -42,7 +42,7 @@ type CfElement struct {
 	Width        int
 	wrapIndent   int
 	CodeWidth    int
-	NeedsFn      bool
+	FnType       string
 	LookupValues []*CfLookupValue
 }
 
@@ -216,6 +216,7 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 			cfEl.Width = width
 			cfEl.Name = line
 			cfEl.CamelName = camelizeString(line)
+			cfEl.FnType = "read"
 			continue
 		}
 
@@ -260,8 +261,24 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 
 			cfEl.CodeWidth = calcCodeWidth(code)
 
-			if codeNeedsSpecialFn(code) {
-				cfEl.NeedsFn = true
+			if isRangeCode(code) {
+				cfEl.FnType = "range"
+			} else {
+				cfEl.FnType = "lookup"
+			}
+		}
+
+		if isRangeCode(code) {
+			if cfEl.FnType == "lookup" || cfEl.FnType == "hybrid" {
+				cfEl.FnType = "hybrid"
+			} else {
+				cfEl.FnType = "range"
+			}
+		} else {
+			if cfEl.FnType == "range" {
+				cfEl.FnType = "hybrid"
+			} else if cfEl.CodeWidth != cfEl.Width {
+				cfEl.FnType = "special"
 			}
 		}
 
@@ -293,9 +310,8 @@ func calcCodeWidth(c string) int {
 	return len(e[0])
 }
 
-// codeNeedsSpecialFn checks for any funkyness like ranges in the code
-// which would make us want to use a special function
-func codeNeedsSpecialFn(code string) bool {
+// isRangeCode checks the code to determine if is defining a range
+func isRangeCode(code string) bool {
 	if pluckBytes(code, 0, 1) != "-" {
 		if strings.Index(code, "-") > 0 {
 			return true
