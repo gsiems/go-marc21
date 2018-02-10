@@ -277,8 +277,10 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 		} else {
 			if cfEl.FnType == "range" {
 				cfEl.FnType = "hybrid"
-			} else if cfEl.CodeWidth != cfEl.Width {
-				cfEl.FnType = "special"
+			} else if cfEl.CodeWidth < cfEl.Width {
+				cfEl.FnType = "multi"
+			} else if strings.Contains(code, "[") {
+				cfEl.FnType = "hybrid"
 			}
 		}
 
