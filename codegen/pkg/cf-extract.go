@@ -90,7 +90,7 @@ func (t CfTag) String() string {
 	return rt
 }
 
-// ExtractCfStruct extracts the stucture for control file entries as
+// ExtractCfStruct extracts the structure for control file entries as
 // defined in the [saved-to-disc] fields list webpage
 func ExtractCfStruct(filename string) (tags CfTags) {
 
