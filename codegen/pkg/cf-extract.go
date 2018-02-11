@@ -271,10 +271,12 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 		if isRangeCode(code) {
 			if cfEl.FnType == "lookup" || cfEl.FnType == "hybrid" {
 				cfEl.FnType = "hybrid"
+			} else if cfEl.CodeWidth < cfEl.Width && strings.Contains(label, "Date") {
+				cfEl.FnType = "hybrid-date"
 			} else {
 				cfEl.FnType = "range"
 			}
-		} else {
+		} else if cfEl.FnType != "hybrid-date" {
 			if cfEl.FnType == "range" {
 				cfEl.FnType = "hybrid"
 			} else if cfEl.CodeWidth < cfEl.Width {
