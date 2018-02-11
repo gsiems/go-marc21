@@ -1638,13 +1638,17 @@ func parseBibliography008(d *Cf008Desc, s string) {
 	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
 	d.append("(06/01) Type of date/Publication status", codeLookup(bibliography008TypeOfDatePublicationStatus, s, 6, 1))
 
-	for i := 7; i < 11; i++ {
-		d.append("(07/04) Date 1", codeLookup(bibliography008Date1, s, i, 1))
+	rt07 := codeLookup(bibliography008Date1, s, 7, 1)
+	if rt07.Label == "" {
+		rt07 = CodeValue{Code: pluckBytes(s, 7, 4), Label: "Date"}
 	}
+	d.append("(07/04) Date 1", rt07)
 
-	for i := 11; i < 15; i++ {
-		d.append("(11/04) Date 2", codeLookup(bibliography008Date2, s, i, 1))
+	rt11 := codeLookup(bibliography008Date2, s, 11, 1)
+	if rt11.Label == "" {
+		rt11 = CodeValue{Code: pluckBytes(s, 11, 4), Label: "Date"}
 	}
+	d.append("(11/04) Date 2", rt11)
 
 	d.append("(15/03) Place of publication, production, or execution", CodeValue{Code: pluckBytes(s, 15, 3), Label: ""})
 	d.append("(35/03) Language", CodeValue{Code: pluckBytes(s, 35, 3), Label: ""})
@@ -1787,23 +1791,23 @@ var bibliography008BKBiography = map[string]string{
 func parseBibliography008BK(d *Cf008Desc, s string) {
 
 	for i := 0; i < 4; i++ {
-		d.append("(00/04) Illustrations", codeLookup(bibliography008BKIllustrations, s, i, 1))
+		d.append("(18/04) Illustrations", codeLookup(bibliography008BKIllustrations, s, i, 1))
 	}
 
-	d.append("(04/01) Target audience", codeLookup(bibliography008BKTargetAudience, s, 4, 1))
-	d.append("(05/01) Form of item", codeLookup(bibliography008BKFormOfItem, s, 5, 1))
+	d.append("(22/01) Target audience", codeLookup(bibliography008BKTargetAudience, s, 4, 1))
+	d.append("(23/01) Form of item", codeLookup(bibliography008BKFormOfItem, s, 5, 1))
 
 	for i := 6; i < 10; i++ {
-		d.append("(06/04) Nature of contents", codeLookup(bibliography008BKNatureOfContents, s, i, 1))
+		d.append("(24/04) Nature of contents", codeLookup(bibliography008BKNatureOfContents, s, i, 1))
 	}
 
-	d.append("(10/01) Government publication", codeLookup(bibliography008BKGovernmentPublication, s, 10, 1))
-	d.append("(11/01) Conference publication", codeLookup(bibliography008BKConferencePublication, s, 11, 1))
-	d.append("(12/01) Festschrift", codeLookup(bibliography008BKFestschrift, s, 12, 1))
-	d.append("(13/01) Index", codeLookup(bibliography008BKIndex, s, 13, 1))
-	d.append("(14/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
-	d.append("(15/01) Literary form", codeLookup(bibliography008BKLiteraryForm, s, 15, 1))
-	d.append("(16/01) Biography", codeLookup(bibliography008BKBiography, s, 16, 1))
+	d.append("(28/01) Government publication", codeLookup(bibliography008BKGovernmentPublication, s, 10, 1))
+	d.append("(29/01) Conference publication", codeLookup(bibliography008BKConferencePublication, s, 11, 1))
+	d.append("(30/01) Festschrift", codeLookup(bibliography008BKFestschrift, s, 12, 1))
+	d.append("(31/01) Index", codeLookup(bibliography008BKIndex, s, 13, 1))
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
+	d.append("(33/01) Literary form", codeLookup(bibliography008BKLiteraryForm, s, 15, 1))
+	d.append("(34/01) Biography", codeLookup(bibliography008BKBiography, s, 16, 1))
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1859,14 +1863,14 @@ var bibliography008CFGovernmentPublication = map[string]string{
 // Bibliography records COMPUTER FILES (CF) data
 func parseBibliography008CF(d *Cf008Desc, s string) {
 
-	d.append("(00/04) Undefined", CodeValue{Code: pluckBytes(s, 0, 4), Label: ""})
-	d.append("(04/01) Target audience", codeLookup(bibliography008CFTargetAudience, s, 4, 1))
-	d.append("(05/01) Form of item", codeLookup(bibliography008CFFormOfItem, s, 5, 1))
-	d.append("(06/02) Undefined", CodeValue{Code: pluckBytes(s, 6, 2), Label: ""})
-	d.append("(08/01) Type of computer file", codeLookup(bibliography008CFTypeOfComputerFile, s, 8, 1))
-	d.append("(09/01) Undefined", CodeValue{Code: pluckBytes(s, 9, 1), Label: ""})
-	d.append("(10/01) Government publication", codeLookup(bibliography008CFGovernmentPublication, s, 10, 1))
-	d.append("(11/06) Undefined", CodeValue{Code: pluckBytes(s, 11, 6), Label: ""})
+	d.append("(18/04) Undefined", CodeValue{Code: pluckBytes(s, 0, 4), Label: ""})
+	d.append("(22/01) Target audience", codeLookup(bibliography008CFTargetAudience, s, 4, 1))
+	d.append("(23/01) Form of item", codeLookup(bibliography008CFFormOfItem, s, 5, 1))
+	d.append("(24/02) Undefined", CodeValue{Code: pluckBytes(s, 6, 2), Label: ""})
+	d.append("(26/01) Type of computer file", codeLookup(bibliography008CFTypeOfComputerFile, s, 8, 1))
+	d.append("(27/01) Undefined", CodeValue{Code: pluckBytes(s, 9, 1), Label: ""})
+	d.append("(28/01) Government publication", codeLookup(bibliography008CFGovernmentPublication, s, 10, 1))
+	d.append("(29/06) Undefined", CodeValue{Code: pluckBytes(s, 11, 6), Label: ""})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2000,21 +2004,21 @@ var bibliography008MPSpecialFormatCharacteristics = map[string]string{
 func parseBibliography008MP(d *Cf008Desc, s string) {
 
 	for i := 0; i < 4; i++ {
-		d.append("(00/04) Relief", codeLookup(bibliography008MPRelief, s, i, 1))
+		d.append("(18/04) Relief", codeLookup(bibliography008MPRelief, s, i, 1))
 	}
 
-	d.append("(04/02) Projection", codeLookup(bibliography008MPProjection, s, 4, 2))
-	d.append("(06/01) Undefined", CodeValue{Code: pluckBytes(s, 6, 1), Label: ""})
-	d.append("(07/01) Type of cartographic material", codeLookup(bibliography008MPTypeOfCartographicMaterial, s, 7, 1))
-	d.append("(08/02) Undefined", CodeValue{Code: pluckBytes(s, 8, 2), Label: ""})
-	d.append("(10/01) Government publication", codeLookup(bibliography008MPGovernmentPublication, s, 10, 1))
-	d.append("(11/01) Form of item", codeLookup(bibliography008MPFormOfItem, s, 11, 1))
-	d.append("(12/01) Undefined", CodeValue{Code: pluckBytes(s, 12, 1), Label: ""})
-	d.append("(13/01) Index", codeLookup(bibliography008MPIndex, s, 13, 1))
-	d.append("(14/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
+	d.append("(22/02) Projection", codeLookup(bibliography008MPProjection, s, 4, 2))
+	d.append("(24/01) Undefined", CodeValue{Code: pluckBytes(s, 6, 1), Label: ""})
+	d.append("(25/01) Type of cartographic material", codeLookup(bibliography008MPTypeOfCartographicMaterial, s, 7, 1))
+	d.append("(26/02) Undefined", CodeValue{Code: pluckBytes(s, 8, 2), Label: ""})
+	d.append("(28/01) Government publication", codeLookup(bibliography008MPGovernmentPublication, s, 10, 1))
+	d.append("(29/01) Form of item", codeLookup(bibliography008MPFormOfItem, s, 11, 1))
+	d.append("(30/01) Undefined", CodeValue{Code: pluckBytes(s, 12, 1), Label: ""})
+	d.append("(31/01) Index", codeLookup(bibliography008MPIndex, s, 13, 1))
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
 
 	for i := 15; i < 17; i++ {
-		d.append("(15/02) Special format characteristics", codeLookup(bibliography008MPSpecialFormatCharacteristics, s, i, 1))
+		d.append("(33/02) Special format characteristics", codeLookup(bibliography008MPSpecialFormatCharacteristics, s, i, 1))
 	}
 
 }
@@ -2205,23 +2209,23 @@ var bibliography008MUTranspositionAndArrangement = map[string]string{
 // Bibliography records MUSIC (MU) data
 func parseBibliography008MU(d *Cf008Desc, s string) {
 
-	d.append("(00/02) Form of composition", codeLookup(bibliography008MUFormOfComposition, s, 0, 2))
-	d.append("(02/01) Format of music", codeLookup(bibliography008MUFormatOfMusic, s, 2, 1))
-	d.append("(03/01) Music parts", codeLookup(bibliography008MUMusicParts, s, 3, 1))
-	d.append("(04/01) Target audience", codeLookup(bibliography008MUTargetAudience, s, 4, 1))
-	d.append("(05/01) Form of item", codeLookup(bibliography008MUFormOfItem, s, 5, 1))
+	d.append("(18/02) Form of composition", codeLookup(bibliography008MUFormOfComposition, s, 0, 2))
+	d.append("(20/01) Format of music", codeLookup(bibliography008MUFormatOfMusic, s, 2, 1))
+	d.append("(21/01) Music parts", codeLookup(bibliography008MUMusicParts, s, 3, 1))
+	d.append("(22/01) Target audience", codeLookup(bibliography008MUTargetAudience, s, 4, 1))
+	d.append("(23/01) Form of item", codeLookup(bibliography008MUFormOfItem, s, 5, 1))
 
 	for i := 6; i < 12; i++ {
-		d.append("(06/06) Accompanying matter", codeLookup(bibliography008MUAccompanyingMatter, s, i, 1))
+		d.append("(24/06) Accompanying matter", codeLookup(bibliography008MUAccompanyingMatter, s, i, 1))
 	}
 
 	for i := 12; i < 14; i++ {
-		d.append("(12/02) Literary text for sound recordings", codeLookup(bibliography008MULiteraryTextForSoundRecordings, s, i, 1))
+		d.append("(30/02) Literary text for sound recordings", codeLookup(bibliography008MULiteraryTextForSoundRecordings, s, i, 1))
 	}
 
-	d.append("(14/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
-	d.append("(15/01) Transposition and arrangement", codeLookup(bibliography008MUTranspositionAndArrangement, s, 15, 1))
-	d.append("(16/01) Undefined", CodeValue{Code: pluckBytes(s, 16, 1), Label: ""})
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
+	d.append("(33/01) Transposition and arrangement", codeLookup(bibliography008MUTranspositionAndArrangement, s, 15, 1))
+	d.append("(34/01) Undefined", CodeValue{Code: pluckBytes(s, 16, 1), Label: ""})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2399,22 +2403,22 @@ var bibliography008CREntryConvention = map[string]string{
 // Bibliography records CONTINUING RESOURCES (CR) data
 func parseBibliography008CR(d *Cf008Desc, s string) {
 
-	d.append("(00/01) Frequency", codeLookup(bibliography008CRFrequency, s, 0, 1))
-	d.append("(01/01) Regularity", codeLookup(bibliography008CRRegularity, s, 1, 1))
-	d.append("(03/01) Type of continuing resource", codeLookup(bibliography008CRTypeOfContinuingResource, s, 3, 1))
-	d.append("(04/01) Form of original item", codeLookup(bibliography008CRFormOfOriginalItem, s, 4, 1))
-	d.append("(05/01) Form of item", codeLookup(bibliography008CRFormOfItem, s, 5, 1))
-	d.append("(06/01) Nature of entire work", codeLookup(bibliography008CRNatureOfEntireWork, s, 6, 1))
+	d.append("(18/01) Frequency", codeLookup(bibliography008CRFrequency, s, 0, 1))
+	d.append("(19/01) Regularity", codeLookup(bibliography008CRRegularity, s, 1, 1))
+	d.append("(21/01) Type of continuing resource", codeLookup(bibliography008CRTypeOfContinuingResource, s, 3, 1))
+	d.append("(22/01) Form of original item", codeLookup(bibliography008CRFormOfOriginalItem, s, 4, 1))
+	d.append("(23/01) Form of item", codeLookup(bibliography008CRFormOfItem, s, 5, 1))
+	d.append("(24/01) Nature of entire work", codeLookup(bibliography008CRNatureOfEntireWork, s, 6, 1))
 
 	for i := 7; i < 10; i++ {
-		d.append("(07/03) Nature of contents", codeLookup(bibliography008CRNatureOfContents, s, i, 1))
+		d.append("(25/03) Nature of contents", codeLookup(bibliography008CRNatureOfContents, s, i, 1))
 	}
 
-	d.append("(10/01) Government publication", codeLookup(bibliography008CRGovernmentPublication, s, 10, 1))
-	d.append("(11/01) Conference publication", codeLookup(bibliography008CRConferencePublication, s, 11, 1))
-	d.append("(12/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
-	d.append("(15/01) Original alphabet or script of title", codeLookup(bibliography008CROriginalAlphabetOrScriptOfTitle, s, 15, 1))
-	d.append("(16/01) Entry convention", codeLookup(bibliography008CREntryConvention, s, 16, 1))
+	d.append("(28/01) Government publication", codeLookup(bibliography008CRGovernmentPublication, s, 10, 1))
+	d.append("(29/01) Conference publication", codeLookup(bibliography008CRConferencePublication, s, 11, 1))
+	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
+	d.append("(33/01) Original alphabet or script of title", codeLookup(bibliography008CROriginalAlphabetOrScriptOfTitle, s, 15, 1))
+	d.append("(34/01) Entry convention", codeLookup(bibliography008CREntryConvention, s, 16, 1))
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2506,16 +2510,16 @@ func parseBibliography008VM(d *Cf008Desc, s string) {
 	if rt18.Code != "" && rt18.Label == "" {
 		rt18.Label = "Running time"
 	}
-	d.append("(00/03) Running time for motion pictures and videorecordings", rt18)
+	d.append("(18/03) Running time for motion pictures and videorecordings", rt18)
 
-	d.append("(03/01) Undefined", CodeValue{Code: pluckBytes(s, 3, 1), Label: ""})
-	d.append("(04/01) Target audience", codeLookup(bibliography008VMTargetAudience, s, 4, 1))
-	d.append("(05/05) Undefined", CodeValue{Code: pluckBytes(s, 5, 5), Label: ""})
-	d.append("(10/01) Government publication", codeLookup(bibliography008VMGovernmentPublication, s, 10, 1))
-	d.append("(11/01) Form of item", codeLookup(bibliography008VMFormOfItem, s, 11, 1))
-	d.append("(12/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
-	d.append("(15/01) Type of visual material", codeLookup(bibliography008VMTypeOfVisualMaterial, s, 15, 1))
-	d.append("(16/01) Technique", codeLookup(bibliography008VMTechnique, s, 16, 1))
+	d.append("(21/01) Undefined", CodeValue{Code: pluckBytes(s, 3, 1), Label: ""})
+	d.append("(22/01) Target audience", codeLookup(bibliography008VMTargetAudience, s, 4, 1))
+	d.append("(23/05) Undefined", CodeValue{Code: pluckBytes(s, 5, 5), Label: ""})
+	d.append("(28/01) Government publication", codeLookup(bibliography008VMGovernmentPublication, s, 10, 1))
+	d.append("(29/01) Form of item", codeLookup(bibliography008VMFormOfItem, s, 11, 1))
+	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
+	d.append("(33/01) Type of visual material", codeLookup(bibliography008VMTypeOfVisualMaterial, s, 15, 1))
+	d.append("(34/01) Technique", codeLookup(bibliography008VMTechnique, s, 16, 1))
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2538,9 +2542,9 @@ var bibliography008MXFormOfItem = map[string]string{
 // Bibliography records MIXED MATERIALS (MX) data
 func parseBibliography008MX(d *Cf008Desc, s string) {
 
-	d.append("(00/05) Undefined", CodeValue{Code: pluckBytes(s, 0, 5), Label: ""})
-	d.append("(05/01) Form of item", codeLookup(bibliography008MXFormOfItem, s, 5, 1))
-	d.append("(06/11) Undefined", CodeValue{Code: pluckBytes(s, 6, 11), Label: ""})
+	d.append("(18/05) Undefined", CodeValue{Code: pluckBytes(s, 0, 5), Label: ""})
+	d.append("(23/01) Form of item", codeLookup(bibliography008MXFormOfItem, s, 5, 1))
+	d.append("(24/11) Undefined", CodeValue{Code: pluckBytes(s, 6, 11), Label: ""})
 }
 
 ////////////////////////////////////////////////////////////////////////
