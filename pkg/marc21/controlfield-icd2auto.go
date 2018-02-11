@@ -48,6 +48,58 @@ func codeLookup(codeList map[string]string, b string, i, w int) CodeValue {
 	return CodeValue{Code: code, Label: label}
 }
 
+// Parse006 parses the 006 controlfield for a record and returns a,
+// hopefully, human readable translation of the field contents.
+func (rec Record) Parse006() (d Cf008Desc) {
+
+	d = make(Cf008Desc)
+
+	type fn func(md *Cf008Desc, s string)
+
+	m := map[string]fn{
+		"BK": parseBibliography008BK,
+		"CF": parseBibliography008CF,
+		"MP": parseBibliography008MP,
+		"MU": parseBibliography008MU,
+		"CR": parseBibliography008CR,
+		"VM": parseBibliography008VM,
+		"MX": parseBibliography008MX,
+	}
+
+	if rec.RecordFormat() == Bibliography {
+
+		c, _ := rec.BibliographyMaterialType()
+
+		// Ref: http://www.loc.gov/marc/bibliographic/bd006.html
+		//
+		// "Except for code s (Serial/Integrating resource), the codes
+		// in field 006/00 correspond to those in Leader/06 (Type of
+		// record). For each occurrence of field 006, the codes
+		// defined for character positions 01-17 will be the same as
+		// those defined in the corresponding field 008, character
+		// positions 18-34."
+
+		// For bibliography 008 fields pass subslice of s -- s[18:]
+		// and for bibliography 006 fields pass subslice of s -- s[1:]
+		// This way the same parsing functions can parse both 008 and
+		// 006 control fields
+
+		cf := rec.GetControlfields("006")
+
+		for _, cf6 := range cf {
+			c6 := pluckByte(cf6.Text, 0)
+			if c6 == c || c6 == "s" || c == "s" {
+				fcn, ok := m[c]
+				if ok {
+					fcn(&d, cf6.Text[1:])
+				}
+			}
+		}
+	}
+
+	return d
+}
+
 // Parse008 parses the 008 controlfield for a record and returns a,
 // hopefully, human readable translation of the field contents.
 func (rec Record) Parse008() (d Cf008Desc) {
@@ -87,7 +139,7 @@ func (rec Record) Parse008() (d Cf008Desc) {
 		cf := rec.GetControlfields("006")
 		for _, cf6 := range cf {
 			// IIF the form of material matches?
-			if pluckByte(cf6.Text, 0) == c {
+			if pluckByte(cf6.Text, 0) == c || pluckByte(cf6.Text, 0) == "s" {
 				fcn, ok := m[c]
 				if ok {
 					fcn(&d, cf6.Text[1:])
