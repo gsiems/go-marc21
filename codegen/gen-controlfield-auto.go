@@ -392,7 +392,7 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 			offsetAdj = 18
 		}
 
-		fieldName := fmt.Sprintf("(%02d/%02d) %s", e.Offset-offsetAdj, e.Width, e.Name)
+		fieldName := fmt.Sprintf("(%02d/%02d) %s", e.Offset, e.Width, e.Name)
 		if len(e.LookupValues) > 0 && e.FnType == "lookup" {
 			fmt.Printf("\td.append(%q, codeLookup(%s, s, %d, %d))\n",
 				fieldName, varname, e.Offset-offsetAdj, e.Width)
@@ -431,6 +431,18 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 					break
 				}
 			}
+		} else if len(e.LookupValues) > 0 && e.FnType == "hybrid-date" {
+
+			vn := fmt.Sprintf("rt%02d", e.Offset)
+
+			fmt.Println()
+			fmt.Printf("\t%s := codeLookup(%s, s, %d, 1)\n", vn, varname, e.Offset-offsetAdj)
+			fmt.Printf("\tif %s.Label == \"\" {\n", vn)
+			fmt.Printf("\t\t%s = CodeValue {Code: pluckBytes(s, %d, %d), Label: \"Date\"}\n", vn, e.Offset-offsetAdj, e.Width)
+			fmt.Println("\t}")
+			fmt.Printf("\td.append(%q, %s)\n", fieldName, vn)
+			fmt.Println()
+
 		}
 	}
 
