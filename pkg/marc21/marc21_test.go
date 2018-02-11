@@ -76,36 +76,18 @@ func TestMARC(t *testing.T) {
 				t.Errorf("ValidLeaderFields() failed")
 			}
 
-		}
-		/*
-			if rf != Bibliography {
-				code, _ := rec.BibliographicLevel()
-				if code == "" {
-					t.Errorf("BibliographicLevel() failed")
-				}
-				code, _ = rec.ControlType()
-				if code == "" {
-					t.Errorf("ControlType() failed")
-				}
-				code, _ = rec.EncodingLevel()
-				if code == "" {
-					t.Errorf("EncodingLevel() failed")
-				}
-				code, _ = rec.CatalogingForm()
-				if code == "" {
-					t.Errorf("CatalogingForm() failed")
-				}
-				code, _ = rec.MultipartResourceRecordLevel()
-				if code == "" {
-					t.Errorf("MultipartResourceRecordLevel() failed")
+			cf8 := rec.Parse008()
+			if len(cf8) == 0 {
+				t.Errorf("rec.Parse008() failed??")
+			}
+
+			if rec.GetControlfield("007") != "" {
+				cf7 := rec.Parse007()
+				if len(cf7) == 0 {
+					t.Errorf("rec.Parse007() failed??")
 				}
 			}
-		*/
-		//cfd := rec.ParseControlfields()
-		//if false {
-		//	fmt.Printf("%q\n", cfd)
-		//	//t.Errorf("Record.parseControlfields() failed")
-		//}
+		}
 
 		out := fmt.Sprint(rec)
 		if out == "" {
@@ -203,5 +185,6 @@ func TestLeaderPrint(t *testing.T) {
 		if out == "" {
 			t.Errorf("Sprint(rec.Leader) failed")
 		}
+
 	}
 }
