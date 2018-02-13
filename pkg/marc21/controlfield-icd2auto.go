@@ -8,8 +8,10 @@ package marc21
 // CodeValue contains a code and it's corresponding descriptive label
 // for a controlfield entry.
 type CodeValue struct {
-	Code  string
-	Label string
+	Code   string
+	Label  string
+	Offset int
+	Width  int
 }
 
 // Cf008Desc is the structure for holding the description from the
@@ -36,16 +38,15 @@ func (mc Cf008Desc) append(k string, c CodeValue) {
 	}
 }
 
-func codeLookup(codeList map[string]string, b string, i, w int) CodeValue {
+func codeLookup(codeList map[string]string, b string, i, w int) (code, label string) {
 
-	var code, label string
 	code = pluckBytes(b, i, w)
 
 	if code != "" {
 		label = codeList[code]
 	}
 
-	return CodeValue{Code: code, Label: label}
+	return code, label
 }
 
 // Parse006 parses the 006 controlfield for a record and returns a,
@@ -87,13 +88,17 @@ func (rec Record) Parse006() (d Cf008Desc) {
 		cf := rec.GetControlfields("006")
 
 		for _, cf6 := range cf {
-			c6 := pluckByte(cf6.Text, 0)
-			if c6 == c || c6 == "s" || c == "s" {
-				fcn, ok := m[c]
-				if ok {
-					fcn(&d, cf6.Text[1:])
-				}
+			//c6 := pluckByte(cf6.Text, 0)
+			//if c6 == c || c6 == "s" || c == "s" {
+
+			code, label := codeLookup(bibliography006FormOfMaterial, cf6.Text, 0, 1)
+			d.append("(00/01) Form of material", CodeValue{Code: code, Label: label, Offset: 0, Width: 1})
+
+			fcn, ok := m[c]
+			if ok {
+				fcn(&d, cf6.Text[1:])
 			}
+			//}
 		}
 	}
 
