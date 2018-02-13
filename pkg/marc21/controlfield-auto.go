@@ -156,33 +156,72 @@ var authority008CatalogingSource = map[string]string{
 // Authority records data
 func parseAuthority008(d *Cf008Desc, s string) {
 
-	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
-	d.append("(06/01) Direct or indirect geographic subdivision", codeLookup(authority008DirectOrIndirectGeographicSubdivision, s, 6, 1))
-	d.append("(07/01) Romanization scheme", codeLookup(authority008RomanizationScheme, s, 7, 1))
-	d.append("(08/01) Language of catalog", codeLookup(authority008LanguageOfCatalog, s, 8, 1))
-	d.append("(09/01) Kind of record", codeLookup(authority008KindOfRecord, s, 9, 1))
-	d.append("(10/01) Descriptive cataloging rules", codeLookup(authority008DescriptiveCatalogingRules, s, 10, 1))
-	d.append("(11/01) Subject heading system/thesaurus", codeLookup(authority008SubjectHeadingSystemThesaurus, s, 11, 1))
-	d.append("(12/01) Type of series", codeLookup(authority008TypeOfSeries, s, 12, 1))
-	d.append("(13/01) Numbered or unnumbered series", codeLookup(authority008NumberedOrUnnumberedSeries, s, 13, 1))
-	d.append("(14/01) Heading use--main or added entry", codeLookup(authority008HeadingUseMainOrAddedEntry, s, 14, 1))
-	d.append("(15/01) Heading use--subject added entry", codeLookup(authority008HeadingUseSubjectAddedEntry, s, 15, 1))
-	d.append("(16/01) Heading use--series added entry", codeLookup(authority008HeadingUseSeriesAddedEntry, s, 16, 1))
-	d.append("(17/01) Type of subject subdivision", codeLookup(authority008TypeOfSubjectSubdivision, s, 17, 1))
-	d.append("(18/10) Undefined character positions", CodeValue{Code: pluckBytes(s, 18, 10), Label: ""})
-	d.append("(28/01) Type of government agency", codeLookup(authority008TypeOfGovernmentAgency, s, 28, 1))
-	d.append("(29/01) Reference evaluation", codeLookup(authority008ReferenceEvaluation, s, 29, 1))
-	d.append("(30/01) Undefined character position", CodeValue{Code: pluckBytes(s, 30, 1), Label: ""})
-	d.append("(31/01) Record update in process", codeLookup(authority008RecordUpdateInProcess, s, 31, 1))
-	d.append("(32/01) Undifferentiated personal name", codeLookup(authority008UndifferentiatedPersonalName, s, 32, 1))
-	d.append("(33/01) Level of establishment", codeLookup(authority008LevelOfEstablishment, s, 33, 1))
-	d.append("(34/04) Undefined character positions", CodeValue{Code: pluckBytes(s, 34, 4), Label: ""})
-	d.append("(38/01) Modified record", codeLookup(authority008ModifiedRecord, s, 38, 1))
-	d.append("(39/01) Cataloging source", codeLookup(authority008CatalogingSource, s, 39, 1))
+	var c string
+	var l string
+	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: "", Offset: 0, Width: 6})
+	c, l = codeLookup(authority008DirectOrIndirectGeographicSubdivision, s, 6, 1)
+	d.append("(06/01) Direct or indirect geographic subdivision", CodeValue{Code: c, Label: l, Offset: 6, Width: 1})
+	c, l = codeLookup(authority008RomanizationScheme, s, 7, 1)
+	d.append("(07/01) Romanization scheme", CodeValue{Code: c, Label: l, Offset: 7, Width: 1})
+	c, l = codeLookup(authority008LanguageOfCatalog, s, 8, 1)
+	d.append("(08/01) Language of catalog", CodeValue{Code: c, Label: l, Offset: 8, Width: 1})
+	c, l = codeLookup(authority008KindOfRecord, s, 9, 1)
+	d.append("(09/01) Kind of record", CodeValue{Code: c, Label: l, Offset: 9, Width: 1})
+	c, l = codeLookup(authority008DescriptiveCatalogingRules, s, 10, 1)
+	d.append("(10/01) Descriptive cataloging rules", CodeValue{Code: c, Label: l, Offset: 10, Width: 1})
+	c, l = codeLookup(authority008SubjectHeadingSystemThesaurus, s, 11, 1)
+	d.append("(11/01) Subject heading system/thesaurus", CodeValue{Code: c, Label: l, Offset: 11, Width: 1})
+	c, l = codeLookup(authority008TypeOfSeries, s, 12, 1)
+	d.append("(12/01) Type of series", CodeValue{Code: c, Label: l, Offset: 12, Width: 1})
+	c, l = codeLookup(authority008NumberedOrUnnumberedSeries, s, 13, 1)
+	d.append("(13/01) Numbered or unnumbered series", CodeValue{Code: c, Label: l, Offset: 13, Width: 1})
+	c, l = codeLookup(authority008HeadingUseMainOrAddedEntry, s, 14, 1)
+	d.append("(14/01) Heading use--main or added entry", CodeValue{Code: c, Label: l, Offset: 14, Width: 1})
+	c, l = codeLookup(authority008HeadingUseSubjectAddedEntry, s, 15, 1)
+	d.append("(15/01) Heading use--subject added entry", CodeValue{Code: c, Label: l, Offset: 15, Width: 1})
+	c, l = codeLookup(authority008HeadingUseSeriesAddedEntry, s, 16, 1)
+	d.append("(16/01) Heading use--series added entry", CodeValue{Code: c, Label: l, Offset: 16, Width: 1})
+	c, l = codeLookup(authority008TypeOfSubjectSubdivision, s, 17, 1)
+	d.append("(17/01) Type of subject subdivision", CodeValue{Code: c, Label: l, Offset: 17, Width: 1})
+	d.append("(18/10) Undefined character positions", CodeValue{Code: pluckBytes(s, 18, 10), Label: "", Offset: 18, Width: 10})
+	c, l = codeLookup(authority008TypeOfGovernmentAgency, s, 28, 1)
+	d.append("(28/01) Type of government agency", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	c, l = codeLookup(authority008ReferenceEvaluation, s, 29, 1)
+	d.append("(29/01) Reference evaluation", CodeValue{Code: c, Label: l, Offset: 29, Width: 1})
+	d.append("(30/01) Undefined character position", CodeValue{Code: pluckBytes(s, 30, 1), Label: "", Offset: 30, Width: 1})
+	c, l = codeLookup(authority008RecordUpdateInProcess, s, 31, 1)
+	d.append("(31/01) Record update in process", CodeValue{Code: c, Label: l, Offset: 31, Width: 1})
+	c, l = codeLookup(authority008UndifferentiatedPersonalName, s, 32, 1)
+	d.append("(32/01) Undifferentiated personal name", CodeValue{Code: c, Label: l, Offset: 32, Width: 1})
+	c, l = codeLookup(authority008LevelOfEstablishment, s, 33, 1)
+	d.append("(33/01) Level of establishment", CodeValue{Code: c, Label: l, Offset: 33, Width: 1})
+	d.append("(34/04) Undefined character positions", CodeValue{Code: pluckBytes(s, 34, 4), Label: "", Offset: 34, Width: 4})
+	c, l = codeLookup(authority008ModifiedRecord, s, 38, 1)
+	d.append("(38/01) Modified record", CodeValue{Code: c, Label: l, Offset: 38, Width: 1})
+	c, l = codeLookup(authority008CatalogingSource, s, 39, 1)
+	d.append("(39/01) Cataloging source", CodeValue{Code: c, Label: l, Offset: 39, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Bibliography
+var bibliography006FormOfMaterial = map[string]string{
+	"a": "Language material",
+	"t": "Manuscript language material",
+	"m": "Computer file/Electronic resource",
+	"e": "Cartographic material",
+	"f": "Manuscript cartographic material",
+	"p": "Mixed material",
+	"c": "Notated music",
+	"d": "Manuscript notated music",
+	"i": "Nonmusical sound recording",
+	"j": "Musical sound recording",
+	"s": "Serial/Integrating resource",
+	"g": "Projected medium",
+	"k": "Two-dimensional nonprojectable graphic",
+	"o": "Kit",
+	"r": "Three-dimensional artifact or naturally occurring object",
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Bibliography -- 007
 var bibliography007CategoryOfMaterial = map[string]string{
@@ -277,14 +316,23 @@ func parseBibliography007MAP(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007MAPSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007MAPColor, s, 3, 1)
-	pd["(04/01) Physical medium"] = codeLookup(bibliography007MAPPhysicalMedium, s, 4, 1)
-	pd["(05/01) Type of reproduction"] = codeLookup(bibliography007MAPTypeOfReproduction, s, 5, 1)
-	pd["(06/01) Production/reproduction details"] = codeLookup(bibliography007MAPProductionReproductionDetails, s, 6, 1)
-	pd["(07/01) Positive/negative aspect"] = codeLookup(bibliography007MAPPositiveNegativeAspect, s, 7, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007MAPSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007MAPColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007MAPPhysicalMedium, s, 4, 1)
+	pd["(04/01) Physical medium"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007MAPTypeOfReproduction, s, 5, 1)
+	pd["(05/01) Type of reproduction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007MAPProductionReproductionDetails, s, 6, 1)
+	pd["(06/01) Production/reproduction details"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007MAPPositiveNegativeAspect, s, 7, 1)
+	pd["(07/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
 
 	return pd
 }
@@ -392,24 +440,36 @@ func parseBibliography007ELR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007ELRSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007ELRColor, s, 3, 1)
-	pd["(04/01) Dimensions"] = codeLookup(bibliography007ELRDimensions, s, 4, 1)
-	pd["(05/01) Sound"] = codeLookup(bibliography007ELRSound, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007ELRSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007ELRColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007ELRDimensions, s, 4, 1)
+	pd["(04/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007ELRSound, s, 5, 1)
+	pd["(05/01) Sound"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
-	rt06 := codeLookup(bibliography007ELRImageBitDepth, s, 6, 3)
-	if rt06.Code != "" && rt06.Label == "" {
-		rt06.Label = "Exact bit depth"
+	c, l = codeLookup(bibliography007ELRImageBitDepth, s, 6, 3)
+	if c != "" && l == "" {
+		l = "Exact bit depth"
 	}
-	pd["(06/03) Image bit depth"] = rt06
+	pd["(06/03) Image bit depth"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
 
-	pd["(09/01) File formats"] = codeLookup(bibliography007ELRFileFormats, s, 9, 1)
-	pd["(10/01) Quality assurance target(s)"] = codeLookup(bibliography007ELRQualityAssuranceTargetS, s, 10, 1)
-	pd["(11/01) Antecedent/source"] = codeLookup(bibliography007ELRAntecedentSource, s, 11, 1)
-	pd["(12/01) Level of compression"] = codeLookup(bibliography007ELRLevelOfCompression, s, 12, 1)
-	pd["(13/01) Reformatting quality"] = codeLookup(bibliography007ELRReformattingQuality, s, 13, 1)
+	c, l = codeLookup(bibliography007ELRFileFormats, s, 9, 1)
+	pd["(09/01) File formats"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(bibliography007ELRQualityAssuranceTargetS, s, 10, 1)
+	pd["(10/01) Quality assurance target(s)"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(bibliography007ELRAntecedentSource, s, 11, 1)
+	pd["(11/01) Antecedent/source"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(bibliography007ELRLevelOfCompression, s, 12, 1)
+	pd["(12/01) Level of compression"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(bibliography007ELRReformattingQuality, s, 13, 1)
+	pd["(13/01) Reformatting quality"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
 
 	return pd
 }
@@ -462,12 +522,19 @@ func parseBibliography007GLB(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007GLBSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007GLBColor, s, 3, 1)
-	pd["(04/01) Physical medium"] = codeLookup(bibliography007GLBPhysicalMedium, s, 4, 1)
-	pd["(05/01) Type of reproduction"] = codeLookup(bibliography007GLBTypeOfReproduction, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007GLBSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007GLBColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007GLBPhysicalMedium, s, 4, 1)
+	pd["(04/01) Physical medium"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007GLBTypeOfReproduction, s, 5, 1)
+	pd["(05/01) Type of reproduction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
 	return pd
 }
@@ -539,20 +606,31 @@ func parseBibliography007TAM(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007TAMSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007TAMSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
 
-	pd["(03/02) Class of braille writing - 1"] = codeLookup(bibliography007TAMClassOfBrailleWriting, s, 3, 1)
-	pd["(03/02) Class of braille writing - 2"] = codeLookup(bibliography007TAMClassOfBrailleWriting, s, 4, 1)
+	c, l = codeLookup(bibliography007TAMClassOfBrailleWriting, s, 3, 1)
+	pd["(03/02) Class of braille writing - 1"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 2}
+	c, l = codeLookup(bibliography007TAMClassOfBrailleWriting, s, 4, 1)
+	pd["(03/02) Class of braille writing - 2"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 2}
 
-	pd["(05/01) Level of contraction"] = codeLookup(bibliography007TAMLevelOfContraction, s, 5, 1)
+	c, l = codeLookup(bibliography007TAMLevelOfContraction, s, 5, 1)
+	pd["(05/01) Level of contraction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
-	pd["(06/03) Braille music format - 1"] = codeLookup(bibliography007TAMBrailleMusicFormat, s, 6, 1)
-	pd["(06/03) Braille music format - 2"] = codeLookup(bibliography007TAMBrailleMusicFormat, s, 7, 1)
-	pd["(06/03) Braille music format - 3"] = codeLookup(bibliography007TAMBrailleMusicFormat, s, 8, 1)
+	c, l = codeLookup(bibliography007TAMBrailleMusicFormat, s, 6, 1)
+	pd["(06/03) Braille music format - 1"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
+	c, l = codeLookup(bibliography007TAMBrailleMusicFormat, s, 7, 1)
+	pd["(06/03) Braille music format - 2"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
+	c, l = codeLookup(bibliography007TAMBrailleMusicFormat, s, 8, 1)
+	pd["(06/03) Braille music format - 3"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
 
-	pd["(09/01) Specific physical characteristics"] = codeLookup(bibliography007TAMSpecificPhysicalCharacteristics, s, 9, 1)
+	c, l = codeLookup(bibliography007TAMSpecificPhysicalCharacteristics, s, 9, 1)
+	pd["(09/01) Specific physical characteristics"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
 
 	return pd
 }
@@ -654,15 +732,25 @@ func parseBibliography007PRG(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007PRGSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007PRGColor, s, 3, 1)
-	pd["(04/01) Base of emulsion"] = codeLookup(bibliography007PRGBaseOfEmulsion, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(bibliography007PRGSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(bibliography007PRGMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(bibliography007PRGDimensions, s, 7, 1)
-	pd["(08/01) Secondary support material"] = codeLookup(bibliography007PRGSecondarySupportMaterial, s, 8, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007PRGSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007PRGColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007PRGBaseOfEmulsion, s, 4, 1)
+	pd["(04/01) Base of emulsion"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007PRGSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007PRGMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007PRGDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(bibliography007PRGSecondarySupportMaterial, s, 8, 1)
+	pd["(08/01) Secondary support material"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
 
 	return pd
 }
@@ -761,17 +849,28 @@ func parseBibliography007MIC(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007MICSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Positive/negative aspect"] = codeLookup(bibliography007MICPositiveNegativeAspect, s, 3, 1)
-	pd["(04/01) Dimensions"] = codeLookup(bibliography007MICDimensions, s, 4, 1)
-	pd["(05/01) Reduction ratio range"] = codeLookup(bibliography007MICReductionRatioRange, s, 5, 1)
-	pd["(06/03) Reduction ratio"] = CodeValue{Code: pluckBytes(s, 6, 3), Label: ""}
-	pd["(09/01) Color"] = codeLookup(bibliography007MICColor, s, 9, 1)
-	pd["(10/01) Emulsion on film"] = codeLookup(bibliography007MICEmulsionOnFilm, s, 10, 1)
-	pd["(11/01) Generation"] = codeLookup(bibliography007MICGeneration, s, 11, 1)
-	pd["(12/01) Base of film"] = codeLookup(bibliography007MICBaseOfFilm, s, 12, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007MICSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007MICPositiveNegativeAspect, s, 3, 1)
+	pd["(03/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007MICDimensions, s, 4, 1)
+	pd["(04/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007MICReductionRatioRange, s, 5, 1)
+	pd["(05/01) Reduction ratio range"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	pd["(06/03) Reduction ratio"] = CodeValue{Code: pluckBytes(s, 6, 3), Label: "", Offset: 6, Width: 3}
+	c, l = codeLookup(bibliography007MICColor, s, 9, 1)
+	pd["(09/01) Color"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(bibliography007MICEmulsionOnFilm, s, 10, 1)
+	pd["(10/01) Emulsion on film"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(bibliography007MICGeneration, s, 11, 1)
+	pd["(11/01) Generation"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(bibliography007MICBaseOfFilm, s, 12, 1)
+	pd["(12/01) Base of film"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
 
 	return pd
 }
@@ -869,12 +968,19 @@ func parseBibliography007NPG(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007NPGSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007NPGColor, s, 3, 1)
-	pd["(04/01) Primary support material"] = codeLookup(bibliography007NPGPrimarySupportMaterial, s, 4, 1)
-	pd["(05/01) Secondary support material"] = codeLookup(bibliography007NPGSecondarySupportMaterial, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007NPGSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007NPGColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007NPGPrimarySupportMaterial, s, 4, 1)
+	pd["(04/01) Primary support material"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007NPGSecondarySupportMaterial, s, 5, 1)
+	pd["(05/01) Secondary support material"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
 	return pd
 }
@@ -1061,24 +1167,42 @@ func parseBibliography007MOP(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007MOPSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007MOPColor, s, 3, 1)
-	pd["(04/01) Motion picture presentation format"] = codeLookup(bibliography007MOPMotionPicturePresentationFormat, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(bibliography007MOPSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(bibliography007MOPMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(bibliography007MOPDimensions, s, 7, 1)
-	pd["(08/01) Configuration of playback channels"] = codeLookup(bibliography007MOPConfigurationOfPlaybackChannels, s, 8, 1)
-	pd["(09/01) Production elements"] = codeLookup(bibliography007MOPProductionElements, s, 9, 1)
-	pd["(10/01) Positive/negative aspect"] = codeLookup(bibliography007MOPPositiveNegativeAspect, s, 10, 1)
-	pd["(11/01) Generation"] = codeLookup(bibliography007MOPGeneration, s, 11, 1)
-	pd["(12/01) Base of film"] = codeLookup(bibliography007MOPBaseOfFilm, s, 12, 1)
-	pd["(13/01) Refined categories of color"] = codeLookup(bibliography007MOPRefinedCategoriesOfColor, s, 13, 1)
-	pd["(14/01) Kind of color stock or print"] = codeLookup(bibliography007MOPKindOfColorStockOrPrint, s, 14, 1)
-	pd["(15/01) Deterioration stage"] = codeLookup(bibliography007MOPDeteriorationStage, s, 15, 1)
-	pd["(16/01) Completeness"] = codeLookup(bibliography007MOPCompleteness, s, 16, 1)
-	pd["(17/06) Film inspection date"] = CodeValue{Code: pluckBytes(s, 17, 6), Label: ""}
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007MOPSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007MOPColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007MOPMotionPicturePresentationFormat, s, 4, 1)
+	pd["(04/01) Motion picture presentation format"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007MOPSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007MOPMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007MOPDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(bibliography007MOPConfigurationOfPlaybackChannels, s, 8, 1)
+	pd["(08/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(bibliography007MOPProductionElements, s, 9, 1)
+	pd["(09/01) Production elements"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(bibliography007MOPPositiveNegativeAspect, s, 10, 1)
+	pd["(10/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(bibliography007MOPGeneration, s, 11, 1)
+	pd["(11/01) Generation"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(bibliography007MOPBaseOfFilm, s, 12, 1)
+	pd["(12/01) Base of film"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(bibliography007MOPRefinedCategoriesOfColor, s, 13, 1)
+	pd["(13/01) Refined categories of color"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
+	c, l = codeLookup(bibliography007MOPKindOfColorStockOrPrint, s, 14, 1)
+	pd["(14/01) Kind of color stock or print"] = CodeValue{Code: c, Label: l, Offset: 14, Width: 1}
+	c, l = codeLookup(bibliography007MOPDeteriorationStage, s, 15, 1)
+	pd["(15/01) Deterioration stage"] = CodeValue{Code: c, Label: l, Offset: 15, Width: 1}
+	c, l = codeLookup(bibliography007MOPCompleteness, s, 16, 1)
+	pd["(16/01) Completeness"] = CodeValue{Code: c, Label: l, Offset: 16, Width: 1}
+	pd["(17/06) Film inspection date"] = CodeValue{Code: pluckBytes(s, 17, 6), Label: "", Offset: 17, Width: 6}
 
 	return pd
 }
@@ -1096,8 +1220,12 @@ func parseBibliography007KIT(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007KITSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007KITSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -1115,8 +1243,12 @@ func parseBibliography007NMU(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007NMUSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007NMUSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -1242,16 +1374,27 @@ func parseBibliography007RSI(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007RSISpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Altitude of sensor"] = codeLookup(bibliography007RSIAltitudeOfSensor, s, 3, 1)
-	pd["(04/01) Attitude of sensor"] = codeLookup(bibliography007RSIAttitudeOfSensor, s, 4, 1)
-	pd["(05/01) Cloud cover"] = codeLookup(bibliography007RSICloudCover, s, 5, 1)
-	pd["(06/01) Platform construction type"] = codeLookup(bibliography007RSIPlatformConstructionType, s, 6, 1)
-	pd["(07/01) Platform use category"] = codeLookup(bibliography007RSIPlatformUseCategory, s, 7, 1)
-	pd["(08/01) Sensor type"] = codeLookup(bibliography007RSISensorType, s, 8, 1)
-	pd["(09/02) Data type"] = codeLookup(bibliography007RSIDataType, s, 9, 2)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007RSISpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007RSIAltitudeOfSensor, s, 3, 1)
+	pd["(03/01) Altitude of sensor"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007RSIAttitudeOfSensor, s, 4, 1)
+	pd["(04/01) Attitude of sensor"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007RSICloudCover, s, 5, 1)
+	pd["(05/01) Cloud cover"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007RSIPlatformConstructionType, s, 6, 1)
+	pd["(06/01) Platform construction type"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007RSIPlatformUseCategory, s, 7, 1)
+	pd["(07/01) Platform use category"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(bibliography007RSISensorType, s, 8, 1)
+	pd["(08/01) Sensor type"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(bibliography007RSIDataType, s, 9, 2)
+	pd["(09/02) Data type"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 2}
 
 	return pd
 }
@@ -1414,20 +1557,35 @@ func parseBibliography007SOR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007SORSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Speed"] = codeLookup(bibliography007SORSpeed, s, 3, 1)
-	pd["(04/01) Configuration of playback channels"] = codeLookup(bibliography007SORConfigurationOfPlaybackChannels, s, 4, 1)
-	pd["(05/01) Groove width/groove pitch"] = codeLookup(bibliography007SORGrooveWidthGroovePitch, s, 5, 1)
-	pd["(06/01) Dimensions"] = codeLookup(bibliography007SORDimensions, s, 6, 1)
-	pd["(07/01) Tape width"] = codeLookup(bibliography007SORTapeWidth, s, 7, 1)
-	pd["(08/01) Tape configuration"] = codeLookup(bibliography007SORTapeConfiguration, s, 8, 1)
-	pd["(09/01) Kind of disc, cylinder or tape"] = codeLookup(bibliography007SORKindOfDiscCylinderOrTape, s, 9, 1)
-	pd["(10/01) Kind of material"] = codeLookup(bibliography007SORKindOfMaterial, s, 10, 1)
-	pd["(11/01) Kind of cutting"] = codeLookup(bibliography007SORKindOfCutting, s, 11, 1)
-	pd["(12/01) Special playback characteristics"] = codeLookup(bibliography007SORSpecialPlaybackCharacteristics, s, 12, 1)
-	pd["(13/01) Capture and storage technique"] = codeLookup(bibliography007SORCaptureAndStorageTechnique, s, 13, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007SORSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007SORSpeed, s, 3, 1)
+	pd["(03/01) Speed"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007SORConfigurationOfPlaybackChannels, s, 4, 1)
+	pd["(04/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007SORGrooveWidthGroovePitch, s, 5, 1)
+	pd["(05/01) Groove width/groove pitch"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007SORDimensions, s, 6, 1)
+	pd["(06/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007SORTapeWidth, s, 7, 1)
+	pd["(07/01) Tape width"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(bibliography007SORTapeConfiguration, s, 8, 1)
+	pd["(08/01) Tape configuration"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(bibliography007SORKindOfDiscCylinderOrTape, s, 9, 1)
+	pd["(09/01) Kind of disc, cylinder or tape"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(bibliography007SORKindOfMaterial, s, 10, 1)
+	pd["(10/01) Kind of material"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(bibliography007SORKindOfCutting, s, 11, 1)
+	pd["(11/01) Kind of cutting"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(bibliography007SORSpecialPlaybackCharacteristics, s, 12, 1)
+	pd["(12/01) Special playback characteristics"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(bibliography007SORCaptureAndStorageTechnique, s, 13, 1)
+	pd["(13/01) Capture and storage technique"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
 
 	return pd
 }
@@ -1450,8 +1608,12 @@ func parseBibliography007TXT(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007TXTSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007TXTSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -1549,15 +1711,25 @@ func parseBibliography007VIR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007VIRSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(bibliography007VIRColor, s, 3, 1)
-	pd["(04/01) Videorecording format"] = codeLookup(bibliography007VIRVideorecordingFormat, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(bibliography007VIRSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(bibliography007VIRMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(bibliography007VIRDimensions, s, 7, 1)
-	pd["(08/01) Configuration of playback channels"] = codeLookup(bibliography007VIRConfigurationOfPlaybackChannels, s, 8, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007VIRSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(bibliography007VIRColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(bibliography007VIRVideorecordingFormat, s, 4, 1)
+	pd["(04/01) Videorecording format"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(bibliography007VIRSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(bibliography007VIRMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(bibliography007VIRDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(bibliography007VIRConfigurationOfPlaybackChannels, s, 8, 1)
+	pd["(08/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
 
 	return pd
 }
@@ -1577,8 +1749,12 @@ func parseBibliography007UNS(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(bibliography007UNSSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(bibliography007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(bibliography007UNSSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -1635,25 +1811,32 @@ var bibliography008CatalogingSource = map[string]string{
 // Bibliography records ALL MATERIALS () data
 func parseBibliography008(d *Cf008Desc, s string) {
 
-	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
-	d.append("(06/01) Type of date/Publication status", codeLookup(bibliography008TypeOfDatePublicationStatus, s, 6, 1))
+	var c string
+	var l string
+	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: "", Offset: 0, Width: 6})
+	c, l = codeLookup(bibliography008TypeOfDatePublicationStatus, s, 6, 1)
+	d.append("(06/01) Type of date/Publication status", CodeValue{Code: c, Label: l, Offset: 6, Width: 1})
 
-	rt07 := codeLookup(bibliography008Date1, s, 7, 1)
-	if rt07.Label == "" {
-		rt07 = CodeValue{Code: pluckBytes(s, 7, 4), Label: "Date"}
+	c, l = codeLookup(bibliography008Date1, s, 7, 1)
+	if l == "" {
+		c = pluckBytes(s, 7, 4)
+		l = "Date"
 	}
-	d.append("(07/04) Date 1", rt07)
+	d.append("(07/04) Date 1", CodeValue{Code: c, Label: l, Offset: 7, Width: 4})
 
-	rt11 := codeLookup(bibliography008Date2, s, 11, 1)
-	if rt11.Label == "" {
-		rt11 = CodeValue{Code: pluckBytes(s, 11, 4), Label: "Date"}
+	c, l = codeLookup(bibliography008Date2, s, 11, 1)
+	if l == "" {
+		c = pluckBytes(s, 11, 4)
+		l = "Date"
 	}
-	d.append("(11/04) Date 2", rt11)
+	d.append("(11/04) Date 2", CodeValue{Code: c, Label: l, Offset: 11, Width: 4})
 
-	d.append("(15/03) Place of publication, production, or execution", CodeValue{Code: pluckBytes(s, 15, 3), Label: ""})
-	d.append("(35/03) Language", CodeValue{Code: pluckBytes(s, 35, 3), Label: ""})
-	d.append("(38/01) Modified record", codeLookup(bibliography008ModifiedRecord, s, 38, 1))
-	d.append("(39/01) Cataloging source", codeLookup(bibliography008CatalogingSource, s, 39, 1))
+	d.append("(15/03) Place of publication, production, or execution", CodeValue{Code: pluckBytes(s, 15, 3), Label: "", Offset: 15, Width: 3})
+	d.append("(35/03) Language", CodeValue{Code: pluckBytes(s, 35, 3), Label: "", Offset: 35, Width: 3})
+	c, l = codeLookup(bibliography008ModifiedRecord, s, 38, 1)
+	d.append("(38/01) Modified record", CodeValue{Code: c, Label: l, Offset: 38, Width: 1})
+	c, l = codeLookup(bibliography008CatalogingSource, s, 39, 1)
+	d.append("(39/01) Cataloging source", CodeValue{Code: c, Label: l, Offset: 39, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1790,24 +1973,37 @@ var bibliography008BKBiography = map[string]string{
 // Bibliography records BOOKS (BK) data
 func parseBibliography008BK(d *Cf008Desc, s string) {
 
+	var c string
+	var l string
+
 	for i := 0; i < 4; i++ {
-		d.append("(18/04) Illustrations", codeLookup(bibliography008BKIllustrations, s, i, 1))
+		c, l = codeLookup(bibliography008BKIllustrations, s, i, 1)
+		d.append("(18/04) Illustrations", CodeValue{Code: c, Label: l, Offset: 18, Width: 4})
 	}
 
-	d.append("(22/01) Target audience", codeLookup(bibliography008BKTargetAudience, s, 4, 1))
-	d.append("(23/01) Form of item", codeLookup(bibliography008BKFormOfItem, s, 5, 1))
+	c, l = codeLookup(bibliography008BKTargetAudience, s, 4, 1)
+	d.append("(22/01) Target audience", CodeValue{Code: c, Label: l, Offset: 22, Width: 1})
+	c, l = codeLookup(bibliography008BKFormOfItem, s, 5, 1)
+	d.append("(23/01) Form of item", CodeValue{Code: c, Label: l, Offset: 23, Width: 1})
 
 	for i := 6; i < 10; i++ {
-		d.append("(24/04) Nature of contents", codeLookup(bibliography008BKNatureOfContents, s, i, 1))
+		c, l = codeLookup(bibliography008BKNatureOfContents, s, i, 1)
+		d.append("(24/04) Nature of contents", CodeValue{Code: c, Label: l, Offset: 24, Width: 4})
 	}
 
-	d.append("(28/01) Government publication", codeLookup(bibliography008BKGovernmentPublication, s, 10, 1))
-	d.append("(29/01) Conference publication", codeLookup(bibliography008BKConferencePublication, s, 11, 1))
-	d.append("(30/01) Festschrift", codeLookup(bibliography008BKFestschrift, s, 12, 1))
-	d.append("(31/01) Index", codeLookup(bibliography008BKIndex, s, 13, 1))
-	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
-	d.append("(33/01) Literary form", codeLookup(bibliography008BKLiteraryForm, s, 15, 1))
-	d.append("(34/01) Biography", codeLookup(bibliography008BKBiography, s, 16, 1))
+	c, l = codeLookup(bibliography008BKGovernmentPublication, s, 10, 1)
+	d.append("(28/01) Government publication", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	c, l = codeLookup(bibliography008BKConferencePublication, s, 11, 1)
+	d.append("(29/01) Conference publication", CodeValue{Code: c, Label: l, Offset: 29, Width: 1})
+	c, l = codeLookup(bibliography008BKFestschrift, s, 12, 1)
+	d.append("(30/01) Festschrift", CodeValue{Code: c, Label: l, Offset: 30, Width: 1})
+	c, l = codeLookup(bibliography008BKIndex, s, 13, 1)
+	d.append("(31/01) Index", CodeValue{Code: c, Label: l, Offset: 31, Width: 1})
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: "", Offset: 32, Width: 1})
+	c, l = codeLookup(bibliography008BKLiteraryForm, s, 15, 1)
+	d.append("(33/01) Literary form", CodeValue{Code: c, Label: l, Offset: 33, Width: 1})
+	c, l = codeLookup(bibliography008BKBiography, s, 16, 1)
+	d.append("(34/01) Biography", CodeValue{Code: c, Label: l, Offset: 34, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1863,14 +2059,20 @@ var bibliography008CFGovernmentPublication = map[string]string{
 // Bibliography records COMPUTER FILES (CF) data
 func parseBibliography008CF(d *Cf008Desc, s string) {
 
-	d.append("(18/04) Undefined", CodeValue{Code: pluckBytes(s, 0, 4), Label: ""})
-	d.append("(22/01) Target audience", codeLookup(bibliography008CFTargetAudience, s, 4, 1))
-	d.append("(23/01) Form of item", codeLookup(bibliography008CFFormOfItem, s, 5, 1))
-	d.append("(24/02) Undefined", CodeValue{Code: pluckBytes(s, 6, 2), Label: ""})
-	d.append("(26/01) Type of computer file", codeLookup(bibliography008CFTypeOfComputerFile, s, 8, 1))
-	d.append("(27/01) Undefined", CodeValue{Code: pluckBytes(s, 9, 1), Label: ""})
-	d.append("(28/01) Government publication", codeLookup(bibliography008CFGovernmentPublication, s, 10, 1))
-	d.append("(29/06) Undefined", CodeValue{Code: pluckBytes(s, 11, 6), Label: ""})
+	var c string
+	var l string
+	d.append("(18/04) Undefined", CodeValue{Code: pluckBytes(s, 0, 4), Label: "", Offset: 18, Width: 4})
+	c, l = codeLookup(bibliography008CFTargetAudience, s, 4, 1)
+	d.append("(22/01) Target audience", CodeValue{Code: c, Label: l, Offset: 22, Width: 1})
+	c, l = codeLookup(bibliography008CFFormOfItem, s, 5, 1)
+	d.append("(23/01) Form of item", CodeValue{Code: c, Label: l, Offset: 23, Width: 1})
+	d.append("(24/02) Undefined", CodeValue{Code: pluckBytes(s, 6, 2), Label: "", Offset: 24, Width: 2})
+	c, l = codeLookup(bibliography008CFTypeOfComputerFile, s, 8, 1)
+	d.append("(26/01) Type of computer file", CodeValue{Code: c, Label: l, Offset: 26, Width: 1})
+	d.append("(27/01) Undefined", CodeValue{Code: pluckBytes(s, 9, 1), Label: "", Offset: 27, Width: 1})
+	c, l = codeLookup(bibliography008CFGovernmentPublication, s, 10, 1)
+	d.append("(28/01) Government publication", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	d.append("(29/06) Undefined", CodeValue{Code: pluckBytes(s, 11, 6), Label: "", Offset: 29, Width: 6})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2003,22 +2205,32 @@ var bibliography008MPSpecialFormatCharacteristics = map[string]string{
 // Bibliography records MAPS (MP) data
 func parseBibliography008MP(d *Cf008Desc, s string) {
 
+	var c string
+	var l string
+
 	for i := 0; i < 4; i++ {
-		d.append("(18/04) Relief", codeLookup(bibliography008MPRelief, s, i, 1))
+		c, l = codeLookup(bibliography008MPRelief, s, i, 1)
+		d.append("(18/04) Relief", CodeValue{Code: c, Label: l, Offset: 18, Width: 4})
 	}
 
-	d.append("(22/02) Projection", codeLookup(bibliography008MPProjection, s, 4, 2))
-	d.append("(24/01) Undefined", CodeValue{Code: pluckBytes(s, 6, 1), Label: ""})
-	d.append("(25/01) Type of cartographic material", codeLookup(bibliography008MPTypeOfCartographicMaterial, s, 7, 1))
-	d.append("(26/02) Undefined", CodeValue{Code: pluckBytes(s, 8, 2), Label: ""})
-	d.append("(28/01) Government publication", codeLookup(bibliography008MPGovernmentPublication, s, 10, 1))
-	d.append("(29/01) Form of item", codeLookup(bibliography008MPFormOfItem, s, 11, 1))
-	d.append("(30/01) Undefined", CodeValue{Code: pluckBytes(s, 12, 1), Label: ""})
-	d.append("(31/01) Index", codeLookup(bibliography008MPIndex, s, 13, 1))
-	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
+	c, l = codeLookup(bibliography008MPProjection, s, 4, 2)
+	d.append("(22/02) Projection", CodeValue{Code: c, Label: l, Offset: 22, Width: 2})
+	d.append("(24/01) Undefined", CodeValue{Code: pluckBytes(s, 6, 1), Label: "", Offset: 24, Width: 1})
+	c, l = codeLookup(bibliography008MPTypeOfCartographicMaterial, s, 7, 1)
+	d.append("(25/01) Type of cartographic material", CodeValue{Code: c, Label: l, Offset: 25, Width: 1})
+	d.append("(26/02) Undefined", CodeValue{Code: pluckBytes(s, 8, 2), Label: "", Offset: 26, Width: 2})
+	c, l = codeLookup(bibliography008MPGovernmentPublication, s, 10, 1)
+	d.append("(28/01) Government publication", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	c, l = codeLookup(bibliography008MPFormOfItem, s, 11, 1)
+	d.append("(29/01) Form of item", CodeValue{Code: c, Label: l, Offset: 29, Width: 1})
+	d.append("(30/01) Undefined", CodeValue{Code: pluckBytes(s, 12, 1), Label: "", Offset: 30, Width: 1})
+	c, l = codeLookup(bibliography008MPIndex, s, 13, 1)
+	d.append("(31/01) Index", CodeValue{Code: c, Label: l, Offset: 31, Width: 1})
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: "", Offset: 32, Width: 1})
 
 	for i := 15; i < 17; i++ {
-		d.append("(33/02) Special format characteristics", codeLookup(bibliography008MPSpecialFormatCharacteristics, s, i, 1))
+		c, l = codeLookup(bibliography008MPSpecialFormatCharacteristics, s, i, 1)
+		d.append("(33/02) Special format characteristics", CodeValue{Code: c, Label: l, Offset: 33, Width: 2})
 	}
 
 }
@@ -2209,23 +2421,33 @@ var bibliography008MUTranspositionAndArrangement = map[string]string{
 // Bibliography records MUSIC (MU) data
 func parseBibliography008MU(d *Cf008Desc, s string) {
 
-	d.append("(18/02) Form of composition", codeLookup(bibliography008MUFormOfComposition, s, 0, 2))
-	d.append("(20/01) Format of music", codeLookup(bibliography008MUFormatOfMusic, s, 2, 1))
-	d.append("(21/01) Music parts", codeLookup(bibliography008MUMusicParts, s, 3, 1))
-	d.append("(22/01) Target audience", codeLookup(bibliography008MUTargetAudience, s, 4, 1))
-	d.append("(23/01) Form of item", codeLookup(bibliography008MUFormOfItem, s, 5, 1))
+	var c string
+	var l string
+	c, l = codeLookup(bibliography008MUFormOfComposition, s, 0, 2)
+	d.append("(18/02) Form of composition", CodeValue{Code: c, Label: l, Offset: 18, Width: 2})
+	c, l = codeLookup(bibliography008MUFormatOfMusic, s, 2, 1)
+	d.append("(20/01) Format of music", CodeValue{Code: c, Label: l, Offset: 20, Width: 1})
+	c, l = codeLookup(bibliography008MUMusicParts, s, 3, 1)
+	d.append("(21/01) Music parts", CodeValue{Code: c, Label: l, Offset: 21, Width: 1})
+	c, l = codeLookup(bibliography008MUTargetAudience, s, 4, 1)
+	d.append("(22/01) Target audience", CodeValue{Code: c, Label: l, Offset: 22, Width: 1})
+	c, l = codeLookup(bibliography008MUFormOfItem, s, 5, 1)
+	d.append("(23/01) Form of item", CodeValue{Code: c, Label: l, Offset: 23, Width: 1})
 
 	for i := 6; i < 12; i++ {
-		d.append("(24/06) Accompanying matter", codeLookup(bibliography008MUAccompanyingMatter, s, i, 1))
+		c, l = codeLookup(bibliography008MUAccompanyingMatter, s, i, 1)
+		d.append("(24/06) Accompanying matter", CodeValue{Code: c, Label: l, Offset: 24, Width: 6})
 	}
 
 	for i := 12; i < 14; i++ {
-		d.append("(30/02) Literary text for sound recordings", codeLookup(bibliography008MULiteraryTextForSoundRecordings, s, i, 1))
+		c, l = codeLookup(bibliography008MULiteraryTextForSoundRecordings, s, i, 1)
+		d.append("(30/02) Literary text for sound recordings", CodeValue{Code: c, Label: l, Offset: 30, Width: 2})
 	}
 
-	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
-	d.append("(33/01) Transposition and arrangement", codeLookup(bibliography008MUTranspositionAndArrangement, s, 15, 1))
-	d.append("(34/01) Undefined", CodeValue{Code: pluckBytes(s, 16, 1), Label: ""})
+	d.append("(32/01) Undefined", CodeValue{Code: pluckBytes(s, 14, 1), Label: "", Offset: 32, Width: 1})
+	c, l = codeLookup(bibliography008MUTranspositionAndArrangement, s, 15, 1)
+	d.append("(33/01) Transposition and arrangement", CodeValue{Code: c, Label: l, Offset: 33, Width: 1})
+	d.append("(34/01) Undefined", CodeValue{Code: pluckBytes(s, 16, 1), Label: "", Offset: 34, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2403,22 +2625,35 @@ var bibliography008CREntryConvention = map[string]string{
 // Bibliography records CONTINUING RESOURCES (CR) data
 func parseBibliography008CR(d *Cf008Desc, s string) {
 
-	d.append("(18/01) Frequency", codeLookup(bibliography008CRFrequency, s, 0, 1))
-	d.append("(19/01) Regularity", codeLookup(bibliography008CRRegularity, s, 1, 1))
-	d.append("(21/01) Type of continuing resource", codeLookup(bibliography008CRTypeOfContinuingResource, s, 3, 1))
-	d.append("(22/01) Form of original item", codeLookup(bibliography008CRFormOfOriginalItem, s, 4, 1))
-	d.append("(23/01) Form of item", codeLookup(bibliography008CRFormOfItem, s, 5, 1))
-	d.append("(24/01) Nature of entire work", codeLookup(bibliography008CRNatureOfEntireWork, s, 6, 1))
+	var c string
+	var l string
+	c, l = codeLookup(bibliography008CRFrequency, s, 0, 1)
+	d.append("(18/01) Frequency", CodeValue{Code: c, Label: l, Offset: 18, Width: 1})
+	c, l = codeLookup(bibliography008CRRegularity, s, 1, 1)
+	d.append("(19/01) Regularity", CodeValue{Code: c, Label: l, Offset: 19, Width: 1})
+	c, l = codeLookup(bibliography008CRTypeOfContinuingResource, s, 3, 1)
+	d.append("(21/01) Type of continuing resource", CodeValue{Code: c, Label: l, Offset: 21, Width: 1})
+	c, l = codeLookup(bibliography008CRFormOfOriginalItem, s, 4, 1)
+	d.append("(22/01) Form of original item", CodeValue{Code: c, Label: l, Offset: 22, Width: 1})
+	c, l = codeLookup(bibliography008CRFormOfItem, s, 5, 1)
+	d.append("(23/01) Form of item", CodeValue{Code: c, Label: l, Offset: 23, Width: 1})
+	c, l = codeLookup(bibliography008CRNatureOfEntireWork, s, 6, 1)
+	d.append("(24/01) Nature of entire work", CodeValue{Code: c, Label: l, Offset: 24, Width: 1})
 
 	for i := 7; i < 10; i++ {
-		d.append("(25/03) Nature of contents", codeLookup(bibliography008CRNatureOfContents, s, i, 1))
+		c, l = codeLookup(bibliography008CRNatureOfContents, s, i, 1)
+		d.append("(25/03) Nature of contents", CodeValue{Code: c, Label: l, Offset: 25, Width: 3})
 	}
 
-	d.append("(28/01) Government publication", codeLookup(bibliography008CRGovernmentPublication, s, 10, 1))
-	d.append("(29/01) Conference publication", codeLookup(bibliography008CRConferencePublication, s, 11, 1))
-	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
-	d.append("(33/01) Original alphabet or script of title", codeLookup(bibliography008CROriginalAlphabetOrScriptOfTitle, s, 15, 1))
-	d.append("(34/01) Entry convention", codeLookup(bibliography008CREntryConvention, s, 16, 1))
+	c, l = codeLookup(bibliography008CRGovernmentPublication, s, 10, 1)
+	d.append("(28/01) Government publication", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	c, l = codeLookup(bibliography008CRConferencePublication, s, 11, 1)
+	d.append("(29/01) Conference publication", CodeValue{Code: c, Label: l, Offset: 29, Width: 1})
+	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: "", Offset: 30, Width: 3})
+	c, l = codeLookup(bibliography008CROriginalAlphabetOrScriptOfTitle, s, 15, 1)
+	d.append("(33/01) Original alphabet or script of title", CodeValue{Code: c, Label: l, Offset: 33, Width: 1})
+	c, l = codeLookup(bibliography008CREntryConvention, s, 16, 1)
+	d.append("(34/01) Entry convention", CodeValue{Code: c, Label: l, Offset: 34, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2506,20 +2741,28 @@ var bibliography008VMTechnique = map[string]string{
 // Bibliography records VISUAL MATERIALS (VM) data
 func parseBibliography008VM(d *Cf008Desc, s string) {
 
-	rt18 := codeLookup(bibliography008VMRunningTimeForMotionPicturesAndVideorecordings, s, 0, 3)
-	if rt18.Code != "" && rt18.Label == "" {
-		rt18.Label = "Running time"
-	}
-	d.append("(18/03) Running time for motion pictures and videorecordings", rt18)
+	var c string
+	var l string
 
-	d.append("(21/01) Undefined", CodeValue{Code: pluckBytes(s, 3, 1), Label: ""})
-	d.append("(22/01) Target audience", codeLookup(bibliography008VMTargetAudience, s, 4, 1))
-	d.append("(23/05) Undefined", CodeValue{Code: pluckBytes(s, 5, 5), Label: ""})
-	d.append("(28/01) Government publication", codeLookup(bibliography008VMGovernmentPublication, s, 10, 1))
-	d.append("(29/01) Form of item", codeLookup(bibliography008VMFormOfItem, s, 11, 1))
-	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
-	d.append("(33/01) Type of visual material", codeLookup(bibliography008VMTypeOfVisualMaterial, s, 15, 1))
-	d.append("(34/01) Technique", codeLookup(bibliography008VMTechnique, s, 16, 1))
+	c, l = codeLookup(bibliography008VMRunningTimeForMotionPicturesAndVideorecordings, s, 0, 3)
+	if c != "" && l == "" {
+		l = "Running time"
+	}
+	d.append("(18/03) Running time for motion pictures and videorecordings", CodeValue{Code: c, Label: l, Offset: 18, Width: 3})
+
+	d.append("(21/01) Undefined", CodeValue{Code: pluckBytes(s, 3, 1), Label: "", Offset: 21, Width: 1})
+	c, l = codeLookup(bibliography008VMTargetAudience, s, 4, 1)
+	d.append("(22/01) Target audience", CodeValue{Code: c, Label: l, Offset: 22, Width: 1})
+	d.append("(23/05) Undefined", CodeValue{Code: pluckBytes(s, 5, 5), Label: "", Offset: 23, Width: 5})
+	c, l = codeLookup(bibliography008VMGovernmentPublication, s, 10, 1)
+	d.append("(28/01) Government publication", CodeValue{Code: c, Label: l, Offset: 28, Width: 1})
+	c, l = codeLookup(bibliography008VMFormOfItem, s, 11, 1)
+	d.append("(29/01) Form of item", CodeValue{Code: c, Label: l, Offset: 29, Width: 1})
+	d.append("(30/03) Undefined", CodeValue{Code: pluckBytes(s, 12, 3), Label: "", Offset: 30, Width: 3})
+	c, l = codeLookup(bibliography008VMTypeOfVisualMaterial, s, 15, 1)
+	d.append("(33/01) Type of visual material", CodeValue{Code: c, Label: l, Offset: 33, Width: 1})
+	c, l = codeLookup(bibliography008VMTechnique, s, 16, 1)
+	d.append("(34/01) Technique", CodeValue{Code: c, Label: l, Offset: 34, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2542,9 +2785,12 @@ var bibliography008MXFormOfItem = map[string]string{
 // Bibliography records MIXED MATERIALS (MX) data
 func parseBibliography008MX(d *Cf008Desc, s string) {
 
-	d.append("(18/05) Undefined", CodeValue{Code: pluckBytes(s, 0, 5), Label: ""})
-	d.append("(23/01) Form of item", codeLookup(bibliography008MXFormOfItem, s, 5, 1))
-	d.append("(24/11) Undefined", CodeValue{Code: pluckBytes(s, 6, 11), Label: ""})
+	var c string
+	var l string
+	d.append("(18/05) Undefined", CodeValue{Code: pluckBytes(s, 0, 5), Label: "", Offset: 18, Width: 5})
+	c, l = codeLookup(bibliography008MXFormOfItem, s, 5, 1)
+	d.append("(23/01) Form of item", CodeValue{Code: c, Label: l, Offset: 23, Width: 1})
+	d.append("(24/11) Undefined", CodeValue{Code: pluckBytes(s, 6, 11), Label: "", Offset: 24, Width: 11})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2597,15 +2843,25 @@ var classification008DisplayController = map[string]string{
 // Classification records data
 func parseClassification008(d *Cf008Desc, s string) {
 
-	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
-	d.append("(06/01) Kind of record", codeLookup(classification008KindOfRecord, s, 6, 1))
-	d.append("(07/01) Type of number", codeLookup(classification008TypeOfNumber, s, 7, 1))
-	d.append("(08/01) Classification validity", codeLookup(classification008ClassificationValidity, s, 8, 1))
-	d.append("(09/01) Standard or optional designation", codeLookup(classification008StandardOrOptionalDesignation, s, 9, 1))
-	d.append("(10/01) Record update in process", codeLookup(classification008RecordUpdateInProcess, s, 10, 1))
-	d.append("(11/01) Level of establishment", codeLookup(classification008LevelOfEstablishment, s, 11, 1))
-	d.append("(12/01) Synthesized number indication", codeLookup(classification008SynthesizedNumberIndication, s, 12, 1))
-	d.append("(13/01) Display controller", codeLookup(classification008DisplayController, s, 13, 1))
+	var c string
+	var l string
+	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: "", Offset: 0, Width: 6})
+	c, l = codeLookup(classification008KindOfRecord, s, 6, 1)
+	d.append("(06/01) Kind of record", CodeValue{Code: c, Label: l, Offset: 6, Width: 1})
+	c, l = codeLookup(classification008TypeOfNumber, s, 7, 1)
+	d.append("(07/01) Type of number", CodeValue{Code: c, Label: l, Offset: 7, Width: 1})
+	c, l = codeLookup(classification008ClassificationValidity, s, 8, 1)
+	d.append("(08/01) Classification validity", CodeValue{Code: c, Label: l, Offset: 8, Width: 1})
+	c, l = codeLookup(classification008StandardOrOptionalDesignation, s, 9, 1)
+	d.append("(09/01) Standard or optional designation", CodeValue{Code: c, Label: l, Offset: 9, Width: 1})
+	c, l = codeLookup(classification008RecordUpdateInProcess, s, 10, 1)
+	d.append("(10/01) Record update in process", CodeValue{Code: c, Label: l, Offset: 10, Width: 1})
+	c, l = codeLookup(classification008LevelOfEstablishment, s, 11, 1)
+	d.append("(11/01) Level of establishment", CodeValue{Code: c, Label: l, Offset: 11, Width: 1})
+	c, l = codeLookup(classification008SynthesizedNumberIndication, s, 12, 1)
+	d.append("(12/01) Synthesized number indication", CodeValue{Code: c, Label: l, Offset: 12, Width: 1})
+	c, l = codeLookup(classification008DisplayController, s, 13, 1)
+	d.append("(13/01) Display controller", CodeValue{Code: c, Label: l, Offset: 13, Width: 1})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2698,17 +2954,30 @@ func parseCommunity007(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category"] = codeLookup(community007Category, s, 0, 1)
-	pd["(01/01) Stairway ramps"] = codeLookup(community007StairwayRamps, s, 1, 1)
-	pd["(02/01) Doors"] = codeLookup(community007Doors, s, 2, 1)
-	pd["(03/01) Furniture, equipment, display racks"] = codeLookup(community007FurnitureEquipmentDisplayRacks, s, 3, 1)
-	pd["(04/01) Restrooms"] = codeLookup(community007Restrooms, s, 4, 1)
-	pd["(05/01) Elevators"] = codeLookup(community007Elevators, s, 5, 1)
-	pd["(06/01) Telephones"] = codeLookup(community007Telephones, s, 6, 1)
-	pd["(07/01) Flashing emergency lights"] = codeLookup(community007FlashingEmergencyLights, s, 7, 1)
-	pd["(08/01) Sign language"] = codeLookup(community007SignLanguage, s, 8, 1)
-	pd["(09/01) Subtitles and/or supertitles"] = codeLookup(community007SubtitlesAndOrSupertitles, s, 9, 1)
-	pd["(10/01) Parking"] = codeLookup(community007Parking, s, 10, 1)
+	var c string
+	var l string
+	c, l = codeLookup(community007Category, s, 0, 1)
+	pd["(00/01) Category"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(community007StairwayRamps, s, 1, 1)
+	pd["(01/01) Stairway ramps"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	c, l = codeLookup(community007Doors, s, 2, 1)
+	pd["(02/01) Doors"] = CodeValue{Code: c, Label: l, Offset: 2, Width: 1}
+	c, l = codeLookup(community007FurnitureEquipmentDisplayRacks, s, 3, 1)
+	pd["(03/01) Furniture, equipment, display racks"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(community007Restrooms, s, 4, 1)
+	pd["(04/01) Restrooms"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(community007Elevators, s, 5, 1)
+	pd["(05/01) Elevators"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(community007Telephones, s, 6, 1)
+	pd["(06/01) Telephones"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(community007FlashingEmergencyLights, s, 7, 1)
+	pd["(07/01) Flashing emergency lights"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(community007SignLanguage, s, 8, 1)
+	pd["(08/01) Sign language"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(community007SubtitlesAndOrSupertitles, s, 9, 1)
+	pd["(09/01) Subtitles and/or supertitles"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(community007Parking, s, 10, 1)
+	pd["(10/01) Parking"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
 
 	return pd
 }
@@ -2756,14 +3025,22 @@ var community008MeetingRoomsAndFacilitiesAvailable = map[string]string{
 // Community records data
 func parseCommunity008(d *Cf008Desc, s string) {
 
-	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
-	d.append("(06/01) Volunteer opportunities", codeLookup(community008VolunteerOpportunities, s, 6, 1))
-	d.append("(07/01) Volunteers provided", codeLookup(community008VolunteersProvided, s, 7, 1))
-	d.append("(08/01) Child care arrangements", codeLookup(community008ChildCareArrangements, s, 8, 1))
-	d.append("(09/01) Speakers bureau", codeLookup(community008SpeakersBureau, s, 9, 1))
-	d.append("(10/01) Mutual support groups", codeLookup(community008MutualSupportGroups, s, 10, 1))
-	d.append("(11/01) Meeting rooms and facilities available", codeLookup(community008MeetingRoomsAndFacilitiesAvailable, s, 11, 1))
-	d.append("(12/03) Language", CodeValue{Code: pluckBytes(s, 12, 3), Label: ""})
+	var c string
+	var l string
+	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: "", Offset: 0, Width: 6})
+	c, l = codeLookup(community008VolunteerOpportunities, s, 6, 1)
+	d.append("(06/01) Volunteer opportunities", CodeValue{Code: c, Label: l, Offset: 6, Width: 1})
+	c, l = codeLookup(community008VolunteersProvided, s, 7, 1)
+	d.append("(07/01) Volunteers provided", CodeValue{Code: c, Label: l, Offset: 7, Width: 1})
+	c, l = codeLookup(community008ChildCareArrangements, s, 8, 1)
+	d.append("(08/01) Child care arrangements", CodeValue{Code: c, Label: l, Offset: 8, Width: 1})
+	c, l = codeLookup(community008SpeakersBureau, s, 9, 1)
+	d.append("(09/01) Speakers bureau", CodeValue{Code: c, Label: l, Offset: 9, Width: 1})
+	c, l = codeLookup(community008MutualSupportGroups, s, 10, 1)
+	d.append("(10/01) Mutual support groups", CodeValue{Code: c, Label: l, Offset: 10, Width: 1})
+	c, l = codeLookup(community008MeetingRoomsAndFacilitiesAvailable, s, 11, 1)
+	d.append("(11/01) Meeting rooms and facilities available", CodeValue{Code: c, Label: l, Offset: 11, Width: 1})
+	d.append("(12/03) Language", CodeValue{Code: pluckBytes(s, 12, 3), Label: "", Offset: 12, Width: 3})
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2862,14 +3139,23 @@ func parseHoldings007MAP(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007MAPSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007MAPColor, s, 3, 1)
-	pd["(04/01) Physical medium"] = codeLookup(holdings007MAPPhysicalMedium, s, 4, 1)
-	pd["(05/01) Type of reproduction"] = codeLookup(holdings007MAPTypeOfReproduction, s, 5, 1)
-	pd["(06/01) Production/reproduction details"] = codeLookup(holdings007MAPProductionReproductionDetails, s, 6, 1)
-	pd["(07/01) Positive/negative aspect"] = codeLookup(holdings007MAPPositiveNegativeAspect, s, 7, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007MAPSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007MAPColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007MAPPhysicalMedium, s, 4, 1)
+	pd["(04/01) Physical medium"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007MAPTypeOfReproduction, s, 5, 1)
+	pd["(05/01) Type of reproduction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007MAPProductionReproductionDetails, s, 6, 1)
+	pd["(06/01) Production/reproduction details"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007MAPPositiveNegativeAspect, s, 7, 1)
+	pd["(07/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
 
 	return pd
 }
@@ -2976,24 +3262,36 @@ func parseHoldings007ELR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007ELRSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007ELRColor, s, 3, 1)
-	pd["(04/01) Dimensions"] = codeLookup(holdings007ELRDimensions, s, 4, 1)
-	pd["(05/01) Sound"] = codeLookup(holdings007ELRSound, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007ELRSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007ELRColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007ELRDimensions, s, 4, 1)
+	pd["(04/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007ELRSound, s, 5, 1)
+	pd["(05/01) Sound"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
-	rt06 := codeLookup(holdings007ELRImageBitDepth, s, 6, 3)
-	if rt06.Code != "" && rt06.Label == "" {
-		rt06.Label = "Exact bit depth"
+	c, l = codeLookup(holdings007ELRImageBitDepth, s, 6, 3)
+	if c != "" && l == "" {
+		l = "Exact bit depth"
 	}
-	pd["(06/03) Image bit depth"] = rt06
+	pd["(06/03) Image bit depth"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
 
-	pd["(09/01) File formats"] = codeLookup(holdings007ELRFileFormats, s, 9, 1)
-	pd["(10/01) Quality assurance target(s)"] = codeLookup(holdings007ELRQualityAssuranceTargetS, s, 10, 1)
-	pd["(11/01) Antecedent/source"] = codeLookup(holdings007ELRAntecedentSource, s, 11, 1)
-	pd["(12/01) Level of compression"] = codeLookup(holdings007ELRLevelOfCompression, s, 12, 1)
-	pd["(13/01) Reformatting quality"] = codeLookup(holdings007ELRReformattingQuality, s, 13, 1)
+	c, l = codeLookup(holdings007ELRFileFormats, s, 9, 1)
+	pd["(09/01) File formats"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(holdings007ELRQualityAssuranceTargetS, s, 10, 1)
+	pd["(10/01) Quality assurance target(s)"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(holdings007ELRAntecedentSource, s, 11, 1)
+	pd["(11/01) Antecedent/source"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(holdings007ELRLevelOfCompression, s, 12, 1)
+	pd["(12/01) Level of compression"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(holdings007ELRReformattingQuality, s, 13, 1)
+	pd["(13/01) Reformatting quality"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
 
 	return pd
 }
@@ -3046,12 +3344,19 @@ func parseHoldings007GLB(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007GLBSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007GLBColor, s, 3, 1)
-	pd["(04/01) Physical medium"] = codeLookup(holdings007GLBPhysicalMedium, s, 4, 1)
-	pd["(05/01) Type of reproduction"] = codeLookup(holdings007GLBTypeOfReproduction, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007GLBSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007GLBColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007GLBPhysicalMedium, s, 4, 1)
+	pd["(04/01) Physical medium"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007GLBTypeOfReproduction, s, 5, 1)
+	pd["(05/01) Type of reproduction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
 	return pd
 }
@@ -3123,20 +3428,31 @@ func parseHoldings007TAM(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007TAMSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007TAMSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
 
-	pd["(03/02) Class of braille writing - 1"] = codeLookup(holdings007TAMClassOfBrailleWriting, s, 3, 1)
-	pd["(03/02) Class of braille writing - 2"] = codeLookup(holdings007TAMClassOfBrailleWriting, s, 4, 1)
+	c, l = codeLookup(holdings007TAMClassOfBrailleWriting, s, 3, 1)
+	pd["(03/02) Class of braille writing - 1"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 2}
+	c, l = codeLookup(holdings007TAMClassOfBrailleWriting, s, 4, 1)
+	pd["(03/02) Class of braille writing - 2"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 2}
 
-	pd["(05/01) Level of contraction"] = codeLookup(holdings007TAMLevelOfContraction, s, 5, 1)
+	c, l = codeLookup(holdings007TAMLevelOfContraction, s, 5, 1)
+	pd["(05/01) Level of contraction"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
-	pd["(06/03) Braille music format - 1"] = codeLookup(holdings007TAMBrailleMusicFormat, s, 6, 1)
-	pd["(06/03) Braille music format - 2"] = codeLookup(holdings007TAMBrailleMusicFormat, s, 7, 1)
-	pd["(06/03) Braille music format - 3"] = codeLookup(holdings007TAMBrailleMusicFormat, s, 8, 1)
+	c, l = codeLookup(holdings007TAMBrailleMusicFormat, s, 6, 1)
+	pd["(06/03) Braille music format - 1"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
+	c, l = codeLookup(holdings007TAMBrailleMusicFormat, s, 7, 1)
+	pd["(06/03) Braille music format - 2"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
+	c, l = codeLookup(holdings007TAMBrailleMusicFormat, s, 8, 1)
+	pd["(06/03) Braille music format - 3"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 3}
 
-	pd["(09/01) Specific physical characteristics"] = codeLookup(holdings007TAMSpecificPhysicalCharacteristics, s, 9, 1)
+	c, l = codeLookup(holdings007TAMSpecificPhysicalCharacteristics, s, 9, 1)
+	pd["(09/01) Specific physical characteristics"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
 
 	return pd
 }
@@ -3238,15 +3554,25 @@ func parseHoldings007PRG(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007PRGSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007PRGColor, s, 3, 1)
-	pd["(04/01) Base of emulsion"] = codeLookup(holdings007PRGBaseOfEmulsion, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(holdings007PRGSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(holdings007PRGMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(holdings007PRGDimensions, s, 7, 1)
-	pd["(08/01) Secondary support material"] = codeLookup(holdings007PRGSecondarySupportMaterial, s, 8, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007PRGSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007PRGColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007PRGBaseOfEmulsion, s, 4, 1)
+	pd["(04/01) Base of emulsion"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007PRGSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007PRGMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007PRGDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(holdings007PRGSecondarySupportMaterial, s, 8, 1)
+	pd["(08/01) Secondary support material"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
 
 	return pd
 }
@@ -3345,17 +3671,28 @@ func parseHoldings007MIC(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007MICSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Positive/negative aspect"] = codeLookup(holdings007MICPositiveNegativeAspect, s, 3, 1)
-	pd["(04/01) Dimensions"] = codeLookup(holdings007MICDimensions, s, 4, 1)
-	pd["(05/01) Reduction ratio range"] = codeLookup(holdings007MICReductionRatioRange, s, 5, 1)
-	pd["(06/03) Reduction ratio"] = CodeValue{Code: pluckBytes(s, 6, 3), Label: ""}
-	pd["(09/01) Color"] = codeLookup(holdings007MICColor, s, 9, 1)
-	pd["(10/01) Emulsion on film"] = codeLookup(holdings007MICEmulsionOnFilm, s, 10, 1)
-	pd["(11/01) Generation"] = codeLookup(holdings007MICGeneration, s, 11, 1)
-	pd["(12/01) Base of film"] = codeLookup(holdings007MICBaseOfFilm, s, 12, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007MICSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007MICPositiveNegativeAspect, s, 3, 1)
+	pd["(03/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007MICDimensions, s, 4, 1)
+	pd["(04/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007MICReductionRatioRange, s, 5, 1)
+	pd["(05/01) Reduction ratio range"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	pd["(06/03) Reduction ratio"] = CodeValue{Code: pluckBytes(s, 6, 3), Label: "", Offset: 6, Width: 3}
+	c, l = codeLookup(holdings007MICColor, s, 9, 1)
+	pd["(09/01) Color"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(holdings007MICEmulsionOnFilm, s, 10, 1)
+	pd["(10/01) Emulsion on film"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(holdings007MICGeneration, s, 11, 1)
+	pd["(11/01) Generation"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(holdings007MICBaseOfFilm, s, 12, 1)
+	pd["(12/01) Base of film"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
 
 	return pd
 }
@@ -3453,12 +3790,19 @@ func parseHoldings007NPG(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007NPGSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007NPGColor, s, 3, 1)
-	pd["(04/01) Primary support material"] = codeLookup(holdings007NPGPrimarySupportMaterial, s, 4, 1)
-	pd["(05/01) Secondary support material"] = codeLookup(holdings007NPGSecondarySupportMaterial, s, 5, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007NPGSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007NPGColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007NPGPrimarySupportMaterial, s, 4, 1)
+	pd["(04/01) Primary support material"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007NPGSecondarySupportMaterial, s, 5, 1)
+	pd["(05/01) Secondary support material"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
 
 	return pd
 }
@@ -3645,24 +3989,42 @@ func parseHoldings007MOP(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007MOPSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007MOPColor, s, 3, 1)
-	pd["(04/01) Motion picture presentation format"] = codeLookup(holdings007MOPMotionPicturePresentationFormat, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(holdings007MOPSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(holdings007MOPMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(holdings007MOPDimensions, s, 7, 1)
-	pd["(08/01) Configuration of playback channels"] = codeLookup(holdings007MOPConfigurationOfPlaybackChannels, s, 8, 1)
-	pd["(09/01) Production elements"] = codeLookup(holdings007MOPProductionElements, s, 9, 1)
-	pd["(10/01) Positive/negative aspect"] = codeLookup(holdings007MOPPositiveNegativeAspect, s, 10, 1)
-	pd["(11/01) Generation"] = codeLookup(holdings007MOPGeneration, s, 11, 1)
-	pd["(12/01) Base of film"] = codeLookup(holdings007MOPBaseOfFilm, s, 12, 1)
-	pd["(13/01) Refined categories of color"] = codeLookup(holdings007MOPRefinedCategoriesOfColor, s, 13, 1)
-	pd["(14/01) Kind of color stock or print"] = codeLookup(holdings007MOPKindOfColorStockOrPrint, s, 14, 1)
-	pd["(15/01) Deterioration stage"] = codeLookup(holdings007MOPDeteriorationStage, s, 15, 1)
-	pd["(16/01) Completeness"] = codeLookup(holdings007MOPCompleteness, s, 16, 1)
-	pd["(17/06) Film inspection date"] = CodeValue{Code: pluckBytes(s, 17, 6), Label: ""}
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007MOPSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007MOPColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007MOPMotionPicturePresentationFormat, s, 4, 1)
+	pd["(04/01) Motion picture presentation format"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007MOPSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007MOPMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007MOPDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(holdings007MOPConfigurationOfPlaybackChannels, s, 8, 1)
+	pd["(08/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(holdings007MOPProductionElements, s, 9, 1)
+	pd["(09/01) Production elements"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(holdings007MOPPositiveNegativeAspect, s, 10, 1)
+	pd["(10/01) Positive/negative aspect"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(holdings007MOPGeneration, s, 11, 1)
+	pd["(11/01) Generation"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(holdings007MOPBaseOfFilm, s, 12, 1)
+	pd["(12/01) Base of film"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(holdings007MOPRefinedCategoriesOfColor, s, 13, 1)
+	pd["(13/01) Refined categories of color"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
+	c, l = codeLookup(holdings007MOPKindOfColorStockOrPrint, s, 14, 1)
+	pd["(14/01) Kind of color stock or print"] = CodeValue{Code: c, Label: l, Offset: 14, Width: 1}
+	c, l = codeLookup(holdings007MOPDeteriorationStage, s, 15, 1)
+	pd["(15/01) Deterioration stage"] = CodeValue{Code: c, Label: l, Offset: 15, Width: 1}
+	c, l = codeLookup(holdings007MOPCompleteness, s, 16, 1)
+	pd["(16/01) Completeness"] = CodeValue{Code: c, Label: l, Offset: 16, Width: 1}
+	pd["(17/06) Film inspection date"] = CodeValue{Code: pluckBytes(s, 17, 6), Label: "", Offset: 17, Width: 6}
 
 	return pd
 }
@@ -3680,8 +4042,12 @@ func parseHoldings007KIT(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007KITSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007KITSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -3699,8 +4065,12 @@ func parseHoldings007NMU(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007NMUSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007NMUSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -3826,16 +4196,27 @@ func parseHoldings007RSI(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007RSISpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Altitude of sensor"] = codeLookup(holdings007RSIAltitudeOfSensor, s, 3, 1)
-	pd["(04/01) Attitude of sensor"] = codeLookup(holdings007RSIAttitudeOfSensor, s, 4, 1)
-	pd["(05/01) Cloud cover"] = codeLookup(holdings007RSICloudCover, s, 5, 1)
-	pd["(06/01) Platform construction type"] = codeLookup(holdings007RSIPlatformConstructionType, s, 6, 1)
-	pd["(07/01) Platform use category"] = codeLookup(holdings007RSIPlatformUseCategory, s, 7, 1)
-	pd["(08/01) Sensor type"] = codeLookup(holdings007RSISensorType, s, 8, 1)
-	pd["(09/02) Data type"] = codeLookup(holdings007RSIDataType, s, 9, 2)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007RSISpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007RSIAltitudeOfSensor, s, 3, 1)
+	pd["(03/01) Altitude of sensor"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007RSIAttitudeOfSensor, s, 4, 1)
+	pd["(04/01) Attitude of sensor"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007RSICloudCover, s, 5, 1)
+	pd["(05/01) Cloud cover"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007RSIPlatformConstructionType, s, 6, 1)
+	pd["(06/01) Platform construction type"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007RSIPlatformUseCategory, s, 7, 1)
+	pd["(07/01) Platform use category"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(holdings007RSISensorType, s, 8, 1)
+	pd["(08/01) Sensor type"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(holdings007RSIDataType, s, 9, 2)
+	pd["(09/02) Data type"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 2}
 
 	return pd
 }
@@ -3995,20 +4376,35 @@ func parseHoldings007SOR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007SORSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Speed"] = codeLookup(holdings007SORSpeed, s, 3, 1)
-	pd["(04/01) Configuration of playback channels"] = codeLookup(holdings007SORConfigurationOfPlaybackChannels, s, 4, 1)
-	pd["(05/01) Groove width/groove pitch"] = codeLookup(holdings007SORGrooveWidthGroovePitch, s, 5, 1)
-	pd["(06/01) Dimensions"] = codeLookup(holdings007SORDimensions, s, 6, 1)
-	pd["(07/01) Tape width"] = codeLookup(holdings007SORTapeWidth, s, 7, 1)
-	pd["(08/01) Tape configuration"] = codeLookup(holdings007SORTapeConfiguration, s, 8, 1)
-	pd["(09/01) Kind of disc, cylinder or tape"] = codeLookup(holdings007SORKindOfDiscCylinderOrTape, s, 9, 1)
-	pd["(10/01) Kind of material"] = codeLookup(holdings007SORKindOfMaterial, s, 10, 1)
-	pd["(11/01) Kind of cutting"] = codeLookup(holdings007SORKindOfCutting, s, 11, 1)
-	pd["(12/01) Special playback characteristics"] = codeLookup(holdings007SORSpecialPlaybackCharacteristics, s, 12, 1)
-	pd["(13/01) Capture and storage technique"] = codeLookup(holdings007SORCaptureAndStorageTechnique, s, 13, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007SORSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007SORSpeed, s, 3, 1)
+	pd["(03/01) Speed"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007SORConfigurationOfPlaybackChannels, s, 4, 1)
+	pd["(04/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007SORGrooveWidthGroovePitch, s, 5, 1)
+	pd["(05/01) Groove width/groove pitch"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007SORDimensions, s, 6, 1)
+	pd["(06/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007SORTapeWidth, s, 7, 1)
+	pd["(07/01) Tape width"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(holdings007SORTapeConfiguration, s, 8, 1)
+	pd["(08/01) Tape configuration"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
+	c, l = codeLookup(holdings007SORKindOfDiscCylinderOrTape, s, 9, 1)
+	pd["(09/01) Kind of disc, cylinder or tape"] = CodeValue{Code: c, Label: l, Offset: 9, Width: 1}
+	c, l = codeLookup(holdings007SORKindOfMaterial, s, 10, 1)
+	pd["(10/01) Kind of material"] = CodeValue{Code: c, Label: l, Offset: 10, Width: 1}
+	c, l = codeLookup(holdings007SORKindOfCutting, s, 11, 1)
+	pd["(11/01) Kind of cutting"] = CodeValue{Code: c, Label: l, Offset: 11, Width: 1}
+	c, l = codeLookup(holdings007SORSpecialPlaybackCharacteristics, s, 12, 1)
+	pd["(12/01) Special playback characteristics"] = CodeValue{Code: c, Label: l, Offset: 12, Width: 1}
+	c, l = codeLookup(holdings007SORCaptureAndStorageTechnique, s, 13, 1)
+	pd["(13/01) Capture and storage technique"] = CodeValue{Code: c, Label: l, Offset: 13, Width: 1}
 
 	return pd
 }
@@ -4031,8 +4427,12 @@ func parseHoldings007TXT(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007TXTSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007TXTSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -4130,15 +4530,25 @@ func parseHoldings007VIR(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007VIRSpecificMaterialDesignation, s, 1, 1)
-	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: ""}
-	pd["(03/01) Color"] = codeLookup(holdings007VIRColor, s, 3, 1)
-	pd["(04/01) Videorecording format"] = codeLookup(holdings007VIRVideorecordingFormat, s, 4, 1)
-	pd["(05/01) Sound on medium or separate"] = codeLookup(holdings007VIRSoundOnMediumOrSeparate, s, 5, 1)
-	pd["(06/01) Medium for sound"] = codeLookup(holdings007VIRMediumForSound, s, 6, 1)
-	pd["(07/01) Dimensions"] = codeLookup(holdings007VIRDimensions, s, 7, 1)
-	pd["(08/01) Configuration of playback channels"] = codeLookup(holdings007VIRConfigurationOfPlaybackChannels, s, 8, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007VIRSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
+	pd["(02/01) Undefined"] = CodeValue{Code: pluckBytes(s, 2, 1), Label: "", Offset: 2, Width: 1}
+	c, l = codeLookup(holdings007VIRColor, s, 3, 1)
+	pd["(03/01) Color"] = CodeValue{Code: c, Label: l, Offset: 3, Width: 1}
+	c, l = codeLookup(holdings007VIRVideorecordingFormat, s, 4, 1)
+	pd["(04/01) Videorecording format"] = CodeValue{Code: c, Label: l, Offset: 4, Width: 1}
+	c, l = codeLookup(holdings007VIRSoundOnMediumOrSeparate, s, 5, 1)
+	pd["(05/01) Sound on medium or separate"] = CodeValue{Code: c, Label: l, Offset: 5, Width: 1}
+	c, l = codeLookup(holdings007VIRMediumForSound, s, 6, 1)
+	pd["(06/01) Medium for sound"] = CodeValue{Code: c, Label: l, Offset: 6, Width: 1}
+	c, l = codeLookup(holdings007VIRDimensions, s, 7, 1)
+	pd["(07/01) Dimensions"] = CodeValue{Code: c, Label: l, Offset: 7, Width: 1}
+	c, l = codeLookup(holdings007VIRConfigurationOfPlaybackChannels, s, 8, 1)
+	pd["(08/01) Configuration of playback channels"] = CodeValue{Code: c, Label: l, Offset: 8, Width: 1}
 
 	return pd
 }
@@ -4158,8 +4568,12 @@ func parseHoldings007UNS(s string) (pd Cf007Desc) {
 
 	pd = make(Cf007Desc)
 
-	pd["(00/01) Category of material"] = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
-	pd["(01/01) Specific material designation"] = codeLookup(holdings007UNSSpecificMaterialDesignation, s, 1, 1)
+	var c string
+	var l string
+	c, l = codeLookup(holdings007CategoryOfMaterial, s, 0, 1)
+	pd["(00/01) Category of material"] = CodeValue{Code: c, Label: l, Offset: 0, Width: 1}
+	c, l = codeLookup(holdings007UNSSpecificMaterialDesignation, s, 1, 1)
+	pd["(01/01) Specific material designation"] = CodeValue{Code: c, Label: l, Offset: 1, Width: 1}
 
 	return pd
 }
@@ -4240,25 +4654,36 @@ var holdings008SeparateOrCompositeCopyReport = map[string]string{
 // Holdings records data
 func parseHoldings008(d *Cf008Desc, s string) {
 
-	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: ""})
-	d.append("(06/01) Receipt or acquisition status", codeLookup(holdings008ReceiptOrAcquisitionStatus, s, 6, 1))
-	d.append("(07/01) Method of acquisition", codeLookup(holdings008MethodOfAcquisition, s, 7, 1))
+	var c string
+	var l string
+	d.append("(00/06) Date entered on file", CodeValue{Code: pluckBytes(s, 0, 6), Label: "", Offset: 0, Width: 6})
+	c, l = codeLookup(holdings008ReceiptOrAcquisitionStatus, s, 6, 1)
+	d.append("(06/01) Receipt or acquisition status", CodeValue{Code: c, Label: l, Offset: 6, Width: 1})
+	c, l = codeLookup(holdings008MethodOfAcquisition, s, 7, 1)
+	d.append("(07/01) Method of acquisition", CodeValue{Code: c, Label: l, Offset: 7, Width: 1})
 
-	rt08 := codeLookup(holdings008ExpectedAcquisitionEndDate, s, 8, 6)
-	if rt08.Code != "" && rt08.Label == "" {
-		rt08.Label = "Date of cancellation or last expected part"
+	c, l = codeLookup(holdings008ExpectedAcquisitionEndDate, s, 8, 6)
+	if c != "" && l == "" {
+		l = "Date of cancellation or last expected part"
 	}
-	d.append("(08/04) Expected acquisition end date", rt08)
+	d.append("(08/04) Expected acquisition end date", CodeValue{Code: c, Label: l, Offset: 8, Width: 4})
 
-	d.append("(12/01) General retention policy", codeLookup(holdings008GeneralRetentionPolicy, s, 12, 1))
-	d.append("(13/01) Policy Type", codeLookup(holdings008PolicyType, s, 13, 1))
-	d.append("(14/01) Number of units", CodeValue{Code: pluckBytes(s, 14, 1), Label: ""})
-	d.append("(15/01) Unit type", CodeValue{Code: pluckBytes(s, 15, 1), Label: ""})
-	d.append("(16/01) Completeness", codeLookup(holdings008Completeness, s, 16, 1))
-	d.append("(17/03) Number of copies reported", CodeValue{Code: pluckBytes(s, 17, 3), Label: ""})
-	d.append("(20/01) Lending policy", codeLookup(holdings008LendingPolicy, s, 20, 1))
-	d.append("(21/01) Reproduction policy", codeLookup(holdings008ReproductionPolicy, s, 21, 1))
-	d.append("(22/03) Language", codeLookup(holdings008Language, s, 22, 3))
-	d.append("(25/01) Separate or composite copy report", codeLookup(holdings008SeparateOrCompositeCopyReport, s, 25, 1))
-	d.append("(26/06) Date of report", CodeValue{Code: pluckBytes(s, 26, 6), Label: ""})
+	c, l = codeLookup(holdings008GeneralRetentionPolicy, s, 12, 1)
+	d.append("(12/01) General retention policy", CodeValue{Code: c, Label: l, Offset: 12, Width: 1})
+	c, l = codeLookup(holdings008PolicyType, s, 13, 1)
+	d.append("(13/01) Policy Type", CodeValue{Code: c, Label: l, Offset: 13, Width: 1})
+	d.append("(14/01) Number of units", CodeValue{Code: pluckBytes(s, 14, 1), Label: "", Offset: 14, Width: 1})
+	d.append("(15/01) Unit type", CodeValue{Code: pluckBytes(s, 15, 1), Label: "", Offset: 15, Width: 1})
+	c, l = codeLookup(holdings008Completeness, s, 16, 1)
+	d.append("(16/01) Completeness", CodeValue{Code: c, Label: l, Offset: 16, Width: 1})
+	d.append("(17/03) Number of copies reported", CodeValue{Code: pluckBytes(s, 17, 3), Label: "", Offset: 17, Width: 3})
+	c, l = codeLookup(holdings008LendingPolicy, s, 20, 1)
+	d.append("(20/01) Lending policy", CodeValue{Code: c, Label: l, Offset: 20, Width: 1})
+	c, l = codeLookup(holdings008ReproductionPolicy, s, 21, 1)
+	d.append("(21/01) Reproduction policy", CodeValue{Code: c, Label: l, Offset: 21, Width: 1})
+	c, l = codeLookup(holdings008Language, s, 22, 3)
+	d.append("(22/03) Language", CodeValue{Code: c, Label: l, Offset: 22, Width: 3})
+	c, l = codeLookup(holdings008SeparateOrCompositeCopyReport, s, 25, 1)
+	d.append("(25/01) Separate or composite copy report", CodeValue{Code: c, Label: l, Offset: 25, Width: 1})
+	d.append("(26/06) Date of report", CodeValue{Code: pluckBytes(s, 26, 6), Label: "", Offset: 26, Width: 6})
 }
