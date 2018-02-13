@@ -81,7 +81,7 @@ func main() {
 
 			if cftag.Tag == "006" && format == "Bibliography" {
 				//tagBanner(format, cftag.Tag)
-				//makeBibliography006FormOfMaterialList(format, cftag)
+				makeBibliography006FormOfMaterialList(format, cftag)
 				continue
 			}
 			if cftag.Tag == "007" && (format == "Bibliography" || format == "Holdings") {
@@ -246,38 +246,6 @@ func makeLookupList(cfe *codegen.CfElement, varname string) {
 	fmt.Println("}")
 }
 
-/*
-func makeValidLookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
-
-	stcode := subtagCodes[fmt.Sprintf("%s\t%s", cftag, cfsubtag.Label)]
-
-	funcName := strings.Join([]string{"valid", format, cftag, stcode, "Fields"}, "")
-
-	fmt.Println()
-	if cfsubtag.Label == "DEFAULT" {
-		fmt.Printf(`// %s lists the valid fields for %s control field
-// data for %s records data`, funcName, cftag, format)
-	} else {
-		fmt.Printf(`// %s lists the valid fields for %s control field
-// data for %s records %s (%s) data`, funcName, cftag, format, cfsubtag.Label, stcode)
-	}
-
-	fmt.Println()
-	fmt.Printf("func %s() []string {\n\n", funcName)
-
-	fmt.Println("\tvalidFields := []string{")
-
-	ve := validElements(cfsubtag.Elements)
-	for _, e := range ve {
-		fieldName := fmt.Sprintf("(%02d/%02d) %s", e.Offset, e.Width, e.Name)
-		fmt.Printf("\t\t%q,\n", fieldName)
-	}
-	fmt.Println("\t}\n")
-	fmt.Println("\treturn validFields")
-	fmt.Println("}")
-}
-*/
-
 func make007LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 
 	stcode := subtagCodes[fmt.Sprintf("%s\t%s", cftag, cfsubtag.Label)]
@@ -296,24 +264,25 @@ func make007LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 	fmt.Println()
 	fmt.Printf("func %s(s string) (pd Cf007Desc) {\n\n", funcName)
 	fmt.Println("\tpd = make(Cf007Desc)\n")
-
+	fmt.Println("\tvar c string")
+	fmt.Println("\tvar l string")
 	ve := validElements(cfsubtag.Elements)
 	for _, e := range ve {
 		var varname string
 		if e.CamelName == "CategoryOfMaterial" {
 			varname = strings.ToLower(format) + cftag + e.CamelName
-
 		} else {
 			varname = strings.ToLower(format) + cftag + stcode + e.CamelName
 		}
 
 		fieldName := fmt.Sprintf("(%02d/%02d) %s", e.Offset, e.Width, e.Name)
 		if len(e.LookupValues) > 0 && e.FnType == "lookup" {
-			fmt.Printf("\tpd[%q] = codeLookup(%s, s, %d, %d)\n",
-				fieldName, varname, e.Offset, e.Width)
-		} else if e.FnType == "read" || e.FnType == "range" {
-			fmt.Printf("\tpd[%q] = CodeValue{Code: pluckBytes(s, %d, %d), Label: \"\"}\n",
+			fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, e.Offset, e.Width)
+			fmt.Printf("\tpd[%q] = CodeValue{Code: c, Label: l, Offset: %d, Width: %d}\n",
 				fieldName, e.Offset, e.Width)
+		} else if e.FnType == "read" || e.FnType == "range" {
+			fmt.Printf("\tpd[%q] = CodeValue{Code: pluckBytes(s, %d, %d), Label: \"\", Offset: %d, Width: %d}\n",
+				fieldName, e.Offset, e.Width, e.Offset, e.Width)
 		} else if len(e.LookupValues) > 0 && e.FnType == "multi" {
 			end := e.Offset + e.Width
 
@@ -323,14 +292,18 @@ func make007LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 				for i := e.Offset; i < end; i++ {
 					fn := fmt.Sprintf("%s - %d", fieldName, j)
 					j++
-					fmt.Printf("\tpd[%q] = codeLookup(%s, s, %d, %d)\n", fn, varname, i, e.CodeWidth)
+					fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, i, e.CodeWidth)
+					fmt.Printf("\tpd[%q] = CodeValue{Code: c, Label: l, Offset: %d, Width: %d}\n",
+						fn, e.Offset, e.Width)
 				}
 			} else {
 				j := 1
 				for i := e.Offset; i < end; i = i + e.CodeWidth {
 					fn := fmt.Sprintf("%s - %d", fieldName, i)
 					j++
-					fmt.Printf("\tpd[%q] = codeLookup(%s, s, %d, %d)\n", fn, varname, i, e.CodeWidth)
+					fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, i, e.CodeWidth)
+					fmt.Printf("\tpd[%q] = CodeValue{Code: c, Label: l, Offset: %d, Width: %d}\n",
+						fn, e.Offset, e.Width)
 				}
 			}
 			fmt.Println()
@@ -341,14 +314,13 @@ func make007LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 			for _, lv := range e.LookupValues {
 				if strings.Contains(lv.Code, "-") {
 
-					vn := fmt.Sprintf("rt%02d", e.Offset)
-
 					fmt.Println()
-					fmt.Printf("\t%s := codeLookup(%s, s, %d, %d)\n", vn, varname, e.Offset, e.CodeWidth)
-					fmt.Printf("\tif %s.Code != \"\" && %s.Label == \"\" {\n", vn, vn)
-					fmt.Printf("\t\t%s.Label = %q\n", vn, lv.Label)
+					fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, e.Offset, e.CodeWidth)
+					fmt.Println("\tif c != \"\" && l == \"\" {")
+					fmt.Printf("\t\tl = %q\n", lv.Label)
 					fmt.Println("\t}")
-					fmt.Printf("\tpd[%q] = %s\n", fieldName, vn)
+					fmt.Printf("\tpd[%q] = CodeValue{Code: c, Label: l, Offset: %d, Width: %d}\n",
+						fieldName, e.Offset, e.Width)
 					fmt.Println()
 
 					break
@@ -377,6 +349,8 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 
 	fmt.Println()
 	fmt.Printf("func %s(d *Cf008Desc, s string) {\n\n", funcName)
+	fmt.Println("\tvar c string")
+	fmt.Println("\tvar l string")
 
 	ve := validElements(cfsubtag.Elements)
 	for _, e := range ve {
@@ -394,11 +368,12 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 
 		fieldName := fmt.Sprintf("(%02d/%02d) %s", e.Offset, e.Width, e.Name)
 		if len(e.LookupValues) > 0 && e.FnType == "lookup" {
-			fmt.Printf("\td.append(%q, codeLookup(%s, s, %d, %d))\n",
-				fieldName, varname, e.Offset-offsetAdj, e.Width)
+			fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, e.Offset-offsetAdj, e.Width)
+			fmt.Printf("\td.append(%q, CodeValue{Code: c, Label: l, Offset: %d, Width: %d})\n",
+				fieldName, e.Offset, e.Width)
 		} else if e.FnType == "read" || e.FnType == "range" {
-			fmt.Printf("\td.append(%q, CodeValue{Code: pluckBytes(s, %d, %d), Label: \"\"} )\n",
-				fieldName, e.Offset-offsetAdj, e.Width)
+			fmt.Printf("\td.append(%q, CodeValue{Code: pluckBytes(s, %d, %d), Label: \"\", Offset: %d, Width: %d})\n",
+				fieldName, e.Offset-offsetAdj, e.Width, e.Offset, e.Width)
 		} else if len(e.LookupValues) > 0 && e.FnType == "multi" {
 			end := e.Offset - offsetAdj + e.Width
 
@@ -408,7 +383,10 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 			} else {
 				fmt.Printf("\tfor i := %d; i < %d; i = i + %d {\n", e.Offset-offsetAdj, end, e.CodeWidth)
 			}
-			fmt.Printf("\t\td.append(%q, codeLookup(%s, s, i, %d))\n", fieldName, varname, e.CodeWidth)
+			fmt.Printf("\tc, l = codeLookup(%s, s, i, %d)\n", varname, e.CodeWidth)
+
+			fmt.Printf("\t\td.append(%q, CodeValue{Code: c, Label: l, Offset: %d, Width: %d})\n",
+				fieldName, e.Offset, e.Width)
 			fmt.Println("\t}")
 			fmt.Println()
 		} else if len(e.LookupValues) > 0 && e.FnType == "hybrid" {
@@ -418,14 +396,13 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 			for _, lv := range e.LookupValues {
 				if strings.Contains(lv.Code, "-") || strings.Contains(lv.Code, "[") {
 
-					vn := fmt.Sprintf("rt%02d", e.Offset)
-
 					fmt.Println()
-					fmt.Printf("\t%s := codeLookup(%s, s, %d, %d)\n", vn, varname, e.Offset-offsetAdj, e.CodeWidth)
-					fmt.Printf("\tif %s.Code != \"\" && %s.Label == \"\" {\n", vn, vn)
-					fmt.Printf("\t\t%s.Label = %q\n", vn, lv.Label)
+					fmt.Printf("\tc, l = codeLookup(%s, s, %d, %d)\n", varname, e.Offset-offsetAdj, e.CodeWidth)
+					fmt.Println("\tif c != \"\" && l == \"\" {")
+					fmt.Printf("\t\tl = %q\n", lv.Label)
 					fmt.Println("\t}")
-					fmt.Printf("\td.append(%q, %s)\n", fieldName, vn)
+					fmt.Printf("\t\td.append(%q, CodeValue{Code: c, Label: l, Offset: %d, Width: %d})\n",
+						fieldName, e.Offset, e.Width)
 					fmt.Println()
 
 					break
@@ -433,14 +410,14 @@ func make008LookupFunc(format, cftag string, cfsubtag *codegen.CfSubtag) {
 			}
 		} else if len(e.LookupValues) > 0 && e.FnType == "hybrid-date" {
 
-			vn := fmt.Sprintf("rt%02d", e.Offset)
-
 			fmt.Println()
-			fmt.Printf("\t%s := codeLookup(%s, s, %d, 1)\n", vn, varname, e.Offset-offsetAdj)
-			fmt.Printf("\tif %s.Label == \"\" {\n", vn)
-			fmt.Printf("\t\t%s = CodeValue {Code: pluckBytes(s, %d, %d), Label: \"Date\"}\n", vn, e.Offset-offsetAdj, e.Width)
+			fmt.Printf("\tc, l = codeLookup(%s, s, %d, 1)\n", varname, e.Offset-offsetAdj)
+			fmt.Println("\tif l == \"\" {")
+			fmt.Printf("\t\tc = pluckBytes(s, %d, %d)\n", e.Offset-offsetAdj, e.Width)
+			fmt.Println("\t\tl = \"Date\"")
 			fmt.Println("\t}")
-			fmt.Printf("\td.append(%q, %s)\n", fieldName, vn)
+			fmt.Printf("\t\td.append(%q, CodeValue{Code: c, Label: l, Offset: %d, Width: %d})\n",
+				fieldName, e.Offset, e.Width)
 			fmt.Println()
 
 		}
