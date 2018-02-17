@@ -35,19 +35,6 @@ func pluckByte(b string, i int) (s string) {
 	return s
 }
 
-// pluckBytes extracts one or more bytes from a string and returns
-// the string result.
-func pluckBytes(b string, i, w int) (s string) {
-
-	if w == 0 {
-		return pluckByte(b, i)
-	}
-	if len(b) >= i+w {
-		s = b[i : i+w]
-	}
-	return s
-}
-
 // toInt converts a byte array of digits to its corresponding integer
 // value
 func toInt(b []byte) (ret int, err error) {

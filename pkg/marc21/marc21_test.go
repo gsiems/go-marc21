@@ -53,50 +53,32 @@ func TestMARC(t *testing.T) {
 		// accordingly.
 		rf := rec.RecordFormat()
 		if rf != FmtUnknown {
-			code, _ := rec.RecordStatus()
-			if code == "" {
-				t.Errorf("RecordStatus() failed")
-			}
-			code, _ = rec.RecordType()
+
+			code, _ := rec.RecordType()
 			if code == "" {
 				t.Errorf("RecordType() failed")
 			}
-			code, label := rec.CharacterCodingScheme()
+			code, _ = rec.CharacterCodingScheme()
 			if code == "" {
 				t.Errorf("CharacterCodingScheme() failed")
 			}
 
-			nc, nl := rec.LookupLeaderField("CharacterCodingScheme")
-			if code != nc || label != nl {
-				t.Errorf("LookupLeaderField(CharacterCodingScheme) failed")
+			n := rec.RecordFormatName()
+			if n == "" {
+				t.Errorf("RecordFormatName() failed")
 			}
 
-			s := rec.ValidLeaderFields()
-			if len(s) == 0 {
-				t.Errorf("ValidLeaderFields() failed")
-			}
-
-			cf8 := rec.Parse008()
-			if len(cf8) == 0 {
-				t.Errorf("rec.Parse008() failed??")
-			}
-
-			if rec.GetControlfield("007") != "" {
-				cf7 := rec.Parse007()
-				if len(cf7) == 0 {
-					t.Errorf("rec.Parse007() failed??")
-				}
+		}
+		if rf == Bibliography {
+			code, _ := rec.BibliographyMaterialType()
+			if code == "" {
+				t.Errorf("BibliographyMaterialType() failed")
 			}
 		}
 
 		out := fmt.Sprint(rec)
 		if out == "" {
 			t.Errorf("Record.Print() failed")
-		}
-
-		out = fmt.Sprint(rec.Leader)
-		if out == "" {
-			t.Errorf("Leader.Print() failed")
 		}
 	}
 }
