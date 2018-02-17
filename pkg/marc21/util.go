@@ -42,7 +42,7 @@ func pluckBytes(b string, i, w int) (s string) {
 	if w == 0 {
 		return pluckByte(b, i)
 	}
-	if len(b) > i+w {
+	if len(b) >= i+w {
 		s = b[i : i+w]
 	}
 	return s
