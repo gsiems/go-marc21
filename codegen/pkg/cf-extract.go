@@ -56,20 +56,22 @@ type CfLookupValue struct {
 // and cleaned-up linewraps, the input data. This is primarily intended
 // for testing that the parsing/extraction is working correctly.
 func (t CfTag) String() string {
-	rt := fmt.Sprintf("%s - %s\n", t.Tag, t.Label)
+	var lines []string
+
+	lines = append(lines, fmt.Sprintf("%s - %s", t.Tag, t.Label))
 
 	if len(t.Subtags) == 0 {
-		rt += "\n"
+		lines = append(lines, "")
 	}
 
 	for _, v := range t.Subtags {
 
 		if v.Label != "DEFAULT" {
-			rt += fmt.Sprintf("   %s--%s\n", t.Tag, v.Label)
+			lines = append(lines, fmt.Sprintf("   %s--%s", t.Tag, v.Label))
 		}
 
 		if len(v.Elements) > 0 {
-			rt += "     Character Positions\n"
+			lines = append(lines, "     Character Positions")
 		}
 
 		for _, v2 := range v.Elements {
@@ -79,15 +81,16 @@ func (t CfTag) String() string {
 				offset = fmt.Sprintf("%s-%02d", offset, v2.Offset+v2.Width-1)
 			}
 
-			rt += fmt.Sprintf("      %s - %s\n", offset, v2.Name)
+			lines = append(lines, fmt.Sprintf("      %s - %s", offset, v2.Name))
 
 			// codes/labels
 			for _, cv := range v2.LookupValues {
-				rt += fmt.Sprintf("         %s - %s\n", cv.Code, cv.Label)
+				lines = append(lines, fmt.Sprintf("         %s - %s", cv.Code, cv.Label))
 			}
 		}
 	}
-	return rt
+	lines = append(lines, "")
+	return strings.Join(lines, "\n")
 }
 
 // ExtractCfStruct extracts the structure for control file entries as
@@ -123,7 +126,7 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 			continue
 		}
 
-		if canIgnoreLine(line) {
+		if canIgnoreCfLine(line) {
 			continue
 		}
 
@@ -304,16 +307,6 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 	return tags
 }
 
-// calcCodeWidth determines the width of the lookup code (accounting
-// for hyphenations)
-func calcCodeWidth(c string) int {
-	if pluckBytes(c, 0, 1) == "-" {
-		return len(c)
-	}
-	e := strings.SplitN(c, "-", 2)
-	return len(e[0])
-}
-
 // isRangeCode checks the code to determine if is defining a range
 func isRangeCode(code string) bool {
 	if pluckBytes(code, 0, 1) != "-" {
@@ -324,7 +317,7 @@ func isRangeCode(code string) bool {
 	return false
 }
 
-func canIgnoreLine(line string) bool {
+func canIgnoreCfLine(line string) bool {
 	// For the few lines that we really want to ignore
 	if pluckByte(line, 0) == "#" {
 		return true
@@ -360,15 +353,4 @@ func isNotInCfBlock(line string, notInCfBlock bool) bool {
 	}
 
 	return notInCfBlock
-}
-
-// Determines if the current line is a continuation line of the previous line
-func isWrappedLine(minIndent int, line string) (isWrap bool) {
-	if minIndent > 0 {
-		t1 := strings.TrimSpace(pluckBytes(line, 0, minIndent))
-		if t1 == "" {
-			return true
-		}
-	}
-	return false
 }

@@ -57,3 +57,24 @@ func toInt(b []byte) (ret int, err error) {
 	}
 	return ret, nil
 }
+
+// Determines if the current line is a continuation line of the previous line
+func isWrappedLine(minIndent int, line string) (isWrap bool) {
+	if minIndent > 0 {
+		t1 := strings.TrimSpace(pluckBytes(line, 0, minIndent))
+		if t1 == "" {
+			return true
+		}
+	}
+	return false
+}
+
+// calcCodeWidth determines the width of the lookup code (accounting
+// for hyphenations)
+func calcCodeWidth(c string) int {
+	if pluckBytes(c, 0, 1) == "-" {
+		return len(c)
+	}
+	e := strings.SplitN(c, "-", 2)
+	return len(e[0])
+}
