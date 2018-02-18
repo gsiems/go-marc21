@@ -6,3 +6,4 @@ marcdump
 marcsplit
 marc2xml
 xml2marc
+codegen/input
