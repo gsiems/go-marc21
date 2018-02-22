@@ -43,13 +43,7 @@ type CfElement struct {
 	wrapIndent   int
 	CodeWidth    int
 	FnType       string
-	LookupValues []*CfLookupValue
-}
-
-// CfLookupValue is the definition of a single lookup value for an element
-type CfLookupValue struct {
-	Code  string
-	Label string
+	LookupValues []*LookupValue
 }
 
 // String should return a string that matches, excepting some whitespace
@@ -112,7 +106,7 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 	cfTg := new(CfTag)
 	cfSt := new(CfSubtag)
 	cfEl := new(CfElement)
-	cfLv := new(CfLookupValue)
+	cfLv := new(LookupValue)
 
 	reElem := regexp.MustCompile("^     [ ]{0,1}[0-9][0-9]")
 
@@ -186,7 +180,7 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 			if cfEl.Name != "" {
 				if cfLv.Code != "" {
 					cfEl.LookupValues = append(cfEl.LookupValues, cfLv)
-					cfLv = new(CfLookupValue)
+					cfLv = new(LookupValue)
 				}
 				cfSt.Elements = append(cfSt.Elements, cfEl)
 				cfEl = new(CfElement)
@@ -289,7 +283,7 @@ func ExtractCfStruct(filename string) (tags CfTags) {
 			}
 		}
 
-		e := new(CfLookupValue)
+		e := new(LookupValue)
 		e.Code = code
 		e.Label = label
 

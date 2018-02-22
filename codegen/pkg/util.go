@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+// LookupValue is the definition of a single lookup value for an element
+type LookupValue struct {
+	Code  string
+	Label string
+}
+
 // camelizeString removes all non-alpha-numerics from a string and
 // upper-camel cased the results
 func camelizeString(s string) (c string) {

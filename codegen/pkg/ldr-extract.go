@@ -24,13 +24,7 @@ type LdrElement struct {
 	wrapIndent   int
 	CodeWidth    int
 	FnType       string
-	LookupValues []*LdrLookupValue
-}
-
-// LdrLookupValue is the definition of a single lookup value for an element
-type LdrLookupValue struct {
-	Code  string
-	Label string
+	LookupValues []*LookupValue
 }
 
 // String should return a string that matches, excepting some whitespace
@@ -79,7 +73,7 @@ func ExtractLdrStruct(filename string) (ldr Ldr) {
 
 	//ldr = new(Ldr)
 	LdrEl := new(LdrElement)
-	LdrLv := new(LdrLookupValue)
+	LdrLv := new(LookupValue)
 
 	reElem := regexp.MustCompile("^     [ ]{0,1}[0-9][0-9]")
 
@@ -103,7 +97,7 @@ func ExtractLdrStruct(filename string) (ldr Ldr) {
 			if LdrEl.Name != "" {
 				if LdrLv.Code != "" {
 					LdrEl.LookupValues = append(LdrEl.LookupValues, LdrLv)
-					LdrLv = new(LdrLookupValue)
+					LdrLv = new(LookupValue)
 				}
 				ldr.Elements = append(ldr.Elements, LdrEl)
 				LdrEl = new(LdrElement)
@@ -176,7 +170,7 @@ func ExtractLdrStruct(filename string) (ldr Ldr) {
 			LdrEl.FnType = "lookup"
 		}
 
-		e := new(LdrLookupValue)
+		e := new(LookupValue)
 		e.Code = code
 		e.Label = label
 
